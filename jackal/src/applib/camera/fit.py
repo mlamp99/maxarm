@@ -22,12 +22,15 @@ them is the arm's error there, not hidden in a bent camera.
 3. **Edges.** Each visible edge of each cube moved onto the strongest colour edge
    beside it (`edges.py`). An outline counts only where the cube's colour is on
    its inner side: a shadow's edge, or the desk's grain, has the desk on both sides.
-4. **The arm.** The camera stays as the cubes' edges made it -- reality, the 40 mm
-   cubes its only length (the owner, 13 Nov: bending it onto the arm's readings
-   tilted the cubes and moved the base) -- and the arm is laid on it by the turn
-   and shift that best put the cubes' centres on the arm's readings, no stretch:
-   where the arm's axis stands follows from its own readings. `desk_to_true` is
-   the mirror, `true_to_pixel` the camera along the arm's x and y so laid, and
+4. **The arm, roughly.** The camera stays as the cubes' edges made it -- reality, the
+   40 mm cubes its only length (the owner, 13 Nov: bending it onto the arm's
+   readings tilted the cubes and moved the base) -- and the arm is laid on it by
+   the turn and shift that best put the cubes' centres on the arm's readings, no
+   stretch. That is only near the arm: CALIBRATE then lays it again by the base
+   the frame shows and the readings' bearings, and keeps what is left as the arm's
+   correction (`calibration/camera/anchor.py`); this lay stays as `cubes_alone`,
+   the desk space the base and the points are found in. `desk_to_true` is the
+   mirror, `true_to_pixel` the camera along the arm's x and y so laid, and
    `desk_to_pixel` names the desk point the arm must be sent to.
 5. **The cubes as seen.** Each cube where its own edges put it through that camera:
    what the check image draws, and how far each arm reading is from its cube --
@@ -94,6 +97,18 @@ class CameraNotFound(Exception):
     """The cubes were found, but no camera explains them where the arm says they stand."""
 
 
+class CubesDoNotFit(CameraNotFound):
+    """The cubes' camera was found, but the arm's readings do not lay on the cubes: `fit` is the camera the cubes'
+    edges make, `apart` each cube's distance from where the other two lay its reading (mm) and that place (true x, y
+    in `fit`), `worst` the cube furthest."""
+
+    def __init__(self, problem: str, fit: "CameraFit", apart: Dict[str, Tuple[float, np.ndarray]]) -> None:
+        self.fit, self.apart = fit, apart
+        self.worst = max(apart, key=lambda colour: apart[colour][0])
+        super().__init__(f"the {self.worst} cube stands {apart[self.worst][0]:.0f} mm from where the arm recorded it, "
+                         f"against the other two ({problem})")
+
+
 @dataclass(frozen=True)
 class Wireframe:
     """A cube as the camera sees it: its corners in pixels, the edges it shows, and those its faces hide."""
@@ -133,6 +148,9 @@ class CameraFit:
     # 2x2: the stretch and mirror a turn, shift and stretch would lay the arm on the cubes with: the arm's measure
     # against the camera's millimetres, shown, not used. None in a file written before the arm was laid without it.
     arm_stretch: Optional[np.ndarray] = None
+    # How the arm was laid on the camera by its base and the points' bearings (calibration/camera/anchor.py): its axis
+    # and turn in `cubes_alone`'s desk space, the base found, the report. None: laid by the readings alone.
+    anchor: Optional[dict] = None
 
     @property
     def desk_to_pixel(self) -> np.ndarray:
@@ -194,11 +212,13 @@ class CameraFit:
                          arm_stretch=_matrix_or_none(alone.get("arm_stretch")))
 
     def to_json(self) -> dict:
-        refinement = {"refined": self.refined, "cubes_alone": self.cubes_alone} if self.refined else {}
+        refinement = {"refined": self.refined} if self.refined else {}
+        alone = {"cubes_alone": self.cubes_alone} if self.cubes_alone is not None else {}
+        anchor = {"anchor": self.anchor} if self.anchor is not None else {}
         stretch = {} if self.arm_stretch is None else {"arm_stretch": self.arm_stretch.tolist()}
         return {"true_to_pixel": self.true_to_pixel.tolist(), "desk_to_true": self.desk_to_true.tolist(),
                 **stretch, "cubes": self.cubes, "frame_size": list(self.frame_size),
-                "edge_px": list(self.edge_px), "edges_used": self.edges_used, **refinement}
+                "edge_px": list(self.edge_px), "edges_used": self.edges_used, **refinement, **alone, **anchor}
 
     @classmethod
     def from_json(cls, stored: dict) -> "CameraFit":
@@ -207,7 +227,7 @@ class CameraFit:
                  for colour, cube in stored["cubes"].items()}
         return cls(true_to_pixel, desk_to_true, cubes, tuple(stored["frame_size"]), tuple(stored["edge_px"]),
                    stored["edges_used"], stored.get("refined"), stored.get("cubes_alone"),
-                   arm_stretch=_matrix_or_none(stored.get("arm_stretch")))
+                   arm_stretch=_matrix_or_none(stored.get("arm_stretch")), anchor=stored.get("anchor"))
 
 
 def _matrix_or_none(stored: Optional[list]) -> Optional[np.ndarray]:
@@ -276,9 +296,26 @@ def fit_camera(frame: np.ndarray, points: Points) -> CameraFit:
     params, _, found = _fit_edges(frame, naming, points, params)
     problem = stretch_problem(_desk_to_true(params))
     if problem:
-        raise CameraNotFound(f"the cubes do not stand where the arm recorded them: {problem}. Was a cube moved "
-                             f"after RECORD, or recorded off centre?")
+        fit = _result(params, points, frame, found)
+        raise CubesDoNotFit(problem, fit, _apart(fit, points))
     return _result(params, points, frame, found)
+
+
+def _apart(fit: "CameraFit", points: Points) -> Dict[str, Tuple[float, np.ndarray]]:
+    """Each cube's distance from where the other two cubes lay its reading -- a turn and shift putting their readings
+    on them as seen -- and that place, true x, y: the cube recorded wrong is the furthest."""
+    apart = {}
+    for colour in COLOURS:
+        others = [other for other in COLOURS if other != colour]
+        arm = np.array([HANDEDNESS @ np.asarray(points[other], float) for other in others])
+        seen = np.array([fit.seen_centre(other) for other in others])
+        left, _, right = np.linalg.svd((seen - seen.mean(axis=0)).T @ (arm - arm.mean(axis=0)))
+        turn = left @ right
+        if np.linalg.det(turn) < 0:
+            turn = left @ np.diag([1.0, -1.0]) @ right
+        laid = turn @ (HANDEDNESS @ np.asarray(points[colour], float) - arm.mean(axis=0)) + seen.mean(axis=0)
+        apart[colour] = (float(np.linalg.norm(laid - fit.seen_centre(colour))), laid)
+    return apart
 
 
 # --- the parameters -------------------------------------------------------

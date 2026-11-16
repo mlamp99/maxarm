@@ -1,0 +1,42 @@
+{
+  "about": "The arm's raw-to-true correction, on top of the formula (maxarm/raw.py), as the camera calibration measured it: a row per point, where the formula put the cup over the cube (its bearing, degrees, 0 straight out, + toward +x, and its reach from the base axis, mm) and how much further out (mm) and further round (degrees) the camera saw the cube, the arm's axis and turn laid on the camera by its base and the points' bearings (camera.json's `anchor`). Between the points the mesh joins them straight; beyond, each holds its nearest edge (maxarm/mesh.py). Read by maxarm/converter.py whenever it changes. Written by calibration/, CALIBRATE and SAVE.",
+  "kind": "mesh",
+  "made": "SAVE dry run",
+  "rows": [
+    {
+      "bearing_deg": -34.919,
+      "reach_mm": 243.913,
+      "further_out_mm": 4.182,
+      "further_round_deg": -0.5302,
+      "point": 1
+    },
+    {
+      "bearing_deg": 36.5739,
+      "reach_mm": 250.16,
+      "further_out_mm": 3.415,
+      "further_round_deg": 0.6325,
+      "point": 2
+    },
+    {
+      "bearing_deg": 0.159,
+      "reach_mm": 118.751,
+      "further_out_mm": 3.817,
+      "further_round_deg": -0.0097,
+      "point": 3
+    },
+    {
+      "bearing_deg": 12.5037,
+      "reach_mm": 184.896,
+      "further_out_mm": 1.992,
+      "further_round_deg": -0.2742,
+      "point": 4
+    },
+    {
+      "bearing_deg": 32.5558,
+      "reach_mm": 244.76,
+      "further_out_mm": 3.61,
+      "further_round_deg": 0.1446,
+      "point": 5
+    }
+  ]
+}

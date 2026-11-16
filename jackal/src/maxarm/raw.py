@@ -25,6 +25,13 @@ point the same way. A target's raw position
 follows from its true one directly but for the bearing, which a few rounds
 find; a reading's true z is the formula solved for it.
 
+This formula is the base model: the same for every MaxArm. `raw_position()`
+and `true_position()` -- the door every position goes through -- ask the
+converter in use (`converter.py`): by default this formula with the camera
+calibration's corrections for this arm on top (`config/arm-true.json`), or
+whatever was put in its place. `formula_raw()` and `formula_true()` are the
+formula alone.
+
 `debug_use_raw(True)` turns the correction off for the whole library: points
 in and out of `MaxArm` are then the firmware's own. For testing the firmware;
 nothing else should need it.
@@ -78,8 +85,17 @@ def is_debug_raw() -> bool:
 
 
 def raw_position(true: Position) -> Position:
-    if _is_raw:
-        return true
+    """Where the firmware is to be sent for the cup to be at `true`, as the converter in use has it."""
+    return true if _is_raw else converter.current().to_raw(true)
+
+
+def true_position(raw: Position) -> Position:
+    """Where the cup is when the firmware reads `raw`, as the converter in use has it."""
+    return raw if _is_raw else converter.current().to_true(raw)
+
+
+def formula_raw(true: Position) -> Position:
+    """The formula alone, true to raw."""
     x, y, z = true
     height = max(z - DESK_Z_MM, 0.0)
     x, y = _raw_xy(x, y, height)
@@ -88,10 +104,9 @@ def raw_position(true: Position) -> Position:
     return (x, y, z - TRUE_Z_PER_MM_OF_REACH * out - _wave(reach) + _too_tall_per_mm2(out) * height ** 2)
 
 
-def true_position(raw: Position) -> Position:
-    """The formula solved for true z -- the height h is what reach alone makes it, less k h^2 -- then x and y."""
-    if _is_raw:
-        return raw
+def formula_true(raw: Position) -> Position:
+    """The formula alone, raw to true: solved for true z -- the height h is what reach alone makes it, less k h^2 --
+    then x and y."""
     x, y, z = raw
     reach = math.hypot(x, y)
     out = reach - LEVEL_REACH_MM
@@ -159,3 +174,6 @@ def _further_out(height: float) -> float:
 def _further_round(bearing: float) -> float:
     """Radians: how much further round the base points than the firmware's `bearing` (radians) says."""
     return math.radians(_between(TURN_DEG, math.degrees(bearing)))
+
+
+from . import converter  # noqa: E402  (last: converter.py reads the formula above)

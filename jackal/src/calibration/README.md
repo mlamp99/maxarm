@@ -100,17 +100,20 @@ button tells the same story as this section, for whoever is at the arm; the firs
    `config/camera-points.json`. RECORD AGAIN replaces it.
 4. **CALIBRATE**, once all three are recorded: the arm goes home, out of the picture, five fresh frames of the live
    view, at the camera's full size, are averaged -- under 2 s -- and the camera is fitted to the cubes in them,
-   about 2 s more. `config/camera.json` is written, with the frame beside it as
-   `config/camera-frame.png`, and the check image shows the fit: the cubes' outlines, yellow and half see-through
+   about 2 s more, to the cubes' readings by the formula alone, so no earlier correction gets in. The arm's base is
+   found in the frame by its nuts, and the arm laid on the camera: its axis where the nuts put it, its turn from the
+   cubes' bearings (`camera/anchor.py`) -- the frame SAVE keeps. `config/camera.json` is written, with the frame
+   beside it as `config/camera-frame.png`, and `config/arm-true.json`, the arm's correction the three cubes make,
+   which the library converts with at once. A cube whose reach is more than 5 mm off what the other two say does
+   not fit: CALIBRATE names it and leaves it out -- record it again and CALIBRATE. The check image shows the fit:
+   the cubes' outlines, yellow and half see-through
    -- fainter still the edges their faces hide, and an X across each one's bottom, crossing under its centre, a
    pixel wide so that the cube's own edge shows -- the arm's
    suction cups in cyan where the calibration puts them, a dot every 50 mm of desk, and the reach. If the cubes
-   cannot all be found, or do not stand where the arm recorded them, nothing is written, and the check image shows
-   what was found.
-5. **VALIDATE CALIBRATION** parks the arm the same way, takes a new frame and draws the saved calibration on it. If
-   the cubes are still there it fits them again and says how far apart the two put the desk: more than 2 mm
-   anywhere in reach, and the camera has probably moved. Click the check image to see it full size, and click that
-   for actual size.
+   cannot all be found, or one does not stand where the arm recorded it against the other two, nothing is written,
+   and the check image shows what was found. A cube that does not fit is outlined in thick red, a red cross and
+   arrow where the arm recorded it. What came of CALIBRATE stays in words beside the check image until the next,
+   and the button shows **!** when it failed or a cube did not fit.
 
 | control                 | does                                                                                 |
 | ----------------------- | ------------------------------------------------------------------------------------ |
@@ -124,13 +127,12 @@ button tells the same story as this section, for whoever is at the arm; the firs
 | RECORD, go, ×           | keep a cube's point; back over it, from above; forget it                             |
 | ? GUIDE                 | how to place the camera and the cubes: `web/camera/guide.md`                         |
 | CALIBRATE               | park the arm, take the frame, fit `camera.json` to the cubes in it                   |
-| VALIDATE CALIBRATION    | park the arm, take a new frame, draw the calibration on it; has the camera moved?    |
 | RESET                   | stop, let go, lift clear of the desk and of the cubes, and home                      |
 
 **How it moves.** Desk space throughout, through the saved `desk.json` or the default desk. Below 60 mm over the
 desk every move is slow: the cubes are there. A grid click from lower goes slowly straight up first, fast across
-at 60, then down to the notch; a new height comes straight down, fast to 60 and slowly on, and ends *precise*. CALIBRATE,
-VALIDATE and RESET all park the same way: slowly up to 10 mm over the desk if lower, fast on up to 60, then home.
+at 60, then down to the notch; a new height comes straight down, fast to 60 and slowly on, and ends *precise*.
+CALIBRATE and RESET park the same way: slowly up to 10 mm over the desk if lower, fast on up to 60, then home.
 
 **How the camera is fitted** (`applib/camera/cubes.py`, `fit.py`). Every decision is measured in the frame itself, so
 another camera, light or desk needs nothing retuned. The cubes are the blobs whose colour stands out from the
@@ -220,16 +222,17 @@ once FIND RED CUBE or ARM TO DESK has brought the cup down (below). Every rim is
    spread over where pieces will go -- the dashed circle on the grid and in the live view is the place in reach and in
    view furthest from every point so far. Each point says how far the arm's
    reading is from the cube as the camera sees it, across the desk (*XY*), and how far from 40 mm tall the camera
-   sees the cube (*Z*, + taller): through the three cubes' calibration, *off at CALIBRATE* -- for its three
-   cubes the miss its turn and shift leave, for a later point how well CALIBRATE foresaw it -- and through the one
-   SAVE would write, *after SAVE*: the point left out, how far its reading is from where the others put it; in the
-   live view the point's dot is that place, its ring the cube. Green within 1.5 mm, yellow within 2.5, red beyond; the point's circle on the grid
-   takes the colour of its XY, as on the desk page. One point far off while the others are not: in XY the cup was
-   off the cube's centre or its edges were found wrong, in Z the snapshot's edges were not all the cube's; forget
-   it and record it again. **SAVE CALIBRATION**, from four points on, writes `camera.json` with the camera fitted
-   with every point's cube where the arm read it, and redraws the camera page's check image with it, on the
-   calibration's own frame; its line says how the camera measures the arm's distances. With no points left, it
-   puts back the three cubes' own calibration.
+   sees the cube (*Z*, + taller): *now*, through the saved calibration and the arm's correction as the library
+   converts with it -- a point in the saved correction is 0 -- and *without it*: how far its reading, through the
+   mesh of the other points, is from its cube; in the live view the point's dot is that place, its ring the cube.
+   Green within 1.5 mm, yellow within 2.5, red beyond; the point's circle on the grid takes the colour of its XY now,
+   as on the desk page. A point whose reach is more than 5 mm off what the others say does not fit (`anchor.py`): its
+   badge is red, and SAVE names it and leaves it out -- its cube moved after RECORD, or the cup was off it; forget
+   it and record it again. In Z one far off says the snapshot's edges were not all the cube's. **SAVE
+   CALIBRATION**, from four points on, keeps the camera and the arm's frame on it as CALIBRATE laid them -- the
+   axis where it found the base, the turn from the cubes' bearings -- writes `arm-true.json`, the mesh of the points
+   that fit, and `camera.json` with its report, and redraws the camera page's check image with it, on the
+   calibration's own frame. With no points left, it puts back the three cubes' own calibration, no correction.
 4. **DESK GRID**, a switch beside GUIDES, off unless turned on: desk space itself drawn on the desk over the live
    view, a thin pale line every 10 mm out past the reach, every 50 mm a little stronger, and the two lines through
    the arm's turning axis, x = 0 and y = 0, stronger still. Lay grid paper along it: where the camera is right, the
@@ -247,7 +250,7 @@ once FIND RED CUBE or ARM TO DESK has brought the cup down (below). Every rim is
 | RECORD POINT           | keep where the arm says the cup is, park the arm, see the cube in the snapshot; then  |
 |                        | the snapshot zoomed in on the cube, and UNDO, REDO (look again, tweaked), KEEP        |
 | ×, CLEAR               | forget a point; all of them                                                           |
-| SAVE CALIBRATION       | `camera.json`: the camera fitted with every point's cube where the arm read it        |
+| SAVE CALIBRATION       | `arm-true.json`, the mesh of the points that fit; `camera.json`'s frame kept          |
 
 **How the red cube is found** (`applib/camera/locate.py`; the arm brought over it, `applib/redcube.py`; drawn,
 `applib/overlay/cube.py`, as the app's `find-cube` finds and draws it). The camera is the calibration's, held still:
@@ -276,9 +279,7 @@ refuses a cup that is not over a cube's top (40 to 60 mm over the desk) and a cu
 a cube from where the arm said the cup was; nothing is recorded then. The points belong to the camera as
 CALIBRATE fitted it: a new CALIBRATE sets them aside, in `camera-refine-points-previous.json`, and writes its
 three cubes as the new points 1, 2 and 3. A file from before the cubes were points gets them once, its points
-numbered on after them. VALIDATE
-CALIBRATION, on the camera page, compares a new frame with the three cubes' own calibration, which `camera.json`
-keeps beside the refined one, so a refinement does not read as a camera moved.
+numbered on after them.
 
 **How a click becomes a desk point.** The calibration at desk height 0, inverted: a point of the picture is a ray,
 and the desk is where it meets it. The page draws with the calibration as shares of the picture's width and
@@ -386,7 +387,7 @@ From the pilot's root:
 | ---------------------- | --------------------------------------------------------------------------------------- |
 | `src/calibration/`     | the app (`calibration.py`) and each page's requests: `common/` the web server, the     |
 |                        | arm's one thread (`worker.py`) and its controls (`arm_api.py`); `desk/` the plane and  |
-|                        | its files; `camera/` CALIBRATE and VALIDATE, the check image (`check.py`), the          |
+|                        | its files; `camera/` CALIBRATE, the check image (`check.py`), the                       |
 |                        | refinement (`refine.py`); `tests/` Fine Tune; `tiles/` the Tiles page                   |
 | `web/`                 | the pages: `common/` the look, the view from above with the height beside it (`grid.js`,|
 |                        | `view.css`, `height.js`), desk space to the picture and back (`shares.js`), the marks  |

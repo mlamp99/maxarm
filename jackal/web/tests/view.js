@@ -91,6 +91,7 @@ export class LiveMarks extends ViewMarks {
       ctx.stroke();
       if (row.put) {
         const [px, py] = [row.put[0] * this.width, row.put[1] * this.height];
+        ctx.strokeStyle = RANK_INK[rank(row.off.without, limits.tests.refine.off)];
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(x, y);

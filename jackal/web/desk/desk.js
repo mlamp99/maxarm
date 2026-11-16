@@ -78,15 +78,62 @@ const furtherOut = (height) => TRUE_XY.reach_at_desk
 const furtherRound = (bearing) => (Math.PI / 180) * between(TRUE_XY.turn, (bearing * 180) / Math.PI);
 // x and y from reach and bearing: 0 straight out (-y), positive toward +x.
 const fromPolar = (reach, bearing) => [reach * Math.sin(bearing), -reach * Math.cos(bearing)];
+// The camera calibration's correction on top of the formula (maxarm/mesh.py), as the server had it when the page
+// loaded: further out (mm) and further round (degrees), straight across the mesh's triangles, beyond it its nearest
+// edge. Null: the formula alone. A CALIBRATE or SAVE since shows after a reload.
+const MESH = TRUE_XY.mesh;
+const TO_RAW_ROUNDS = 8;
+function meshValue(bearing, reach) {
+  const { plane, values, triangles, edges, scale } = MESH;
+  if (values.length === 1) return values[0];
+  const here = [bearing * scale, reach];
+  const blend = (weights, corners) => [0, 1].map((k) => corners.reduce((sum, c, i) => sum + weights[i] * values[c][k], 0));
+  for (const [a, b, c] of triangles) {
+    const [ax, ay] = plane[a];
+    const [ux, uy, vx, vy] = [plane[b][0] - ax, plane[b][1] - ay, plane[c][0] - ax, plane[c][1] - ay];
+    const det = ux * vy - uy * vx;
+    const s = ((here[0] - ax) * vy - (here[1] - ay) * vx) / det;
+    const t = (ux * (here[1] - ay) - uy * (here[0] - ax)) / det;
+    if (Math.min(1 - s - t, s, t) >= -1e-9) return blend([1 - s - t, s, t], [a, b, c]);
+  }
+  let best = null;
+  for (const [a, b] of edges) {
+    const [dx, dy] = [plane[b][0] - plane[a][0], plane[b][1] - plane[a][1]];
+    const share = Math.min(Math.max(((here[0] - plane[a][0]) * dx + (here[1] - plane[a][1]) * dy)
+      / Math.max(dx * dx + dy * dy, 1e-12), 0), 1);
+    const gap = Math.hypot(plane[a][0] + share * dx - here[0], plane[a][1] + share * dy - here[1]);
+    if (!best || gap < best.gap) best = { gap, value: blend([1 - share, share], [a, b]) };
+  }
+  return best.value;
+}
+// The formula's true x, y corrected by the mesh.
+function meshed([x, y]) {
+  const reach = Math.hypot(x, y);
+  if (!MESH || reach < 1) return [x, y];
+  const bearing = Math.atan2(x, -y);
+  const [out, round] = meshValue(bearing, reach);
+  return fromPolar(reach + out, bearing + (round * Math.PI) / 180);
+}
+// The formula's true x, y that the mesh corrects to [x, y]: found by repeating.
+function unmeshed([x, y]) {
+  if (!MESH) return [x, y];
+  let estimate = [x, y];
+  for (let round = 0; round < TO_RAW_ROUNDS; round += 1) {
+    const there = meshed(estimate);
+    estimate = [estimate[0] + x - there[0], estimate[1] + y - there[1]];
+  }
+  return estimate;
+}
 // The true x and y of the firmware's, at true height z.
 function trueXY([x, y], z) {
   const reach = Math.hypot(x, y);
   if (reach === 0) return [x, y];
   const bearing = Math.atan2(x, -y);
-  return fromPolar(reach + furtherOut(Math.max(z - TRUE_Z.desk_z, 0)), bearing + furtherRound(bearing));
+  return meshed(fromPolar(reach + furtherOut(Math.max(z - TRUE_Z.desk_z, 0)), bearing + furtherRound(bearing)));
 }
-function rawPoint([x, y, z]) {
+function rawPoint([trueX, trueY, z]) {
   const height = Math.max(z - TRUE_Z.desk_z, 0);
+  const [x, y] = unmeshed([trueX, trueY]);
   const reach = Math.hypot(x, y);
   const bearing = Math.atan2(x, -y);
   let rawBearing = bearing;

@@ -5,14 +5,16 @@
   their faces hide, and an X across each one's bottom under its centre, fainter. On a frame taken later, a
   cube standing anywhere else, or a camera nudged since, shows as the outline off
   its cube.
-- The arm's base, where the calibration puts it, its sizes the owner's
-  (work/PILOT-kiwi-idea.md): the four suction cups' rims, 42 mm across, flush on the
-  desk, in cyan; the screw nuts at their centres on a 120 mm square round the arm's
-  axis -- the hex, 7 mm across its flats, from the plate's top 10 mm up to 13, and
-  the rounded tip, 5 mm across narrowing to 4, up to 18 -- in magenta; the base
-  plate's four straight central edges, 124.5 mm apart, 10 mm up, in white. Away
-  from the cubes, this is the one check of the calibration the arm always brings
-  along.
+- The arm's base, where the calibration puts it -- round the arm's axis, turned as
+  the arm's x and y are -- its sizes the owner's (work/PILOT-kiwi-idea.md): the four
+  suction cups' rims, 42 mm across, flush on the desk, in cyan; the screw nuts at
+  their centres on a 120 mm square round the arm's axis -- the hex, 7 mm across its
+  flats, from the plate's top 10 mm up to 13, and the rounded tip, 5 mm across
+  narrowing to 4, up to 18 -- in magenta; the base plate's four straight central
+  edges, 124.5 mm apart, 10 mm up, in white. CALIBRATE sets the axis by the base's
+  nuts and the turn by the points' bearings, so the drawing sits off the base by
+  as much as those two disagree (`anchor.py`'s report). Away from the cubes, this
+  is the one check of the calibration the arm always brings along.
 - Desk coordinates: a dot every 50 mm within reach, labelled every 100 mm.
 - The reach on the desk: 95 mm in orange, 270 mm in red, across the arm's fan.
 - No text over the picture (the owner): the page says what the calibration is and
@@ -31,9 +33,10 @@ import numpy as np
 from maxarm.geometry import BASE_FAN_DEG, bearing_degrees
 from maxarm.path import REACH_MAX_MM, REACH_MIN_MM
 
+from applib.camera import base
 from applib.camera.cubes import COLOURS, Blob, is_warm
 from applib.camera.fit import CameraFit
-from applib.camera.model import project
+from applib.camera.model import CUBE_MM, project
 
 YELLOW = (63, 210, 255)                 # BGR, as OpenCV draws: every cube's wireframe, as the overlay draws it
 PINK = (255, 0, 255)                    # the blobs that could have been cubes, when no calibration comes of a frame
@@ -45,16 +48,12 @@ OUTLINE_OPACITY = 0.5                   # the cubes' outlines, a pixel wide: the
 HIDDEN_OPACITY = 0.25                   # the edges a cube hides, and the X under its centre: there, not in the way
 DOT_STEP_MM = 50
 LABEL_STEP_MM = 100
-# The MaxArm's base: a suction cup at each corner of a square round the arm's axis, its sides along the arm's x and y.
-# The arm's base (the owner, work/PILOT-kiwi-idea.md), mm, round the arm's axis, sides along its x and y.
-BASE_CUP_SPACING_MM = 120.0       # the screw nuts' centres, and the cups' on them
-BASE_CUP_RADIUS_MM = 21.0         # 162 mm across the outer rims, flush on the desk
-PLATE_TOP_MM = 10.0
-NUT_TOP_MM = 13.0                 # the hex, 3 mm tall on the plate
-NUT_HALF_MM = 3.5                 # 7 mm across the flats
-TIP_BOTTOM_HALF_MM, TIP_TOP_HALF_MM, TIP_TOP_MM, TIP_MM = 2.5, 2.0, 17.0, 18.0
-PLATE_EDGE_MM = 124.5             # the plate's straight central edges apart
-PLATE_EDGE_HALF_MM = 28.0         # each straight for this either side of its middle
+# The MaxArm's base (the owner, work/PILOT-kiwi-idea.md; applib/camera/base.py), mm, round the arm's axis.
+BASE_CUP_SPACING_MM, BASE_CUP_RADIUS_MM = base.CUP_SPACING_MM, base.CUP_RADIUS_MM
+PLATE_TOP_MM, NUT_TOP_MM, NUT_HALF_MM = base.PLATE_TOP_MM, base.NUT_TOP_MM, base.NUT_HALF_MM
+TIP_BOTTOM_HALF_MM, TIP_TOP_HALF_MM, TIP_TOP_MM, TIP_MM = (base.TIP_BOTTOM_HALF_MM, base.TIP_TOP_HALF_MM,
+                                                           base.TIP_TOP_MM, base.TIP_MM)
+PLATE_EDGE_MM, PLATE_EDGE_HALF_MM = base.PLATE_EDGE_MM, base.PLATE_EDGE_HALF_MM
 MAGENTA = (255, 0, 255)
 LEGEND = (f"yellow: the cubes as seen, fainter where hidden, X under the centre   cyan: the base's suction cups   "
           f"orange, red: the reach on the desk, {REACH_MIN_MM:.0f} and {REACH_MAX_MM:.0f} mm   "
@@ -78,6 +77,38 @@ def draw(frame: np.ndarray, fit: CameraFit, caption: Sequence[str]) -> np.ndarra
         for start, end in (pair for cube in lines for pair in cube):
             cv2.line(drawn, _pixel(start), _pixel(end), YELLOW, 1, cv2.LINE_AA)
         image = cv2.addWeighted(drawn, opacity, image, 1 - opacity, 0)
+    return image
+
+
+def mark(image: np.ndarray, fit: CameraFit, colour: str, label: str, recorded: Optional[np.ndarray] = None,
+         caption: Sequence[str] = ()) -> np.ndarray:
+    """The cube that does not fit, made plain: its outline in thick red, `label` beside it in large letters, a red
+    cross where the arm's reading puts it (`recorded`, true x, y in `fit`, at the cube's top) with an arrow from the
+    cube to it; and `caption` across the top."""
+    image = image.copy()
+    line = max(1, round(image.shape[1] / 1300))
+    cube = fit.wireframe(colour)
+    for start, end in cube.seen_lines + cube.hidden_lines:
+        cv2.line(image, _pixel(start), _pixel(end), RED, 3 * line, cv2.LINE_AA)
+    top = project(fit.true_to_pixel, np.array([[*fit.seen_centre(colour), CUBE_MM]]))[0]
+    if recorded is not None:
+        there = project(fit.true_to_pixel, np.array([[*recorded, CUBE_MM]]))[0]
+        cv2.arrowedLine(image, _pixel(top), _pixel(there), RED, 2 * line, cv2.LINE_AA, tipLength=0.3)
+        cv2.drawMarker(image, _pixel(there), RED, cv2.MARKER_CROSS, 28 * line, 3 * line, cv2.LINE_AA)
+    if caption:
+        _caption(image, caption)
+    corners = cube.corners
+    scale = image.shape[1] / 1600
+    thickness = max(2, round(2.5 * scale))
+    (width, height), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, scale, thickness)
+    x = min(corners[:, 0].max() + 20 * line, image.shape[1] - width - 10)
+    y = corners[:, 1].min() + height
+    if y - height < 110 * scale:                     # under the caption's band: below the cube instead
+        x, y = max(10, min(corners[:, 0].min(), image.shape[1] - width - 10)), corners[:, 1].max() + height + 20 * line
+    origin = _pixel((x, y))
+    cv2.rectangle(image, (origin[0] - 8, origin[1] - height - 10), (origin[0] + width + 8, origin[1] + 12),
+                  (0, 0, 0), -1)
+    cv2.putText(image, label, origin, cv2.FONT_HERSHEY_SIMPLEX, scale, RED, thickness, cv2.LINE_AA)
     return image
 
 

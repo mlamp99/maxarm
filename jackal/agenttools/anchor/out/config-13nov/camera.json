@@ -1,0 +1,362 @@
+{
+  "about": "Desk space to camera pixels: pixel ~ desk_to_pixel @ [x, y, z, 1], desk mm, z the height above the desk. It holds for frames of frame_size only, from a camera that has not moved. Fitted by calibration/, the camera page, to the three 40 mm cubes in camera-frame.png, each standing where camera-points.json says the arm read the cup over it, its millimetres real ones: true_to_pixel is the camera, in true mm along the arm's x and y; desk_to_true takes the arm's x, y to true mm: the board's mirror. arm_stretch is the stretch a turn, shift and stretch would take between the arm's readings and the cubes where their own edges put them, the arm's measure against the camera's, shown, not used. desk_to_pixel is the two together. `anchor` says how the arm is laid on the camera: its axis where the base's nuts put it, its turn from the points' bearings, in the desk space of `cubes_alone` -- the camera with the arm laid on the three cubes' readings alone -- and how each thing trusted fitted; what is left at each point is the arm's correction, arm-true.json. `refined`, if there, says SAVE laid it with every point in camera-refine-points.json: how many, and each point's miss through the tie and correction the others make. `lens` is the camera it was calibrated with, as it calls itself, and the focus it was held at (focus_absolute): the live view holds that camera at it, since focusing moves the picture.",
+  "desk_to_pixel": [
+    [
+      -154.39152181523096,
+      -901.8898059251349,
+      -2125.331633285104,
+      397596.9554041482
+    ],
+    [
+      672.0768407469313,
+      1549.3877132228663,
+      -1181.6865733018735,
+      505114.7472683686
+    ],
+    [
+      -0.6786617849351562,
+      0.2742054307467325,
+      -0.6813439391508718,
+      435.60275316281883
+    ]
+  ],
+  "lens": {
+    "camera": "HD Pro Webcam C920",
+    "focus": 50,
+    "mode": {
+      "format": "YUYV",
+      "size": [
+        2560,
+        1472
+      ]
+    }
+  },
+  "true_to_pixel": [
+    [
+      154.39152181523096,
+      -901.8898059251349,
+      -2125.331633285104,
+      397596.9554041482
+    ],
+    [
+      -672.0768407469313,
+      1549.3877132228663,
+      -1181.6865733018735,
+      505114.7472683686
+    ],
+    [
+      0.6786617849351562,
+      0.2742054307467325,
+      -0.6813439391508718,
+      435.60275316281883
+    ]
+  ],
+  "desk_to_true": [
+    [
+      -1.0,
+      0.0
+    ],
+    [
+      0.0,
+      1.0
+    ]
+  ],
+  "arm_stretch": [
+    [
+      -1.029603049122889,
+      -0.0024559086778854363
+    ],
+    [
+      0.002455908677885435,
+      0.9728567585071012
+    ]
+  ],
+  "cubes": {
+    "blue": {
+      "x": -139.62,
+      "y": -200.0,
+      "turn_deg": 47.94,
+      "pixel": [
+        1260.03,
+        199.376
+      ]
+    },
+    "green": {
+      "x": 149.06,
+      "y": -200.9,
+      "turn_deg": 75.24,
+      "pixel": [
+        2013.569,
+        1069.112
+      ]
+    },
+    "red": {
+      "x": 0.33,
+      "y": -118.75,
+      "turn_deg": 56.38,
+      "pixel": [
+        1264.604,
+        785.075
+      ]
+    }
+  },
+  "frame_size": [
+    2560,
+    1472
+  ],
+  "edge_px": [
+    0.6833199444508438,
+    1.937241318035948
+  ],
+  "edges_used": 621,
+  "refined": {
+    "points": 5,
+    "off_mm": [
+      2.0,
+      2.8
+    ],
+    "height_mm": [
+      0.13,
+      0.42
+    ]
+  },
+  "cubes_alone": {
+    "true_to_pixel": [
+      [
+        157.47548721040948,
+        -901.3564416854991,
+        -2125.331633285104,
+        399799.70326185995
+      ],
+      [
+        -677.3725117119113,
+        1547.0798447822451,
+        -1181.6865733018735,
+        501088.48542229686
+      ],
+      [
+        0.6777199090981653,
+        0.27652515508421277,
+        -0.6813439391508718,
+        435.3648002989221
+      ]
+    ],
+    "desk_to_true": [
+      [
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "arm_stretch": [
+      [
+        -1.029603049122889,
+        -0.0024559086778854363
+      ],
+      [
+        0.002455908677885435,
+        0.9728567585071012
+      ]
+    ],
+    "cubes": {
+      "blue": {
+        "x": -139.62,
+        "y": -200.0,
+        "turn_deg": 47.94,
+        "pixel": [
+          1260.03,
+          199.376
+        ]
+      },
+      "green": {
+        "x": 149.06,
+        "y": -200.9,
+        "turn_deg": 75.24,
+        "pixel": [
+          2013.569,
+          1069.112
+        ]
+      },
+      "red": {
+        "x": 0.33,
+        "y": -118.75,
+        "turn_deg": 56.38,
+        "pixel": [
+          1264.604,
+          785.075
+        ]
+      }
+    }
+  },
+  "anchor": {
+    "axis": [
+      0.603,
+      2.338
+    ],
+    "turn_deg": -0.196,
+    "base": {
+      "x": 1.546,
+      "y": 1.211,
+      "turn_deg": 0.4149,
+      "by_nuts": true,
+      "shape": [
+        -1.7,
+        2.8,
+        1.1
+      ],
+      "parts": [
+        {
+          "name": "nut +x+y",
+          "found": false,
+          "x": 57.137,
+          "y": 63.941,
+          "contrast": 0.0,
+          "off_mm": null
+        },
+        {
+          "name": "cup +x+y",
+          "found": false,
+          "x": 57.137,
+          "y": 63.941,
+          "contrast": 0.72,
+          "off_mm": null
+        },
+        {
+          "name": "nut +x-y",
+          "found": true,
+          "x": 62.041,
+          "y": -58.437,
+          "contrast": 0.773,
+          "off_mm": 0.104
+        },
+        {
+          "name": "cup +x-y",
+          "found": true,
+          "x": 61.741,
+          "y": -59.737,
+          "contrast": 0.47,
+          "off_mm": 1.404
+        },
+        {
+          "name": "nut -x-y",
+          "found": true,
+          "x": -60.637,
+          "y": -58.041,
+          "contrast": 0.62,
+          "off_mm": 2.873
+        },
+        {
+          "name": "cup -x-y",
+          "found": false,
+          "x": -60.537,
+          "y": -58.341,
+          "contrast": 0.314,
+          "off_mm": null
+        },
+        {
+          "name": "nut -x+y",
+          "found": false,
+          "x": -62.841,
+          "y": 61.637,
+          "contrast": 0.563,
+          "off_mm": null
+        },
+        {
+          "name": "cup -x+y",
+          "found": false,
+          "x": -62.841,
+          "y": 61.637,
+          "contrast": 0.087,
+          "off_mm": null
+        }
+      ]
+    },
+    "report": {
+      "points": 5,
+      "axis": [
+        0.6,
+        2.34
+      ],
+      "turn_deg": -0.196,
+      "base": {
+        "axis_off_mm": 1.47,
+        "turn_off_deg": -0.611
+      },
+      "rows": [
+        {
+          "id": 1,
+          "bearing": -34.92,
+          "reach": 243.9,
+          "out_mm": 4.18,
+          "across_mm": -2.3,
+          "across_spreads": 1.54
+        },
+        {
+          "id": 2,
+          "bearing": 36.57,
+          "reach": 250.2,
+          "out_mm": 3.42,
+          "across_mm": 2.8,
+          "across_spreads": 1.74
+        },
+        {
+          "id": 3,
+          "bearing": 0.16,
+          "reach": 118.8,
+          "out_mm": 3.82,
+          "across_mm": -0.02,
+          "across_spreads": 0.03
+        },
+        {
+          "id": 4,
+          "bearing": 12.5,
+          "reach": 184.9,
+          "out_mm": 1.99,
+          "across_mm": -0.89,
+          "across_spreads": 1.03
+        },
+        {
+          "id": 5,
+          "bearing": 32.56,
+          "reach": 244.8,
+          "out_mm": 3.61,
+          "across_mm": 0.63,
+          "across_spreads": 0.42
+        }
+      ],
+      "typical_out_mm": 3.61,
+      "turns_axis": {
+        "axis": [
+          0.56,
+          5.36
+        ],
+        "off_mm": 3.02,
+        "sure_mm": 1.63,
+        "turn_deg": -0.343
+      },
+      "reach_axis": {
+        "axis": [
+          -0.03,
+          -1.21
+        ],
+        "off_mm": 3.61,
+        "sure_mm": 0.75,
+        "turn_deg": 0.134
+      },
+      "left_out_mm": {
+        "1": 2.8,
+        "2": 2.2,
+        "3": 1.71,
+        "4": 2.0,
+        "5": 1.68
+      },
+      "worst": {
+        "what": "point 4 out, from the points' typical +3.6",
+        "spreads": 1.9
+      }
+    }
+  }
+}

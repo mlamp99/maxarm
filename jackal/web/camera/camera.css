@@ -56,12 +56,23 @@ main.camera {
 
 /* --- the check image ---------------------------------------------------- */
 
-.calibrate-row { display: flex; gap: 10px; margin: 14px 0 6px; }
-.calibrate-row #calibrate { flex: 1; padding: 10px 14px; font-size: 14px; letter-spacing: 1.2px; }
-.calibrate-row #validate { letter-spacing: 0.6px; }
-
-.check-row { display: grid; grid-template-columns: 176px 1fr; gap: 14px; align-items: center; margin-top: 12px;
+.check-row { display: grid; grid-template-columns: 176px 1fr; gap: 14px; align-items: start; margin-top: 12px;
   padding-top: 12px; border-top: 1px solid var(--line); }
+.check-side { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.check-side #calibrate { position: relative; padding: 10px 14px; font-size: 14px; letter-spacing: 1.2px; }
+.alert-mark { display: inline-grid; place-items: center; width: 20px; height: 20px; margin-left: 10px;
+  border-radius: 50%; background: var(--red); color: #fff; font-weight: 800; font-size: 13px; letter-spacing: 0;
+  vertical-align: 1px; box-shadow: 0 0 10px var(--red); }
+.alert-mark.warn { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
+.outcome { padding: 9px 11px; border-radius: 8px; font-size: 13px; line-height: 1.5; color: var(--text);
+  border: 1px solid var(--line-strong); background: var(--panel-raised); }
+.outcome b { display: block; margin-bottom: 2px; }
+.outcome .todo { display: block; margin-top: 4px; color: var(--muted); }
+.outcome.fail { border-color: var(--red); background: var(--red-wash); }
+.outcome.fail b { color: var(--red); }
+.outcome.warn { border-color: var(--orange); background: rgba(240, 140, 60, 0.12); }
+.outcome.warn b { color: var(--orange); }
+.outcome.ok b { color: var(--green-bright); }
 .check-box { position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; padding: 0; overflow: hidden;
   border-radius: 8px; background: #05070a; border: 1px solid var(--line-strong); cursor: zoom-in; }
 .check-box img { display: block; width: 100%; height: 100%; object-fit: cover; }

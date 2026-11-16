@@ -171,15 +171,20 @@
     </div>
     <div class="refine-body">
       <div class="refine-how">
-        <p>CALIBRATE's three cubes put the camera roughly in place, each where the arm read it, and are points 1, 2 and
-          3; the red cube's points all over the desk then make it. SAVE fits the camera with every point's cube,
-          40 mm each, where the arm read the cup over it, its millimetres taken as real: the arm's distances between
-          the points are the camera's measure, the cubes their shape. XY after SAVE is how far a point's cube, as the
-          camera the other points make sees it, is from its reading: the point left out. In the live view a point's
-          ring is where the camera saw its cube, its dot its reading. Z is how far from 40 mm tall the camera sees
-          its cube. One point far off while the others are not: the cup was off the cube's centre, the reading off,
-          or the cube's edges were not found right. RECORD POINT shows the snapshot zoomed in on the cube: REDO looks
-          again, UNDO forgets it. Forget a point (×), a cube's too, and record it again near there.
+        <p>CALIBRATE fits the camera to the three cubes' edges alone -- reality, 40 mm cubes its only length -- finds
+          the arm's base by its nuts, and lays the arm on the camera: its axis where the nuts are, its turn from the
+          cubes' bearings. What is left at each point -- the cube further out or further round than the arm read it
+          -- is the arm's correction, which the library converts with from then on. CALIBRATE's three cubes are
+          points 1, 2 and 3; the red cube's points all over the desk then add to it, and SAVE writes the correction
+          all of them make: a mesh of the points, exact at each (XY off now 0), the camera and the arm's frame on it
+          kept as CALIBRATE laid them, so a point changes the correction only round itself. "Without it" is how far a point's cube is
+          from its reading through the mesh of the other points: how well the mesh does between points. A point whose
+          reach is more than 5 mm off what the others say does not fit -- its badge red: its cube moved after RECORD
+          or the cup was off it -- and SAVE leaves it out. It shows from 4 points on. In the live view a point's ring
+          is where the camera saw its cube, its dot its reading. Z is how far from 40 mm tall the camera sees its
+          cube. One point far off while the others are not: the cup was off the cube's centre, the reading off, or
+          its edges were found wrong. RECORD POINT shows the snapshot zoomed in on the cube: REDO looks again, UNDO
+          forgets it. Forget a point (×), a cube's too, and record it again near there.
           Take the three cubes away. Then, again and again, in a new place each time:</p>
         <ol>
           <li>Set the red cube down, <b>a corner towards the camera</b>: its top and two sides in view.</li>
@@ -204,21 +209,18 @@
             <th rowspan="2">#</th><th rowspan="2">X</th><th rowspan="2">Y</th>
             <th rowspan="2" title="Where the saved calibration sees the cube, desk mm">seen X</th>
             <th rowspan="2">seen Y</th>
-            <th colspan="2" class="group" title="Through the three cubes' calibration, CALIBRATE's">
-              off at CALIBRATE</th>
-            <th colspan="2" class="group" title="Through the calibration SAVE would write, fitted to the points">
-              after SAVE</th>
+            <th colspan="2" class="group" title="Through the saved calibration and the arm's correction, as the library converts now">
+              off now</th>
+            <th rowspan="2" title="Where the mesh of the other points puts this point's reading, against its cube as the camera
+sees it: how well the mesh does between points. Its ring against its dot in the live view. A point whose reach is
+more than 5 mm off what the others say does not fit (its badge red): its cube moved after RECORD or the cup was off
+it. SAVE leaves it out of the mesh; forget it and record it again">
+              without it</th>
             <th rowspan="2"></th>
           </tr>
           <tr class="sub">
-            <th title="How far the arm's reading is from the cube as CALIBRATE's camera sees it. For a later point, how
-well CALIBRATE foresaw it">
-              XY</th>
-            <th title="How far from 40 mm tall the camera sees the cube, its base on the desk: + taller, - shorter.
-One point far off while the others are not is likely a bad snapshot: forget it, record it again.">Z</th>
-            <th title="How far the cube, as the camera the other points make sees it, is from the arm's reading, this one
-left out: its ring against its dot in the live view. One point far off while the others are not: the cup was off
-the cube's centre, the reading off, or its edges were found wrong">
+            <th title="How far the arm's reading, as the library converts it now, is from the cube as the saved
+calibration sees it. A point in the saved mesh is 0; a new one says how well the calibration foresaw it">
               XY</th>
             <th title="How far from 40 mm tall the camera sees the cube, its base on the desk: + taller, - shorter.
 One point far off while the others are not is likely a bad snapshot: forget it, record it again.">Z</th>

@@ -65,6 +65,27 @@ nothing.
 the plane through the touch points. `config/` starts empty: no `desk.json` until the first SAVE, and no `camera.json`
 until the camera calibration exists, so the Fine Tune and Tiles pages wait for that (`config/README.md`).
 
+## True and raw: one swappable converter
+
+Every position the library sends or reads passes `raw.raw_position()` / `raw.true_position()`, and they ask
+`converter.current()`. The default is the formula (`raw.py`, the same for every MaxArm) with this arm's correction
+on top, `config/arm-true.json`, which the camera calibration writes and the library reads again whenever it changes.
+No file: the formula alone.
+
+```python
+from maxarm import converter
+converter.describe()                   # 'the formula with a mesh of 9 points (SAVE 14 Nov 10:12)'
+converter.use(model)                   # anything with to_true(raw) and to_raw(true); None: the default again
+converter.register("my-model", load)   # a kind of correction arm-true.json may name, and its loader
+```
+
+A correction is anything with `at(raw, formula_true) -> (dx, dy, dz)`, `converter.Corrected` turns one into a
+converter, inverse included. The default kind is `mesh.Mesh`: per calibration point, how much further out (mm) and
+further round (degrees) the camera saw the cube than the formula put the cup; between points straight across their
+triangles, beyond them held at the nearest edge; exact at the points. A model trained on the arm's servos plugs in
+the same way.
+`raw.formula_true()` / `raw.formula_raw()` are the formula alone.
+
 ## What a move does
 
 **Fast and slow are one command per leg, waited out.** Nothing is read back while the arm moves, and nothing is

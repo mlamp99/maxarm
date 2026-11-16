@@ -1,0 +1,50 @@
+{
+  "about": "Where the cup was over the centre of each cube's top, as the servos read it: desk space, millimetres, z the height above the desk (desk.json, or the default desk). Each cube is 40 mm: under its x and y the base is at desk height 0 and the top at 40. `sent` is where the cup had been sent; `raw` the firmware's position, what the calibration is made of. Written by calibration/, the camera page.",
+  "cubes": {
+    "blue": {
+      "x": -129.41,
+      "y": -189.86,
+      "z": 40.84,
+      "sent": [
+        -130.0,
+        -190.0,
+        41.0
+      ],
+      "raw": [
+        -137.873,
+        -192.721,
+        83.579
+      ]
+    },
+    "green": {
+      "x": 139.6,
+      "y": -219.91,
+      "z": 41.26,
+      "sent": [
+        140.0,
+        -220.0,
+        41.0
+      ],
+      "raw": [
+        143.767,
+        -211.786,
+        83.004
+      ]
+    },
+    "red": {
+      "x": 0.07,
+      "y": -128.98,
+      "z": 40.84,
+      "sent": [
+        0.0,
+        -130.0,
+        41.0
+      ],
+      "raw": [
+        0.087,
+        -124.14,
+        89.55
+      ]
+    }
+  }
+}

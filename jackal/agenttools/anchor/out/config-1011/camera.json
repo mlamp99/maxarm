@@ -1,0 +1,333 @@
+{
+  "about": "Desk space to camera pixels: pixel ~ desk_to_pixel @ [x, y, z, 1], desk mm, z the height above the desk. It holds for frames of frame_size only, from a camera that has not moved. Fitted by calibration/, the camera page, to the three 40 mm cubes in camera-frame.png, each standing where camera-points.json says the arm read the cup over it, its millimetres real ones: true_to_pixel is the camera, in true mm along the arm's x and y; desk_to_true takes the arm's x, y to true mm: the board's mirror. arm_stretch is the stretch a turn, shift and stretch would take between the arm's readings and the cubes where their own edges put them, the arm's measure against the camera's, shown, not used. desk_to_pixel is the two together. `anchor` says how the arm is laid on the camera: its axis where the base's nuts put it, its turn from the points' bearings, in the desk space of `cubes_alone` -- the camera with the arm laid on the three cubes' readings alone -- and how each thing trusted fitted; what is left at each point is the arm's correction, arm-true.json. `refined`, if there, says SAVE laid it with every point in camera-refine-points.json: how many, and each point's miss through the tie and correction the others make. `lens` is the camera it was calibrated with, as it calls itself, and the focus it was held at (focus_absolute): the live view holds that camera at it, since focusing moves the picture.",
+  "desk_to_pixel": [
+    [
+      -146.36499814051987,
+      -939.8430840678333,
+      -2116.729060258852,
+      398350.1811520044
+    ],
+    [
+      694.3444050400043,
+      1563.5272798960848,
+      -1196.0054300374647,
+      511151.83558531886
+    ],
+    [
+      -0.6865496377521774,
+      0.27525043686839346,
+      -0.6729686411015842,
+      440.2798016013306
+    ]
+  ],
+  "lens": {
+    "camera": "HD Pro Webcam C920",
+    "focus": 50,
+    "mode": {
+      "format": "YUYV",
+      "size": [
+        2560,
+        1472
+      ]
+    }
+  },
+  "true_to_pixel": [
+    [
+      146.36499814051984,
+      -939.8430840678332,
+      -2116.7290602588514,
+      398350.18115200434
+    ],
+    [
+      -694.3444050400042,
+      1563.5272798960846,
+      -1196.0054300374645,
+      511151.8355853188
+    ],
+    [
+      0.6865496377521773,
+      0.2752504368683934,
+      -0.672968641101584,
+      440.2798016013305
+    ]
+  ],
+  "desk_to_true": [
+    [
+      -1.0,
+      0.0
+    ],
+    [
+      0.0,
+      1.0
+    ]
+  ],
+  "arm_stretch": [
+    [
+      -0.9987315229931759,
+      0.038641218469315695
+    ],
+    [
+      -0.03864121846931566,
+      0.9159898652933804
+    ]
+  ],
+  "cubes": {
+    "blue": {
+      "x": -139.17,
+      "y": -210.12,
+      "turn_deg": 47.08,
+      "pixel": [
+        1268.155,
+        215.36
+      ]
+    },
+    "green": {
+      "x": 128.91,
+      "y": -210.44,
+      "turn_deg": 44.21,
+      "pixel": [
+        1983.78,
+        929.824
+      ]
+    },
+    "red": {
+      "x": 0.6,
+      "y": -129.19,
+      "turn_deg": 63.59,
+      "pixel": [
+        1295.179,
+        755.413
+      ]
+    }
+  },
+  "frame_size": [
+    2560,
+    1472
+  ],
+  "edge_px": [
+    0.7208467498103488,
+    2.028705727932336
+  ],
+  "edges_used": 627,
+  "cubes_alone": {
+    "true_to_pixel": [
+      [
+        114.33687256374772,
+        -944.2747560552234,
+        -2116.7290602588514,
+        395824.0218165496
+      ],
+      [
+        -640.8017819264021,
+        1586.2234344724436,
+        -1196.0054300374645,
+        519040.5144879685
+      ],
+      [
+        0.6955082360815653,
+        0.2517568303673145,
+        -0.672968641101584,
+        435.05594810358957
+      ]
+    ],
+    "desk_to_true": [
+      [
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "arm_stretch": [
+      [
+        -0.9987315229931759,
+        0.038641218469315695
+      ],
+      [
+        -0.03864121846931566,
+        0.9159898652933804
+      ]
+    ],
+    "cubes": {
+      "blue": {
+        "x": -139.17,
+        "y": -210.12,
+        "turn_deg": 47.08,
+        "pixel": [
+          1268.155,
+          215.36
+        ]
+      },
+      "green": {
+        "x": 128.91,
+        "y": -210.44,
+        "turn_deg": 44.21,
+        "pixel": [
+          1983.78,
+          929.824
+        ]
+      },
+      "red": {
+        "x": 0.6,
+        "y": -129.19,
+        "turn_deg": 63.59,
+        "pixel": [
+          1295.179,
+          755.413
+        ]
+      }
+    }
+  },
+  "anchor": {
+    "axis": [
+      -8.123,
+      -1.692
+    ],
+    "turn_deg": 1.9478,
+    "base": {
+      "x": -7.777,
+      "y": -2.557,
+      "turn_deg": 2.3191,
+      "by_nuts": true,
+      "shape": [
+        -5.8,
+        -3.5,
+        2.2
+      ],
+      "parts": [
+        {
+          "name": "nut +x+y",
+          "found": false,
+          "x": 51.853,
+          "y": 58.759,
+          "contrast": 0.0,
+          "off_mm": null
+        },
+        {
+          "name": "cup +x+y",
+          "found": false,
+          "x": 51.853,
+          "y": 58.759,
+          "contrast": 0.984,
+          "off_mm": null
+        },
+        {
+          "name": "nut +x-y",
+          "found": true,
+          "x": 55.359,
+          "y": -60.253,
+          "contrast": 0.805,
+          "off_mm": 0.777
+        },
+        {
+          "name": "cup +x-y",
+          "found": true,
+          "x": 56.459,
+          "y": -64.453,
+          "contrast": 0.518,
+          "off_mm": 4.751
+        },
+        {
+          "name": "nut -x-y",
+          "found": true,
+          "x": -65.653,
+          "y": -65.259,
+          "contrast": 0.634,
+          "off_mm": 0.478
+        },
+        {
+          "name": "cup -x-y",
+          "found": false,
+          "x": -63.453,
+          "y": -65.759,
+          "contrast": 0.381,
+          "off_mm": null
+        },
+        {
+          "name": "nut -x+y",
+          "found": false,
+          "x": -68.059,
+          "y": 54.153,
+          "contrast": 0.596,
+          "off_mm": null
+        },
+        {
+          "name": "cup -x+y",
+          "found": false,
+          "x": -68.059,
+          "y": 54.153,
+          "contrast": 0.372,
+          "off_mm": null
+        }
+      ]
+    },
+    "report": {
+      "points": 3,
+      "axis": [
+        -8.12,
+        -1.69
+      ],
+      "turn_deg": 1.948,
+      "base": {
+        "axis_off_mm": 0.93,
+        "turn_off_deg": -0.371
+      },
+      "rows": [
+        {
+          "id": 1,
+          "bearing": -33.52,
+          "reach": 252.0,
+          "out_mm": -9.65,
+          "across_mm": -2.68,
+          "across_spreads": 1.63
+        },
+        {
+          "id": 2,
+          "bearing": 31.49,
+          "reach": 246.8,
+          "out_mm": 2.78,
+          "across_mm": 1.52,
+          "across_spreads": 0.98
+        },
+        {
+          "id": 3,
+          "bearing": 0.27,
+          "reach": 129.2,
+          "out_mm": 3.07,
+          "across_mm": -0.02,
+          "across_spreads": 0.03
+        }
+      ],
+      "typical_out_mm": 2.78,
+      "turns_axis": {
+        "axis": [
+          -7.8,
+          2.25
+        ],
+        "off_mm": 3.95,
+        "sure_mm": 2.11,
+        "turn_deg": 1.739
+      },
+      "reach_axis": {
+        "axis": [
+          -3.1,
+          -1.46
+        ],
+        "off_mm": 5.03,
+        "sure_mm": 1.18,
+        "turn_deg": 0.281
+      },
+      "left_out_mm": {
+        "1": 13.19,
+        "2": 2.13,
+        "3": 6.11
+      },
+      "worst": {
+        "what": "point 1 out, from the points' typical +2.8",
+        "spreads": 14.62
+      }
+    }
+  }
+}

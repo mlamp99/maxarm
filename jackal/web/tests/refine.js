@@ -3,9 +3,9 @@
 // add most.
 //
 // Each point is off by how far the camera puts the cube's centre from where the arm says the cup was, across the
-// desk (XY), and by how far from 40 mm tall it sees the cube (Z): through the three cubes' calibration, CALIBRATE's
-// ("calibrate"), and through the one SAVE would write, the camera fitted to the points. Z is none for a point kept
-// before the cube's edges were.
+// desk (XY), and by how far from 40 mm tall it sees the cube (Z), through the saved calibration ("now"); and, without
+// it, by how far the mesh of the other points puts its reading from its cube ("without"). A point that does not fit
+// its neighbours is left out of the mesh at SAVE. Z is none for a point kept before the cube's edges were.
 
 import { fmt } from '/common/page.js';
 import { cubeIcon } from '/common/height.js';
@@ -22,8 +22,8 @@ export function rank(off, [warn, bad]) {
   return off <= warn ? 'ok' : off <= bad ? 'warn' : 'bad';
 }
 
-// What a point is coloured by: how far off it is after SAVE, or through CALIBRATE's while SAVE cannot be done.
-export const offShown = (row) => (row.off.after === null ? row.off.calibrate : row.off.after);
+// What a point is coloured by: how far off it is now, through the saved calibration; red if it does not fit the others.
+export const offShown = (row) => (row.fits === false ? Infinity : row.off.now);
 
 export function tableRows(refine, offLimits) {
   const cell = (off) => `<td class="num dev ${rank(off, offLimits)}">${fmt(off, 2)}</td>`;
@@ -32,15 +32,16 @@ export function tableRows(refine, offLimits) {
   const row = (point, tail = '') => `
     <td class="num">${fmt(point.x)}</td><td class="num">${fmt(point.y)}</td>
     <td class="num faint">${fmt(point.seen[0])}</td><td class="num faint">${fmt(point.seen[1])}</td>
-    ${cell(point.off.calibrate)}${heightCell(point.height.calibrate)}
-    ${cell(point.off.after)}${heightCell(point.height.after)}<td class="actions">${tail}</td>`;
+    ${cell(point.off.now)}${heightCell(point.height.now)}
+    ${cell(point.off.without)}<td class="actions">${tail}</td>`;
   const points = refine.points.map((point) => `<tr class="${point.cube ? 'cube' : ''}" title="${point.cube
     ? `The ${point.cube} cube, recorded on the camera page and seen in CALIBRATE's frame, ${point.taken}`
-    : `Recorded ${point.taken}`}">
+    : `Recorded ${point.taken}`}${point.fits === false ? '. Does not fit: its reach is far off what the other '
+      + 'points say. SAVE leaves it out; forget it and record it again' : ''}">
     <td><span class="badge ${rank(offShown(point), offLimits)}">${point.id}</span>${point.cube ? cubeIcon(point.cube)
       : ''}</td>
     ${row(point, `<button class="btn small ghost" data-id="${point.id}" title="Forget it">×</button>`)}</tr>`);
-  const empty = refine.points.length ? [] : ['<tr class="empty"><td colspan="10">No points: FIND RED CUBE, '
+  const empty = refine.points.length ? [] : ['<tr class="empty"><td colspan="9">No points: FIND RED CUBE, '
     + 'centre the cube under the cup, RECORD POINT.</td></tr>'];
   return [...points, ...empty].join('');
 }
@@ -57,8 +58,12 @@ export function fitLine(refine) {
   }
   const height = fit.height_mm ? ` Their cubes' tops are <b>${fmt(fit.height_mm[0])}</b> mm from 40 typically,
     <b>${fmt(fit.height_mm[1])}</b> at worst.` : '';
-  return `After SAVE the arm's readings are <b>${fmt(fit.off_mm[0])}</b> mm typically, <b>${fmt(fit.off_mm[1])}</b>
-    at worst, from where the other points put each (XY).${height} ${change} ${armLine(fit.arm)}`;
+  const misfits = fit.does_not_fit.map(({ id, mm }) => `<b>Point ${id} does not fit</b>: its reach is ${fmt(mm)} mm
+    off what the others say, so SAVE leaves it out. Forget it and record it again.`).join(' ');
+  const without = fit.off_mm ? `Without it, each point is <b>${fmt(fit.off_mm[0])}</b> mm typically,
+    <b>${fmt(fit.off_mm[1])}</b> at worst, from where the others put it: how well the mesh does between points.` : '';
+  return `${misfits} SAVE makes the mesh of the points that fit, exact at each. ${without}${height} ${change}
+    ${armLine(fit.arm)}`;
 }
 
 // How the arm measures against the camera: information, not counted against any point.

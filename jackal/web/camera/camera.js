@@ -1,7 +1,7 @@
 // The camera calibration page: aim the camera, set each cube down under the cup and record where the cup is, then
-// CALIBRATE, which parks the arm, takes the frame and fits the camera to the cubes in it. VALIDATE CALIBRATION draws
-// the saved calibration on a new frame. QUALITY or FPS picks the camera's mode, where it has the choice; changing it
-// sets the calibration aside, after a warning.
+// CALIBRATE, which parks the arm, takes the frame and fits the camera to the cubes in it; what came of it stays beside
+// the check picture until the next, and the button says "!" when it failed or a cube did not fit. QUALITY or FPS
+// picks the camera's mode, where it has the choice; changing it sets the calibration aside, after a warning.
 //
 // Everything is desk space: millimetres, z the height over the desk. The arm's target is the grid point last
 // clicked and the height column; a grid click comes down to the notch, 1 mm over a cube's top. Whatever moves the arm from elsewhere (a cube's "go", CALIBRATE, RESET) moves the
@@ -182,17 +182,41 @@ function renderCamera() {
   $('calibrate').disabled = missing.length > 0 || isBusy();
   $('calibrate').title = missing.length ? `Record ${missing.join(', ')} first`
     : 'Park the arm, take the frame, and fit the camera to the cubes in it';
-  $('validate').disabled = isBusy();
-  $('calibration-file').textContent = `config/${calibration.summary}`;
+  renderOutcome(state.camera.outcome);
   $('check-box').classList.toggle('empty', !check);
   if (check && check.stamp !== checkShown) {
     $('check-image').src = `/api/camera/check.jpg?v=${check.stamp}`;
     checkShown = check.stamp;
   }
-  $('check-info').innerHTML = check
-    ? `<b>Calibration check</b><br>taken ${check.taken}, ${check.size[0]} × ${check.size[1]}<br>`
-      + 'click it to see it full size'
-    : '<b>No check image yet</b><br>CALIBRATE or VALIDATE CALIBRATION takes one, with the arm out of the way.';
+  const saved = calibration.exists ? `Saved calibration: ${calibration.saved.replace(/^camera\.json, saved /, '')}.`
+    : 'No calibration saved yet.';
+  $('check-info').textContent = check ? `${saved} Check picture taken ${check.taken}: click it to see it full size.`
+    : `${saved} CALIBRATE takes a check picture, the arm out of the way.`;
+}
+
+// What the last CALIBRATE came to, in words, until the next; and "!" on the button when it failed or a cube did not
+// fit. Nothing since the app started: the saved calibration's line says the rest.
+const OUTCOME_TITLES = { fail: 'CALIBRATE failed', warn: 'Calibrated, with a problem', ok: 'Calibrated' };
+function renderOutcome(outcome) {
+  const box = $('calibrate-outcome');
+  const alert = $('calibrate-alert');
+  box.hidden = !outcome;
+  alert.hidden = !outcome || outcome.status === 'ok';
+  if (!outcome) return;
+  alert.className = `alert-mark ${outcome.status}`;
+  alert.title = outcome.text;
+  box.className = `outcome ${outcome.status}`;
+  const title = document.createElement('b');
+  title.textContent = `${OUTCOME_TITLES[outcome.status]} at ${outcome.when}`;
+  const text = document.createElement('span');
+  text.textContent = outcome.text;
+  box.replaceChildren(title, text);
+  if (outcome.todo) {
+    const todo = document.createElement('span');
+    todo.className = 'todo';
+    todo.textContent = outcome.todo;
+    box.append(todo);
+  }
 }
 
 // QUALITY and FPS, shown only when the camera's two modes differ.
@@ -289,7 +313,6 @@ $('view-mode').addEventListener('click', (event) => {
   const button = event.target.closest('button[data-choice]');
   if (button) chooseViewMode(button.dataset.choice);
 });
-$('validate').addEventListener('click', () => command('camera/validate', {}, 'VALIDATE CALIBRATION'));
 $('check-box').addEventListener('click', () => { if (checkShown !== null) showCheck(); });
 $('guide').addEventListener('click', showGuide);
 if (!localStorage.getItem(GUIDE_SEEN)) {

@@ -17,7 +17,8 @@ page's (`/api/camera/move`): over the cubes, then down.
 | `POST /api/tests/undo`     |      | forget the last point                                                  |
 | `POST /api/tests/forget`   | id   | forget a point                                                         |
 | `POST /api/tests/clear`    |      | forget every point                                                     |
-| `POST /api/tests/save`     |      | refine `camera.json` with the points (`camera/refine.py`)              |
+| `POST /api/tests/save`     |      | lay the arm on the camera with the points, `camera.json`, and write    |
+|                            |      | the arm's correction they make, `arm-true.json` (`camera/refine.py`)   |
 | `GET /api/tests/found.png` | w, s | the red cube found, drawn for a picture `w` px wide at pixel ratio `s` |
 | `GET /api/tests/record.png`| w, h,| the last point's snapshot zoomed in on its cube, as large as fits `w` |
 |                            | s    | x `h` px at pixel ratio `s`; the cube as found                         |
@@ -62,7 +63,7 @@ from applib.camera.store import RefinePoint
 from applib.motion import OVER_CUBES_MM, Motion
 from applib.overlay import draw_cube, picture_layer
 from applib.redcube import NOTCH_MM, OVER_MM, RedCube
-from camera import check
+from camera import anchor, check
 from camera.refine import off_by
 from common.server import BadRequest, Server, number
 from common.worker import Refused, Worker
@@ -96,6 +97,7 @@ class TestsSession:
         self.rng = random.Random()
         self._version = 0                           # counts the points' changes
         self._loaded: Tuple[Optional[int], Optional[CameraFit]] = (None, None)
+        self._base: Tuple[Optional[int], Optional[anchor.FoundBase]] = (None, None)   # CALIBRATE's base, per camera.json
         self._described: Tuple[Optional[tuple], Optional[dict]] = (None, None)
 
     def register(self, server: Server) -> None:
@@ -198,7 +200,7 @@ class TestsSession:
         _check_under_cup(found, here, "Nothing is recorded")
         with self.lock:
             point = _point(max((point.id for point in self.points), default=0) + 1, here, sent, frame, found,
-                           time.strftime("%d %b %H:%M:%S"))
+                           time.strftime("%d %b %H:%M:%S"), store.raw_reading(motion.measured))
             self._keep(self.points + [point])
         detail = _described(fit, point)
         self.kept = record.Kept(point.id, tuple(here), list(sent), frame, found, fit, detail=detail,
@@ -225,7 +227,8 @@ class TestsSession:
             index = next((index for index, point in enumerate(self.points) if point.id == kept.id), None)
             if index is None:
                 raise Refused(f"point {kept.id} is forgotten")
-            point = _point(kept.id, kept.here, kept.sent, kept.frame, found, self.points[index].taken)
+            point = _point(kept.id, kept.here, kept.sent, kept.frame, found, self.points[index].taken,
+                           self.points[index].raw)
             self._keep([*self.points[:index], point, *self.points[index + 1:]])
         detail = f"{_described(fit, point)}; looked for with {tweak.describe()}"
         self.kept = kept.looked_again(found, fit, tweak, detail)
@@ -270,14 +273,20 @@ class TestsSession:
                                self._save, uses_arm=False)
 
     def _save(self, motion: Motion) -> str:
-        """camera.json refined by the points; the check image, the refined calibration on the calibration's frame."""
+        """camera.json laid by the points, and the arm's correction they make; the check image, the calibration on
+        the calibration's frame."""
         fit, problem = self._calibration()
         if problem:
             raise Refused(problem)
         with self.lock:
             points = list(self.points)
-        refined = refine.refined(fit, points)
+        refined, tie = refine.refined(fit, points, self._found(fit))
         store.save_camera(self.config_dir, refined)
+        store.save_correction(self.config_dir, tie.mesh(f"SAVE {time.strftime('%d %b %H:%M')}, "
+                                                        f"{len(tie.rows)} points") if tie else None)
+        misfits = "".join(f"Point {point} does not fit: its reach is {miss:.1f} mm off what the other points say, so "
+                          f"its cube moved after RECORD or the cup was off it. It is left out of the correction: "
+                          f"forget it and record it again. " for point, miss in (tie.misfits.items() if tie else ()))
         typical, worst = check.difference_mm(fit, refined)
         what = (f"refined just now by {len(points)} points" if points
                 else "put back just now as the three cubes alone gave it")
@@ -287,10 +296,11 @@ class TestsSession:
                 f"camera.json, {what}, on the calibration's own frame", store.describe_fit(refined)]))
         heights = refined.refined.get("height_mm") if refined.refined else None
         offs = (f"; the arm's readings {refined.refined['off_mm'][0]:.1f} mm from where the others put each "
-                f"typically, {refined.refined['off_mm'][1]:.1f} at worst" if refined.refined else "")
+                f"typically, {refined.refined['off_mm'][1]:.1f} at worst"
+                if refined.refined and refined.refined.get("off_mm") else "")
         offs += (f"; their cubes' tops {heights[0]:.1f} mm from {CUBE_MM:.0f} typically, {heights[1]:.1f} at worst"
                  if heights else "")
-        return (f"config/{store.CAMERA_FILE} {what}: it puts the desk {typical:.1f} mm from where the saved one did, "
+        return (misfits + f"config/{store.CAMERA_FILE} {what}: it puts the desk {typical:.1f} mm from where the saved one did, "
                 f"{worst:.1f} at worst{offs}; {store.describe_stretch(refined.measured_stretch)}")
 
     def _keep(self, points: List[RefinePoint]) -> None:
@@ -339,8 +349,16 @@ class TestsSession:
         with self.lock:
             key, points = (self._loaded[0], self._version), list(self.points)
         if key != self._described[0]:
-            self._described = (key, refine.describe(fit, points))
+            self._described = (key, refine.describe(fit, points, self._found(fit)))
         return self._described[1]
+
+    def _found(self, fit: CameraFit) -> Optional[anchor.FoundBase]:
+        """The base CALIBRATE found, as camera.json keeps it, or found again in CALIBRATE's frame for a camera.json from
+        before it was kept: once per camera.json."""
+        stamp = self._loaded[0]
+        if self._base[0] != stamp or stamp is None:
+            self._base = (stamp, anchor.base_of(fit, store.load_frame(self.config_dir)))
+        return self._base[1]
 
     def _usable(self) -> CameraFit:
         """The calibration, or Refused, saying why the tests cannot run."""
@@ -369,11 +387,13 @@ def _check_under_cup(found: FoundCube, here: Sequence[float], otherwise: str) ->
 
 
 def _point(point_id: int, here: Sequence[float], sent: Sequence[float], frame: np.ndarray, found: FoundCube,
-           taken: str) -> RefinePoint:
-    """A point: where the servos said the cup was, and the red cube as found in the snapshot `frame`."""
+           taken: str, raw: Optional[List[float]]) -> RefinePoint:
+    """A point: where the servos said the cup was -- the firmware's position, and as the library converted it -- and
+    the red cube as found in the snapshot `frame`."""
     return RefinePoint(point_id, *map(_tidy, here[:3]), sent=list(map(_tidy, sent)),
                        pixel=[round(value, 3) for value in found.pixel], frame_size=[frame.shape[1], frame.shape[0]],
-                       taken=taken, turn_deg=round(found.true_turn_deg, 4), edges=store.edges_to_json(found.edges))
+                       taken=taken, turn_deg=round(found.true_turn_deg, 4), edges=store.edges_to_json(found.edges),
+                       raw=raw)
 
 
 def _described(fit: CameraFit, point: RefinePoint) -> str:

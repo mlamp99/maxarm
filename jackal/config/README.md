@@ -16,6 +16,7 @@ but this one belongs to one rig, so none of them is in git (`../.gitignore`).
 | `camera-check.jpg`          | the latest check image, as the camera page shows it     | `calibration/`, camera page |
 | `camera-refine-points.json` | the points which refine `camera.json`                   | `calibration/`, both pages  |
 | `camera-view.json`          | QUALITY or FPS: the camera's mode for the live view     | `calibration/`, camera page |
+| `arm-true.json`             | the arm's raw-to-true correction the points make        | `calibration/`, both pages  |
 | `appcfg.json`               | the app's settings that differ from their defaults      | the Tiles page; the app     |
 | `iotcDeviceConfig.json`     | the device, as /IOTCONNECT knows it                     | you: downloaded             |
 | `device-cert.pem`           | the device's certificate                                | you, or `scripts/install.sh`|
@@ -50,6 +51,15 @@ Written by the camera page's RECORD: for each cube, where the servos said the cu
 under it, in desk space -- x and y the arm's own, z the cup's height over the desk, about 44 at the notch -- and
 where the cup had been sent. A cube not recorded is `null`. Under each x and y the cube's base is at desk height 0
 and its top at 40: those, not the cup's height, are what the fit will use.
+
+## arm-true.json
+
+Written by CALIBRATE (its three cubes) and SAVE CALIBRATION (every point): this arm's raw-to-true correction on top
+of the formula, which the library converts every position with from then on (`maxarm/converter.py`), read again
+whenever the file changes. A row per point: the formula's bearing and reach for the cup over the cube, and how much
+further out (mm) and further round (degrees) the camera saw the cube, the arm laid on the camera by its base's nuts
+and the points' bearings (`camera.json`'s `anchor`). Between the points `maxarm/mesh.py` joins them straight; beyond,
+each holds its nearest edge. No file: the formula alone.
 
 ## camera.json
 

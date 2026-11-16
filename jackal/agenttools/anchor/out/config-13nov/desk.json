@@ -1,0 +1,30 @@
+{
+  "about": "desk space to arm space: arm [x, y, z, 1] = desk_to_arm @ desk [x, y, z, 1]. Arm z is true z, the firmware's corrected by the library. Desk space is millimetres, z the height above the desk (0: the cup snug on it). A plane: arm x and y are desk x and y, and the surface is at arm z = 0.000000 x + 0.000000 y + 44.000. The level desk, saved by calibration/desk with no touch points: confirmed on the desk page that the true z formula alone puts the desk right.",
+  "desk_to_arm": [
+    [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      44.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "points": []
+}

@@ -101,17 +101,14 @@
       <span class="feed-note" id="feed-note"></span>
     </div>
 
-    <div class="calibrate-row">
-      <button class="btn primary" id="calibrate">◎ CALIBRATE</button>
-      <button class="btn" id="validate"
-        title="Park the arm, take a new image with the calibration drawn on it, and say whether the camera has moved">
-        VALIDATE CALIBRATION</button>
-    </div>
-    <p class="hint" id="calibration-file"></p>
-
     <div class="check-row">
       <button class="check-box" id="check-box" title="See it full size"><img id="check-image" alt=""></button>
-      <div class="check-info" id="check-info"></div>
+      <div class="check-side">
+        <button class="btn primary" id="calibrate">◎ CALIBRATE<span class="alert-mark" id="calibrate-alert"
+          hidden>!</span></button>
+        <div class="outcome" id="calibrate-outcome" hidden></div>
+        <p class="check-info" id="check-info"></p>
+      </div>
     </div>
   </section>
 

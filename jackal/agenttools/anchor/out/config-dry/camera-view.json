@@ -1,0 +1,4 @@
+{
+  "about": "Which of the camera's modes the live view is: quality, its largest YUYV, uncompressed, or fps, its largest MJPG, fast. A calibration holds for the mode it was taken in only. Written by calibration/, the camera page.",
+  "choice": "quality"
+}

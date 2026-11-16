@@ -17,7 +17,7 @@ with `true_z` and `true_xy` from the limits, the library's own constants
 (`maxarm/raw.py`).
 """
 
-from maxarm import Space, geometry, nozzle, path, raw
+from maxarm import Space, converter, geometry, nozzle, path, raw
 from maxarm.arm import home_position
 from maxarm.geometry import Position
 
@@ -83,7 +83,8 @@ def limits() -> dict:
                    "tall_per_mm_of_reach": raw.TALL_PER_MM_OF_REACH, "desk_wave": raw.DESK_WAVE_MM},
         "true_xy": {"reach_at_desk": raw.REACH_AT_DESK_MM, "reach_less_per_mm": raw.REACH_LESS_PER_MM,
                     "reach_top": raw.REACH_TOP_MM, "turn": raw.TURN_DEG,
-                    "bearing_rounds": raw.BEARING_ROUNDS},
+                    "bearing_rounds": raw.BEARING_ROUNDS,
+                    "mesh": converter.page_mesh(), "converter": converter.describe()},
     }
 
 
