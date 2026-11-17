@@ -224,15 +224,17 @@ once FIND RED CUBE or ARM TO DESK has brought the cup down (below). Every rim is
    reading is from the cube as the camera sees it, across the desk (*XY*), and how far from 40 mm tall the camera
    sees the cube (*Z*, + taller): *now*, through the saved calibration and the arm's correction as the library
    converts with it -- a point in the saved correction is 0 -- and *without it*: how far its reading, through the
-   mesh of the other points, is from its cube; in the live view the point's dot is that place, its ring the cube.
+   correction of the other points, is from its cube; in the live view the point's dot is that place, its ring the cube.
    Green within 1.5 mm, yellow within 2.5, red beyond; the point's circle on the grid takes the colour of its XY now,
    as on the desk page. A point whose reach is more than 5 mm off what the others say does not fit (`anchor.py`): its
    badge is red, and SAVE names it and leaves it out -- its cube moved after RECORD, or the cup was off it; forget
    it and record it again. In Z one far off says the snapshot's edges were not all the cube's. **SAVE
    CALIBRATION**, from four points on, keeps the camera and the arm's frame on it as CALIBRATE laid them -- the
-   axis where it found the base, the turn from the cubes' bearings -- writes `arm-true.json`, the mesh of the points
-   that fit, and `camera.json` with its report, and redraws the camera page's check image with it, on the
+   axis where it found the base, the turn from the cubes' bearings -- writes `arm-true.json`, the points that fit --
+   their pattern over the whole desk and a mesh of what it leaves at each (`maxarm/mesh.py`) -- and `camera.json` with its report, and redraws the camera page's check image with it, on the
    calibration's own frame. With no points left, it puts back the three cubes' own calibration, no correction.
+   Points not saved -- changed since the last SAVE or CALIBRATE -- are not used by the arm: SAVE then stands out,
+   orange with "!", and leaving the page asks first; saved, SAVE is greyed out.
 4. **DESK GRID**, a switch beside GUIDES, off unless turned on: desk space itself drawn on the desk over the live
    view, a thin pale line every 10 mm out past the reach, every 50 mm a little stronger, and the two lines through
    the arm's turning axis, x = 0 and y = 0, stronger still. Lay grid paper along it: where the camera is right, the
@@ -250,7 +252,7 @@ once FIND RED CUBE or ARM TO DESK has brought the cup down (below). Every rim is
 | RECORD POINT           | keep where the arm says the cup is, park the arm, see the cube in the snapshot; then  |
 |                        | the snapshot zoomed in on the cube, and UNDO, REDO (look again, tweaked), KEEP        |
 | ×, CLEAR               | forget a point; all of them                                                           |
-| SAVE CALIBRATION       | `arm-true.json`, the mesh of the points that fit; `camera.json`'s frame kept          |
+| SAVE CALIBRATION       | `arm-true.json`, the points that fit (pattern and mesh); `camera.json`'s frame kept   |
 
 **How the red cube is found** (`applib/camera/locate.py`; the arm brought over it, `applib/redcube.py`; drawn,
 `applib/overlay/cube.py`, as the app's `find-cube` finds and draws it). The camera is the calibration's, held still:

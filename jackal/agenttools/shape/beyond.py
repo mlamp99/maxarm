@@ -3,12 +3,12 @@
 the points, alone or with the mesh of what it leaves at each point on top (that faded to nothing beyond the points).
 Judged on points left out where they lie beyond the others: one side, far, near, one at a time. Misses mm, x-y.
 
-    PYTHONPATH=src:src/calibration ../.venv/bin/python3 agenttools/shape/beyond.py
+    PYTHONPATH=src:src/calibration:agenttools/shape ../.venv/bin/python3 agenttools/shape/beyond.py
 """
 import json, math
 from pathlib import Path
 import numpy as np
-from maxarm.mesh import Mesh, Row, REACH_SCALE_MM
+from mesh_held import Mesh, Row, REACH_SCALE_MM, _barycentric
 
 rows = json.loads(Path("agenttools/shape/out/rows.json").read_text())
 
@@ -44,7 +44,7 @@ def mesh_of(train, value):
 def gap(m, r):
     """How far beyond the mesh, in its plane, mm; 0 inside."""
     here = plane(r)
-    from maxarm.mesh import _barycentric
+
     for c in m.triangles:
         if _barycentric(m.plane[list(c)], here).min() >= -1e-9:
             return 0.0

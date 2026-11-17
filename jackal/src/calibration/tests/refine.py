@@ -5,8 +5,8 @@ cube's from this page. Each is shown with how far the arm's reading for it is
 from its cube as the camera sees it, across the desk (XY), and how far from 40
 mm tall the camera sees the cube (Z), through the saved calibration -- camera.json
 and the arm's correction as the library converts with it: "off now". And without
-it: its reading through the mesh of the other points, against its cube
-(`camera/anchor.py`), which the page draws beside the cube. A point the others put
+it: its reading through the correction of the other points -- their pattern and
+mesh -- against its cube (`camera/anchor.py`), which the page draws beside the cube. A point the others put
 further than `anchor.DOES_NOT_FIT_MM` from its cube does not fit: SAVE leaves it out
 of the mesh and names it. With no points, SAVE CALIBRATION puts back the three
 cubes' own calibration.
@@ -69,7 +69,8 @@ def describe(fit: CameraFit, points: List[RefinePoint], found: Optional[FoundBas
     misfits = tie.misfits if tie else {}
     rows = [{"id": point.id, "cube": point.cube, "z": point.z, "taken": point.taken, "fits": point.id not in misfits,
              **_row(fit, trial, point.sighting, others)} for point, others in zip(points, put)]
-    return {"points": rows, "fit": _summary(fit, trial, rows, misfits) if trial else None, "problem": problem,
+    pattern = tie.mesh().describe_pattern() if tie and tie.rows else None
+    return {"points": rows, "fit": _summary(fit, trial, rows, misfits, pattern) if trial else None, "problem": problem,
             "refined": fit.refined}
 
 
@@ -95,17 +96,19 @@ def _rounded(off: Optional[Off]) -> Optional[float]:
     return round(off.height, 2) if off and off.height is not None else None
 
 
-def _summary(fit: CameraFit, trial: CameraFit, rows: List[dict], misfits: dict) -> dict:
+def _summary(fit: CameraFit, trial: CameraFit, rows: List[dict], misfits: dict, pattern: Optional[str]) -> dict:
     """After SAVE: how far each point that fits is from where the others put it, typically and at worst (None with
-    none), and the points that do not fit; their cubes' tops from 40 mm; how far it moves the desk, in reach and in
-    view; how the arm measures against the camera (the least and most a distance is stretched, and how far off
-    square); and whether it is the cubes' own calibration put back."""
+    none), and the points that do not fit; the pattern they share over the whole desk, in words; their cubes' tops
+    from 40 mm; how far it moves the desk, in reach and in view; how the arm measures against the camera (the least
+    and most a distance is stretched, and how far off square); and whether it is the cubes' own calibration put
+    back."""
     offs = [row["off"]["without"] for row in rows if row["off"]["without"] is not None and row["fits"]]
     heights = [abs(row["height"]["now"]) for row in rows if row["height"]["now"] is not None]
     typical, worst = check.difference_mm(fit, trial)
     low, high, skew = stretch_of(trial.measured_stretch)
     return {"off_mm": [float(np.median(offs)), max(offs)] if offs else None,
             "does_not_fit": [{"id": point, "mm": miss} for point, miss in misfits.items()],
+            "pattern": pattern,
             "height_mm": [float(np.median(heights)), max(heights)] if heights else None,
             "change_mm": [round(typical, 2), round(worst, 2)] if math.isfinite(worst) else None,
             "arm": {"stretch": [round(low, 4), round(high, 4)], "skew_deg": round(skew, 2)},

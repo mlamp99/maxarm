@@ -7,7 +7,8 @@
 // it, the point clicked, drawn through the calibration; and, if asked, desk space itself every 10 mm.
 //
 // And the red cube's test in reverse: with the cube centred under the cup, RECORD POINT keeps a point that refines
-// the calibration, the cube seen in the snapshot; SAVE CALIBRATION writes it (refine.js).
+// the calibration, the cube seen in the snapshot; SAVE CALIBRATION writes it (refine.js). Until it does, SAVE stands
+// out and leaving the page is asked first; saved, SAVE is greyed out.
 //
 // The arm's target is the grid point last clicked, the arrows' steps and the height column. Whatever moves the arm
 // from elsewhere (a test, RESET, another page) moves the target with it, and a move the arm refuses puts it back.
@@ -64,6 +65,8 @@ let accepted = JSON.stringify(ui.target);
 let isLost = false;
 let full = null;                // the live view full size, while it is open
 let pointsShown = '';
+let isUnsaved = false;          // points SAVE CALIBRATION could save and has not: leaving is asked first
+let isLeaving = false;          // the person said leave anyway
 
 const grid = new TestsGrid($('grid'), limits, jump);
 const column = new HeightColumn(NOTCH, {
@@ -269,9 +272,13 @@ function renderRefine(refine, next) {
     $('points').tBodies[0].innerHTML = tableRows(refine, offLimits);
   }
   $('refine-fit').innerHTML = fitLine(refine);
-  $('refine-saved').textContent = savedLine(refine);
-  $('save').disabled = !refine.fit || isBusy();
-  $('save').title = refine.fit ? 'Write camera.json with the calibration these points make' : refine.problem;
+  $('refine-saved').innerHTML = savedLine(refine);
+  isUnsaved = refine.saved === false && Boolean(refine.fit);
+  $('refine-save').classList.toggle('unsaved', isUnsaved);
+  $('save-alert').hidden = !isUnsaved;
+  $('save').disabled = !refine.fit || isBusy() || refine.saved === true;
+  $('save').title = !refine.fit ? refine.problem : refine.saved === true ? 'Saved: the points have not changed since'
+    : 'Write camera.json and the arm\'s correction these points make';
   $('clear').disabled = count === 0 || isBusy();
 }
 
@@ -441,6 +448,21 @@ $('record').addEventListener('click', async () => {
   if (reply.status === 'done') openRecordDialog(reply);
 });
 $('save').addEventListener('click', () => command('tests/save', {}, 'SAVE CALIBRATION'));
+
+// Leaving with points not saved is asked first: a link here in words, closing or reloading by the browser's own ask.
+const LEAVE_ASK = 'The points are not saved: the arm takes them on only with SAVE CALIBRATION. Leave without saving?';
+document.addEventListener('click', (event) => {
+  const link = event.target.closest('a[href]');
+  if (!isUnsaved || !link || event.defaultPrevented || event.button !== 0 || link.target === '_blank'
+    || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  if (window.confirm(LEAVE_ASK)) isLeaving = true;
+  else event.preventDefault();
+});
+window.addEventListener('beforeunload', (event) => {
+  if (!isUnsaved || isLeaving) return;
+  event.preventDefault();
+  event.returnValue = '';
+});
 $('clear').addEventListener('click', clearPoints);
 for (const button of document.querySelectorAll('[data-help]')) {
   button.addEventListener('click', () => { openModal('help').body.innerHTML = $(button.dataset.help).innerHTML; });

@@ -176,9 +176,12 @@
           cubes' bearings. What is left at each point -- the cube further out or further round than the arm read it
           -- is the arm's correction, which the library converts with from then on. CALIBRATE's three cubes are
           points 1, 2 and 3; the red cube's points all over the desk then add to it, and SAVE writes the correction
-          all of them make: a mesh of the points, exact at each (XY off now 0), the camera and the arm's frame on it
-          kept as CALIBRATE laid them, so a point changes the correction only round itself. "Without it" is how far a point's cube is
-          from its reading through the mesh of the other points: how well the mesh does between points. A point whose
+          all of them make, the camera and the arm's frame on it kept as CALIBRATE laid them: the pattern the points
+          share over the whole desk -- the reach off, the turn off, and from 5 points the arm's axis off its place and
+          the turn wider to the sides -- and a mesh of what it leaves at each point, exact there (XY off now 0),
+          fading out beyond the points. A point changes the correction most round itself. "Without it" is how far a
+          point's cube is from its reading through the correction of the other points: how well it does between
+          points. A point whose
           reach is more than 5 mm off what the others say does not fit -- its badge red: its cube moved after RECORD
           or the cup was off it -- and SAVE leaves it out. It shows from 4 points on. In the live view a point's ring
           is where the camera saw its cube, its dot its reading. Z is how far from 40 mm tall the camera sees its
@@ -196,8 +199,9 @@
         </ol>
         <p id="refine-ask"></p>
       </div>
-      <div class="refine-save">
-        <button class="btn primary" id="save">SAVE CALIBRATION</button>
+      <div class="refine-save" id="refine-save">
+        <button class="btn primary" id="save">SAVE CALIBRATION<span class="alert-mark" id="save-alert" hidden
+          >!</span></button>
         <p class="refine-fit" id="refine-fit"></p>
         <p class="hint" id="refine-saved"></p>
       </div>
@@ -211,16 +215,16 @@
             <th rowspan="2">seen Y</th>
             <th colspan="2" class="group" title="Through the saved calibration and the arm's correction, as the library converts now">
               off now</th>
-            <th rowspan="2" title="Where the mesh of the other points puts this point's reading, against its cube as the camera
-sees it: how well the mesh does between points. Its ring against its dot in the live view. A point whose reach is
+            <th rowspan="2" title="Where the correction of the other points puts this point's reading, against its cube as the
+camera sees it: how well the correction does between points. Its ring against its dot in the live view. A point whose reach is
 more than 5 mm off what the others say does not fit (its badge red): its cube moved after RECORD or the cup was off
-it. SAVE leaves it out of the mesh; forget it and record it again">
+it. SAVE leaves it out of the correction; forget it and record it again">
               without it</th>
             <th rowspan="2"></th>
           </tr>
           <tr class="sub">
             <th title="How far the arm's reading, as the library converts it now, is from the cube as the saved
-calibration sees it. A point in the saved mesh is 0; a new one says how well the calibration foresaw it">
+calibration sees it. A point in the saved correction is 0; a new one says how well the calibration foresaw it">
               XY</th>
             <th title="How far from 40 mm tall the camera sees the cube, its base on the desk: + taller, - shorter.
 One point far off while the others are not is likely a bad snapshot: forget it, record it again.">Z</th>

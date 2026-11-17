@@ -81,8 +81,9 @@ converter.register("my-model", load)   # a kind of correction arm-true.json may 
 
 A correction is anything with `at(raw, formula_true) -> (dx, dy, dz)`, `converter.Corrected` turns one into a
 converter, inverse included. The default kind is `mesh.Mesh`: per calibration point, how much further out (mm) and
-further round (degrees) the camera saw the cube than the formula put the cup; between points straight across their
-triangles, beyond them held at the nearest edge; exact at the points. A model trained on the arm's servos plugs in
+further round (degrees) the camera saw the cube than the formula put the cup. One pattern over the whole desk fitted
+to them (the reach and the turn off; from 5 points the axis off its place and the turn wider to the sides), and what
+it leaves at each point straight across their triangles, fading out beyond them; exact at the points. A model trained on the arm's servos plugs in
 the same way.
 `raw.formula_true()` / `raw.formula_raw()` are the formula alone.
 

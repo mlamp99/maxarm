@@ -1,28 +1,140 @@
 {
-  "about": "The arm's raw-to-true correction, on top of the formula (maxarm/raw.py), as the camera calibration measured it: a row per point, where the formula put the cup over the cube (its bearing, degrees, 0 straight out, + toward +x, and its reach from the base axis, mm) and how much further out (mm) and further round (degrees) the camera saw the cube, the arm's axis and turn laid on the camera by its base and the points' bearings (camera.json's `anchor`). Between the points the mesh joins them straight; beyond, each holds its nearest edge (maxarm/mesh.py). Read by maxarm/converter.py whenever it changes. Written by calibration/, CALIBRATE and SAVE.",
+  "about": "The arm's raw-to-true correction, on top of the formula (maxarm/raw.py), as the camera calibration measured it: a row per point, where the formula put the cup over the cube (its bearing, degrees, 0 straight out, + toward +x, and its reach from the base axis, mm) and how much further out (mm) and further round (degrees) the camera saw the cube, the arm's axis and turn laid on the camera by its base and the points' bearings (camera.json's `anchor`). The rows make the pattern they share over the whole desk and a mesh of what it leaves at each, fading out beyond the points (maxarm/mesh.py), made again from the rows when read. Read by maxarm/converter.py whenever it changes. Written by calibration/, CALIBRATE and SAVE.",
   "kind": "mesh",
-  "made": "CALIBRATE dry run, the 3 cubes",
+  "made": "SAVE dry run",
   "rows": [
     {
       "bearing_deg": -33.6781,
       "reach_mm": 238.728,
-      "further_out_mm": 6.792,
-      "further_round_deg": -0.9174,
+      "further_out_mm": 6.768,
+      "further_round_deg": -0.8765,
       "point": 1
     },
     {
       "bearing_deg": 32.0577,
       "reach_mm": 257.695,
-      "further_out_mm": 1.72,
-      "further_round_deg": 0.1023,
+      "further_out_mm": 1.533,
+      "further_round_deg": 0.096,
       "point": 2
     },
     {
       "bearing_deg": 0.0377,
       "reach_mm": 125.908,
-      "further_out_mm": 3.218,
-      "further_round_deg": 0.2409,
+      "further_out_mm": 3.119,
+      "further_round_deg": 0.2286,
       "point": 3
+    },
+    {
+      "bearing_deg": -31.1957,
+      "reach_mm": 199.165,
+      "further_out_mm": 3.841,
+      "further_round_deg": -0.6699,
+      "point": 4
+    },
+    {
+      "bearing_deg": 36.6944,
+      "reach_mm": 148.136,
+      "further_out_mm": 1.809,
+      "further_round_deg": 0.5078,
+      "point": 5
+    },
+    {
+      "bearing_deg": -75.5333,
+      "reach_mm": 140.492,
+      "further_out_mm": 2.181,
+      "further_round_deg": 0.2623,
+      "point": 6
+    },
+    {
+      "bearing_deg": -56.271,
+      "reach_mm": 198.341,
+      "further_out_mm": 3.515,
+      "further_round_deg": -0.1347,
+      "point": 7
+    },
+    {
+      "bearing_deg": -2.6583,
+      "reach_mm": 236.569,
+      "further_out_mm": 3.845,
+      "further_round_deg": -0.1783,
+      "point": 8
+    },
+    {
+      "bearing_deg": -2.564,
+      "reach_mm": 162.169,
+      "further_out_mm": 2.702,
+      "further_round_deg": -0.0903,
+      "point": 9
+    },
+    {
+      "bearing_deg": 45.1556,
+      "reach_mm": 190.741,
+      "further_out_mm": 1.543,
+      "further_round_deg": 0.5473,
+      "point": 10
+    },
+    {
+      "bearing_deg": 16.1003,
+      "reach_mm": 194.423,
+      "further_out_mm": 2.095,
+      "further_round_deg": 0.2005,
+      "point": 11
+    },
+    {
+      "bearing_deg": -72.4023,
+      "reach_mm": 204.069,
+      "further_out_mm": 1.443,
+      "further_round_deg": -0.0318,
+      "point": 12
+    },
+    {
+      "bearing_deg": -61.6175,
+      "reach_mm": 252.244,
+      "further_out_mm": 4.37,
+      "further_round_deg": -0.4286,
+      "point": 13
+    },
+    {
+      "bearing_deg": -42.2553,
+      "reach_mm": 132.255,
+      "further_out_mm": 3.391,
+      "further_round_deg": 0.5523,
+      "point": 14
+    },
+    {
+      "bearing_deg": -13.7628,
+      "reach_mm": 202.579,
+      "further_out_mm": 2.956,
+      "further_round_deg": -0.0586,
+      "point": 15
+    },
+    {
+      "bearing_deg": 24.1412,
+      "reach_mm": 118.586,
+      "further_out_mm": 1.014,
+      "further_round_deg": 0.2147,
+      "point": 16
+    },
+    {
+      "bearing_deg": -69.8672,
+      "reach_mm": 176.482,
+      "further_out_mm": 1.398,
+      "further_round_deg": 0.009,
+      "point": 17
+    },
+    {
+      "bearing_deg": -36.0393,
+      "reach_mm": 243.328,
+      "further_out_mm": 5.217,
+      "further_round_deg": -0.037,
+      "point": 18
+    },
+    {
+      "bearing_deg": -20.7338,
+      "reach_mm": 241.421,
+      "further_out_mm": 4.345,
+      "further_round_deg": -0.3685,
+      "point": 19
     }
   ]
 }

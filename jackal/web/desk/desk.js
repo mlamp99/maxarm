@@ -79,15 +79,25 @@ const furtherRound = (bearing) => (Math.PI / 180) * between(TRUE_XY.turn, (beari
 // x and y from reach and bearing: 0 straight out (-y), positive toward +x.
 const fromPolar = (reach, bearing) => [reach * Math.sin(bearing), -reach * Math.cos(bearing)];
 // The camera calibration's correction on top of the formula (maxarm/mesh.py), as the server had it when the page
-// loaded: further out (mm) and further round (degrees), straight across the mesh's triangles, beyond it its nearest
-// edge. Null: the formula alone. A CALIBRATE or SAVE since shows after a reload.
+// loaded: further out (mm) and further round (degrees) by the points' pattern over the whole desk -- the turn's
+// widening held from a little past the points' bearings -- and what it leaves at each point straight across the mesh's triangles,
+// beyond them its nearest edge's fading out. Null: the formula alone. A CALIBRATE or SAVE since shows after a reload.
 const MESH = TRUE_XY.mesh;
 const TO_RAW_ROUNDS = 8;
 function meshValue(bearing, reach) {
-  const { plane, values, triangles, edges, scale } = MESH;
-  if (values.length === 1) return values[0];
+  const { pattern: [out, round, axisX, axisY, widening], per, span: [low, high] } = MESH;
+  if (!MESH.left.length) return [0, 0];
+  const across = axisX * Math.cos(bearing) + axisY * Math.sin(bearing);
+  const held = Math.min(Math.max((bearing * 180) / Math.PI, low), high);
+  const [leftOut, leftRound] = meshLeft(bearing, reach);
+  return [out + axisX * Math.sin(bearing) - axisY * Math.cos(bearing) + leftOut,
+    round + (widening * held) / per + ((across / reach) * 180) / Math.PI + leftRound];
+}
+// What the pattern leaves.
+function meshLeft(bearing, reach) {
+  const { plane, left, triangles, edges, scale, fade } = MESH;
   const here = [bearing * scale, reach];
-  const blend = (weights, corners) => [0, 1].map((k) => corners.reduce((sum, c, i) => sum + weights[i] * values[c][k], 0));
+  const blend = (weights, corners) => [0, 1].map((k) => corners.reduce((sum, c, i) => sum + weights[i] * left[c][k], 0));
   for (const [a, b, c] of triangles) {
     const [ax, ay] = plane[a];
     const [ux, uy, vx, vy] = [plane[b][0] - ax, plane[b][1] - ay, plane[c][0] - ax, plane[c][1] - ay];
@@ -96,15 +106,16 @@ function meshValue(bearing, reach) {
     const t = (ux * (here[1] - ay) - uy * (here[0] - ax)) / det;
     if (Math.min(1 - s - t, s, t) >= -1e-9) return blend([1 - s - t, s, t], [a, b, c]);
   }
-  let best = null;
+  let best = { gap: Math.hypot(plane[0][0] - here[0], plane[0][1] - here[1]), value: left[0] };   // one point: its own
   for (const [a, b] of edges) {
     const [dx, dy] = [plane[b][0] - plane[a][0], plane[b][1] - plane[a][1]];
     const share = Math.min(Math.max(((here[0] - plane[a][0]) * dx + (here[1] - plane[a][1]) * dy)
       / Math.max(dx * dx + dy * dy, 1e-12), 0), 1);
     const gap = Math.hypot(plane[a][0] + share * dx - here[0], plane[a][1] + share * dy - here[1]);
-    if (!best || gap < best.gap) best = { gap, value: blend([1 - share, share], [a, b]) };
+    if (gap < best.gap) best = { gap, value: blend([1 - share, share], [a, b]) };
   }
-  return best.value;
+  const keep = Math.max(0, 1 - best.gap / fade);
+  return best.value.map((value) => keep * value);
 }
 // The formula's true x, y corrected by the mesh.
 function meshed([x, y]) {

@@ -106,6 +106,14 @@ main.tests.is-blocked .view, main.tests.is-blocked .live, main.tests.is-blocked 
 .refine-fit b { font-family: var(--mono); font-weight: 600; color: var(--text); }
 .refine-fit .note { color: var(--faint); }
 .refine-save .hint { margin: 0; }
+/* Points not saved: the box and SAVE stand out, "!" on it; saved, SAVE is greyed out (disabled). */
+.refine-save.unsaved { border-color: var(--orange); box-shadow: 0 0 0 1px var(--orange) inset; }
+.refine-save.unsaved #save { animation: unsaved 1.6s ease-in-out infinite; }
+@keyframes unsaved { 50% { box-shadow: 0 0 18px var(--orange); } }
+.alert-mark { display: inline-grid; place-items: center; width: 20px; height: 20px; margin-left: 10px;
+  border-radius: 50%; background: var(--orange); color: #fff; font-weight: 800; font-size: 13px; letter-spacing: 0;
+  vertical-align: 1px; box-shadow: 0 0 10px var(--orange); }
+.refine-save .unsaved-note { color: var(--orange); font-weight: 650; }
 .refine .table-wrap { max-height: 420px; overflow: auto; }
 .refine th.group { text-align: center; padding-bottom: 2px; }
 .refine thead tr.sub th { text-align: right; padding-top: 2px; }

@@ -4,8 +4,8 @@
 //
 // Each point is off by how far the camera puts the cube's centre from where the arm says the cup was, across the
 // desk (XY), and by how far from 40 mm tall it sees the cube (Z), through the saved calibration ("now"); and, without
-// it, by how far the mesh of the other points puts its reading from its cube ("without"). A point that does not fit
-// its neighbours is left out of the mesh at SAVE. Z is none for a point kept before the cube's edges were.
+// it, by how far the correction of the other points puts its reading from its cube ("without"). A point that does not fit
+// its neighbours is left out of the correction at SAVE. Z is none for a point kept before the cube's edges were.
 
 import { fmt } from '/common/page.js';
 import { cubeIcon } from '/common/height.js';
@@ -61,9 +61,10 @@ export function fitLine(refine) {
   const misfits = fit.does_not_fit.map(({ id, mm }) => `<b>Point ${id} does not fit</b>: its reach is ${fmt(mm)} mm
     off what the others say, so SAVE leaves it out. Forget it and record it again.`).join(' ');
   const without = fit.off_mm ? `Without it, each point is <b>${fmt(fit.off_mm[0])}</b> mm typically,
-    <b>${fmt(fit.off_mm[1])}</b> at worst, from where the others put it: how well the mesh does between points.` : '';
-  return `${misfits} SAVE makes the mesh of the points that fit, exact at each. ${without}${height} ${change}
-    ${armLine(fit.arm)}`;
+    <b>${fmt(fit.off_mm[1])}</b> at worst, from where the others put it: how well the correction does between points.` : '';
+  const pattern = fit.pattern ? ` Their pattern over the whole desk: ${fit.pattern}.` : '';
+  return `${misfits} SAVE makes the correction of the points that fit: their pattern, and a mesh of what it leaves,
+    exact at each point.${pattern} ${without}${height} ${change} ${armLine(fit.arm)}`;
 }
 
 // How the arm measures against the camera: information, not counted against any point.
@@ -77,10 +78,15 @@ function armLine(arm) {
     deg off square.</span>`;
 }
 
+// Whether the points are saved: the arm takes them on only with SAVE CALIBRATION.
 export function savedLine(refine) {
+  if (refine.saved === false) {
+    return '<span class="unsaved-note">Not saved.</span> The points changed since the last SAVE: the arm takes them '
+      + 'on only with SAVE CALIBRATION.';
+  }
   const { refined } = refine;
-  return refined ? `camera.json's camera is fitted to ${refined.points} points.`
-    : 'camera.json is the three cubes\' calibration alone.';
+  const what = refined ? `the calibration of ${refined.points} points.` : 'the three cubes\' calibration alone.';
+  return refine.saved ? `Saved: ${what}` : `camera.json: ${what}`;
 }
 
 // Where the red cube would add most next: the place in reach, whole in view, furthest from every point.

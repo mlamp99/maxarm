@@ -2,42 +2,53 @@
   "about": "Desk space to camera pixels: pixel ~ desk_to_pixel @ [x, y, z, 1], desk mm, z the height above the desk. It holds for frames of frame_size only, from a camera that has not moved. Fitted by calibration/, the camera page, to the three 40 mm cubes in camera-frame.png, each standing where camera-points.json says the arm read the cup over it, its millimetres real ones: true_to_pixel is the camera, in true mm along the arm's x and y; desk_to_true takes the arm's x, y to true mm: the board's mirror. arm_stretch is the stretch a turn, shift and stretch would take between the arm's readings and the cubes where their own edges put them, the arm's measure against the camera's, shown, not used. desk_to_pixel is the two together. `anchor` says how the arm is laid on the camera: its axis where the base's nuts put it, its turn from the points' bearings, in the desk space of `cubes_alone` -- the camera with the arm laid on the three cubes' readings alone -- and how each thing trusted fitted; what is left at each point is the arm's correction, arm-true.json. `refined`, if there, says SAVE laid it with every point in camera-refine-points.json: how many, and each point's miss through the tie and correction the others make. `lens` is the camera it was calibrated with, as it calls itself, and the focus it was held at (focus_absolute): the live view holds that camera at it, since focusing moves the picture.",
   "desk_to_pixel": [
     [
-      -147.12604858116964,
-      -922.9754151523082,
-      -2114.3998904760365,
-      398396.52029417397
+      -145.49733264512622,
+      -924.0067044341218,
+      -2109.794904099466,
+      399063.98658907565
     ],
     [
-      677.5799799169124,
-      1567.922387356946,
-      -1188.8869094787253,
-      510738.31937736546
+      678.5267151804574,
+      1571.4599764720292,
+      -1187.6457632788724,
+      511966.6930472631
     ],
     [
-      -0.6881664944926194,
-      0.2765910348031254,
-      -0.6707639490344394,
-      438.8617291662261
+      -0.690173981039722,
+      0.2786183526322606,
+      -0.6678560394817635,
+      440.1449786439558
     ]
   ],
+  "lens": {
+    "camera": "HD Pro Webcam C920",
+    "focus": 50,
+    "mode": {
+      "format": "YUYV",
+      "size": [
+        2560,
+        1472
+      ]
+    }
+  },
   "true_to_pixel": [
     [
-      147.12604858116964,
-      -922.9754151523082,
-      -2114.3998904760365,
-      398396.52029417397
+      145.49733264512622,
+      -924.0067044341218,
+      -2109.794904099466,
+      399063.98658907565
     ],
     [
-      -677.5799799169124,
-      1567.922387356946,
-      -1188.8869094787253,
-      510738.31937736546
+      -678.5267151804574,
+      1571.4599764720292,
+      -1187.6457632788724,
+      511966.6930472631
     ],
     [
-      0.6881664944926194,
-      0.2765910348031254,
-      -0.6707639490344394,
-      438.8617291662261
+      0.690173981039722,
+      0.2786183526322606,
+      -0.6678560394817635,
+      440.1449786439558
     ]
   ],
   "desk_to_true": [
@@ -52,40 +63,40 @@
   ],
   "arm_stretch": [
     [
-      -1.0337357617316962,
-      -0.025168584316950564
+      -1.0326536677723919,
+      -0.025290622660051935
     ],
     [
-      0.025168584316950567,
-      0.9900218939853405
+      0.025290622660051963,
+      0.9908252549057949
     ]
   ],
   "cubes": {
     "blue": {
       "x": -132.38086638109448,
       "y": -198.66141539011,
-      "turn_deg": 47.68,
+      "turn_deg": 47.64,
       "pixel": [
-        1264.266,
-        207.549
+        1263.03,
+        207.864
       ]
     },
     "green": {
       "x": 136.77764886592516,
       "y": -218.39995320395346,
-      "turn_deg": 53.11,
+      "turn_deg": 53.17,
       "pixel": [
-        2051.522,
-        918.301
+        2050.108,
+        918.63
       ]
     },
     "red": {
       "x": 0.08282703860413494,
       "y": -125.90797380090764,
-      "turn_deg": 69.56,
+      "turn_deg": 69.69,
       "pixel": [
-        1284.985,
-        766.563
+        1283.36,
+        766.785
       ]
     }
   },
@@ -94,29 +105,40 @@
     1472
   ],
   "edge_px": [
-    0.6873905745251712,
-    2.245820919506216
+    0.6686524005529737,
+    1.9186913781305217
   ],
-  "edges_used": 626,
+  "edges_used": 629,
+  "refined": {
+    "points": 19,
+    "off_mm": [
+      0.92,
+      3.62
+    ],
+    "height_mm": [
+      0.17,
+      0.54
+    ]
+  },
   "cubes_alone": {
     "true_to_pixel": [
       [
-        151.44694275220448,
-        -922.2762680876565,
-        -2114.3998904760365,
-        401205.5690923399
+        150.47681170757613,
+        -923.2088565348448,
+        -2109.794904099466,
+        401841.80636033986
       ],
       [
-        -684.915492951876,
-        1564.7319289494278,
-        -1188.8869094787253,
-        504866.8592480685
+        -686.9890598494522,
+        1567.7789998957817,
+        -1187.6457632788724,
+        506079.77701327874
       ],
       [
-        0.6868636079218859,
-        0.2798108446580544,
-        -0.6707639490344394,
-        439.90265599947037
+        0.6886618366496975,
+        0.28233523561539164,
+        -0.6678560394817635,
+        441.28718633328845
       ]
     ],
     "desk_to_true": [
@@ -131,194 +153,354 @@
     ],
     "arm_stretch": [
       [
-        -1.0337357617316962,
-        -0.025168584316950564
+        -1.0326536677723919,
+        -0.025290622660051935
       ],
       [
-        0.025168584316950567,
-        0.9900218939853405
+        0.025290622660051963,
+        0.9908252549057949
       ]
     ],
     "cubes": {
       "blue": {
         "x": -132.38086638109448,
         "y": -198.66141539011,
-        "turn_deg": 47.68,
+        "turn_deg": 47.64,
         "pixel": [
-          1264.266,
-          207.549
+          1263.03,
+          207.864
         ]
       },
       "green": {
         "x": 136.77764886592516,
         "y": -218.39995320395346,
-        "turn_deg": 53.11,
+        "turn_deg": 53.17,
         "pixel": [
-          2051.522,
-          918.301
+          2050.108,
+          918.63
         ]
       },
       "red": {
         "x": 0.08282703860413494,
         "y": -125.90797380090764,
-        "turn_deg": 69.56,
+        "turn_deg": 69.69,
         "pixel": [
-          1284.985,
-          766.563
+          1283.36,
+          766.785
         ]
       }
     }
   },
   "anchor": {
     "axis": [
-      2.583,
-      2.622
+      2.711,
+      2.567
     ],
-    "turn_deg": -0.2683,
+    "turn_deg": -0.3089,
     "base": {
-      "x": 2.403,
-      "y": 1.75,
-      "turn_deg": 0.3951,
+      "x": 2.601,
+      "y": 1.7,
+      "turn_deg": 0.4012,
       "by_nuts": true,
       "shape": [
-        3.8,
-        1.3,
+        3.2,
+        0.8,
         0.2
       ],
       "parts": [
         {
           "name": "nut +x+y",
           "found": false,
-          "x": 63.59,
-          "y": 61.509,
+          "x": 62.99,
+          "y": 61.009,
           "contrast": 0.0,
           "off_mm": null
         },
         {
           "name": "cup +x+y",
           "found": false,
-          "x": 63.59,
-          "y": 61.509,
-          "contrast": 0.983,
+          "x": 62.99,
+          "y": 61.009,
+          "contrast": 0.982,
           "off_mm": null
         },
         {
           "name": "nut +x-y",
           "found": true,
-          "x": 62.909,
-          "y": -57.79,
-          "contrast": 0.74,
-          "off_mm": 0.104
+          "x": 63.009,
+          "y": -57.89,
+          "contrast": 0.731,
+          "off_mm": 0.016
         },
         {
           "name": "cup +x-y",
           "found": true,
-          "x": 63.809,
-          "y": -61.49,
-          "contrast": 0.507,
-          "off_mm": 3.788
+          "x": 63.509,
+          "y": -61.79,
+          "contrast": 0.504,
+          "off_mm": 3.942
         },
         {
           "name": "nut -x-y",
           "found": true,
-          "x": -58.39,
-          "y": -58.309,
-          "contrast": 0.636,
-          "off_mm": 1.259
+          "x": -57.79,
+          "y": -58.209,
+          "contrast": 0.66,
+          "off_mm": 0.959
         },
         {
           "name": "cup -x-y",
           "found": false,
-          "x": -55.99,
-          "y": -58.909,
-          "contrast": 0.394,
+          "x": -56.59,
+          "y": -59.409,
+          "contrast": 0.382,
           "off_mm": null
         },
         {
           "name": "nut -x+y",
           "found": false,
-          "x": -56.409,
-          "y": 61.09,
-          "contrast": 0.6,
+          "x": -57.009,
+          "y": 60.59,
+          "contrast": 0.634,
           "off_mm": null
         },
         {
           "name": "cup -x+y",
           "found": false,
-          "x": -56.409,
-          "y": 61.09,
-          "contrast": 0.196,
+          "x": -57.009,
+          "y": 60.59,
+          "contrast": 0.238,
           "off_mm": null
         }
       ]
     },
     "report": {
-      "points": 3,
+      "points": 19,
       "axis": [
-        2.58,
-        2.62
+        2.71,
+        2.57
       ],
-      "turn_deg": -0.268,
+      "turn_deg": -0.309,
       "base": {
-        "axis_off_mm": 0.89,
-        "turn_off_deg": -0.663
+        "axis_off_mm": 0.87,
+        "turn_off_deg": -0.71
       },
       "rows": [
         {
           "id": 1,
           "bearing": -33.68,
           "reach": 238.7,
-          "out_mm": 6.79,
-          "across_mm": -3.93,
-          "across_spreads": 2.81,
+          "out_mm": 6.77,
+          "across_mm": -3.76,
+          "across_spreads": 2.68,
           "fits": true
         },
         {
           "id": 2,
           "bearing": 32.06,
           "reach": 257.7,
-          "out_mm": 1.72,
-          "across_mm": 0.46,
-          "across_spreads": 0.26,
+          "out_mm": 1.53,
+          "across_mm": 0.43,
+          "across_spreads": 0.25,
           "fits": true
         },
         {
           "id": 3,
           "bearing": 0.04,
           "reach": 125.9,
-          "out_mm": 3.22,
-          "across_mm": 0.54,
-          "across_spreads": 0.82,
+          "out_mm": 3.12,
+          "across_mm": 0.51,
+          "across_spreads": 0.78,
+          "fits": true
+        },
+        {
+          "id": 4,
+          "bearing": -31.2,
+          "reach": 199.2,
+          "out_mm": 3.84,
+          "across_mm": -2.37,
+          "across_spreads": 2.57,
+          "fits": true
+        },
+        {
+          "id": 5,
+          "bearing": 36.69,
+          "reach": 148.1,
+          "out_mm": 1.81,
+          "across_mm": 1.33,
+          "across_spreads": 1.8,
+          "fits": true
+        },
+        {
+          "id": 6,
+          "bearing": -75.53,
+          "reach": 140.5,
+          "out_mm": 2.18,
+          "across_mm": 0.65,
+          "across_spreads": 0.92,
+          "fits": true
+        },
+        {
+          "id": 7,
+          "bearing": -56.27,
+          "reach": 198.3,
+          "out_mm": 3.52,
+          "across_mm": -0.47,
+          "across_spreads": 0.51,
+          "fits": true
+        },
+        {
+          "id": 8,
+          "bearing": -2.66,
+          "reach": 236.6,
+          "out_mm": 3.85,
+          "across_mm": -0.75,
+          "across_spreads": 0.55,
+          "fits": true
+        },
+        {
+          "id": 9,
+          "bearing": -2.56,
+          "reach": 162.2,
+          "out_mm": 2.7,
+          "across_mm": -0.26,
+          "across_spreads": 0.33,
+          "fits": true
+        },
+        {
+          "id": 10,
+          "bearing": 45.16,
+          "reach": 190.7,
+          "out_mm": 1.54,
+          "across_mm": 1.84,
+          "across_spreads": 2.06,
+          "fits": true
+        },
+        {
+          "id": 11,
+          "bearing": 16.1,
+          "reach": 194.4,
+          "out_mm": 2.1,
+          "across_mm": 0.69,
+          "across_spreads": 0.76,
+          "fits": true
+        },
+        {
+          "id": 12,
+          "bearing": -72.4,
+          "reach": 204.1,
+          "out_mm": 1.44,
+          "across_mm": -0.11,
+          "across_spreads": 0.12,
+          "fits": true
+        },
+        {
+          "id": 13,
+          "bearing": -61.62,
+          "reach": 252.2,
+          "out_mm": 4.37,
+          "across_mm": -1.92,
+          "across_spreads": 1.16,
+          "fits": true
+        },
+        {
+          "id": 14,
+          "bearing": -42.26,
+          "reach": 132.3,
+          "out_mm": 3.39,
+          "across_mm": 1.31,
+          "across_spreads": 1.91,
+          "fits": true
+        },
+        {
+          "id": 15,
+          "bearing": -13.76,
+          "reach": 202.6,
+          "out_mm": 2.96,
+          "across_mm": -0.21,
+          "across_spreads": 0.22,
+          "fits": true
+        },
+        {
+          "id": 16,
+          "bearing": 24.14,
+          "reach": 118.6,
+          "out_mm": 1.01,
+          "across_mm": 0.45,
+          "across_spreads": 0.7,
+          "fits": true
+        },
+        {
+          "id": 17,
+          "bearing": -69.87,
+          "reach": 176.5,
+          "out_mm": 1.4,
+          "across_mm": 0.03,
+          "across_spreads": 0.03,
+          "fits": true
+        },
+        {
+          "id": 18,
+          "bearing": -36.04,
+          "reach": 243.3,
+          "out_mm": 5.22,
+          "across_mm": -0.16,
+          "across_spreads": 0.11,
+          "fits": true
+        },
+        {
+          "id": 19,
+          "bearing": -20.73,
+          "reach": 241.4,
+          "out_mm": 4.34,
+          "across_mm": -1.58,
+          "across_spreads": 1.09,
           "fits": true
         }
       ],
       "does_not_fit_mm": {},
       "turns_axis": {
         "axis": [
-          5.12,
-          6.78
+          3.08,
+          3.08
         ],
-        "off_mm": 4.87,
-        "sure_mm": 2.08,
-        "turn_deg": -1.119
+        "off_mm": 0.63,
+        "sure_mm": 0.89,
+        "turn_deg": -0.33
       },
       "reach_axis": {
         "axis": [
-          -0.38,
-          -1.37
+          1.63,
+          0.26
         ],
-        "off_mm": 4.97,
-        "sure_mm": 0.89,
-        "turn_deg": 0.831
+        "off_mm": 2.54,
+        "sure_mm": 0.32,
+        "turn_deg": -0.354
       },
       "left_out_mm": {
-        "1": 6.11,
+        "1": 3.62,
         "2": 1.75,
-        "3": 1.95
+        "3": 0.8,
+        "4": 1.72,
+        "5": 0.75,
+        "6": 0.71,
+        "7": 0.85,
+        "8": 0.32,
+        "9": 0.76,
+        "10": 0.51,
+        "11": 0.55,
+        "12": 1.89,
+        "13": 1.68,
+        "14": 0.92,
+        "15": 0.95,
+        "16": 1.47,
+        "17": 0.87,
+        "18": 2.25,
+        "19": 1.24
       },
       "worst": {
         "what": "point 1 across",
-        "spreads": 2.81
+        "spreads": 2.68
       }
     }
   }

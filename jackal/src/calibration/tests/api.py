@@ -36,7 +36,8 @@ arm is out of the way. Finding the red cube and coming over it is
 drawn over the live view by `applib/overlay`, a layer the page lays over it.
 CALIBRATE's three cubes are points 1, 2 and 3, forgotten as any other. They are
 kept in `camera-refine-points.json` and belong to the camera as CALIBRATE fitted
-it: a new CALIBRATE sets them aside.
+it: a new CALIBRATE sets them aside. The arm takes them on only with SAVE
+CALIBRATION; the state says whether they changed since (`refine.saved`).
 
 ARM TO DESK from a cup at a cube's top -- FIND RED CUBE's or a grid click's
 notch -- parks the arm first: straight across from there strains it (the owner's).
@@ -324,7 +325,7 @@ class TestsSession:
                 "desk_to_true": fit.desk_to_true.tolist() if fit else None,
                 "found": self.cube.found,
                 "last": self.kept.to_json() if self.kept else None,
-                "refine": self._refinement(fit) if fit else None,
+                "refine": {**self._refinement(fit), "saved": self._is_saved()} if fit else None,
             },
             "unavailable": {"tests": problem} if problem else {},
         }
@@ -343,6 +344,12 @@ class TestsSession:
             self._loaded = (stamp, fit)
         fit = self._loaded[1]
         return (fit, None) if fit else (None, "camera.json was not written by the camera page: CALIBRATE again")
+
+    def _is_saved(self) -> bool:
+        """Whether camera.json was written -- by SAVE CALIBRATION, or CALIBRATE with its cubes -- after the points last
+        changed: every change to them writes their file."""
+        points, camera = self.config_dir / store.REFINE_FILE, self.config_dir / store.CAMERA_FILE
+        return not points.exists() or points.stat().st_mtime_ns <= camera.stat().st_mtime_ns
 
     def _refinement(self, fit: CameraFit) -> dict:
         """The points as `refine.describe()` has them, worked out again only when they or camera.json change."""

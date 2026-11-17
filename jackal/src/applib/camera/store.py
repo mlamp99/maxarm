@@ -269,8 +269,9 @@ def save_correction(config_dir: Path, mesh: Optional[Mesh]) -> None:
                   "calibration measured it: a row per point, where the formula put the cup over the cube (its "
                   "bearing, degrees, 0 straight out, + toward +x, and its reach from the base axis, mm) and how much "
                   "further out (mm) and further round (degrees) the camera saw the cube, the arm's axis and turn "
-                  "laid on the camera by its base and the points' bearings (camera.json's `anchor`). Between the "
-                  "points the mesh joins them straight; beyond, each holds its nearest edge (maxarm/mesh.py). Read "
+                  "laid on the camera by its base and the points' bearings (camera.json's `anchor`). The rows make "
+                  "the pattern they share over the whole desk and a mesh of what it leaves at each, fading out "
+                  "beyond the points (maxarm/mesh.py), made again from the rows when read. Read "
                   "by maxarm/converter.py whenever it changes. Written by calibration/, CALIBRATE and SAVE."),
         **mesh.to_json(),
     }

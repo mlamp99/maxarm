@@ -52,7 +52,7 @@ described = page.describe(saved, points, anchor.base_of(saved, frame))
 for row in described["points"]:
     print(f"  #{row['id']}: off now {row['off']['now']:.2f}, without it {row['off']['without']}, "
           f"Z now {row['height']['now']}, fits {row['fits']}")
-print(f"  SAVE would: {described['fit'] and {key: described['fit'][key] for key in ('off_mm', 'does_not_fit', 'change_mm')}}"
+print(f"  SAVE would: {described['fit'] and {key: described['fit'][key] for key in ('off_mm', 'does_not_fit', 'pattern', 'change_mm')}}"
       f"{' -- ' + described['problem'] if described['problem'] else ''}")
 refined, tie = page.refined(saved, points, anchor.base_of(saved, frame))
 store.save_camera(DRY, refined)

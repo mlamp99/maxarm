@@ -58,8 +58,9 @@ Written by CALIBRATE (its three cubes) and SAVE CALIBRATION (every point): this 
 of the formula, which the library converts every position with from then on (`maxarm/converter.py`), read again
 whenever the file changes. A row per point: the formula's bearing and reach for the cup over the cube, and how much
 further out (mm) and further round (degrees) the camera saw the cube, the arm laid on the camera by its base's nuts
-and the points' bearings (`camera.json`'s `anchor`). Between the points `maxarm/mesh.py` joins them straight; beyond,
-each holds its nearest edge. No file: the formula alone.
+and the points' bearings (`camera.json`'s `anchor`). `maxarm/mesh.py` makes of the rows the pattern they share over the
+whole desk and a mesh of what it leaves at each, exact at the points, fading out beyond them. No file: the formula
+alone.
 
 ## camera.json
 

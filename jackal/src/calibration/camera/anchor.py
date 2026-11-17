@@ -13,8 +13,8 @@ their readings (`cube_fit()`), which only has to be near the arm's: the tie says
 where the arm really stands in it.
 
 **The frame, once.** CALIBRATE lays the arm: its axis where the base is, its turn
-from the cubes' bearings. SAVE keeps it: points add to the mesh and never move the
-camera, so a point changes the correction only round itself.
+from the cubes' bearings. SAVE keeps it: points add to the correction and never move
+the camera.
 
 **What is trusted, and how much.** Each point is a cube seen by the camera (where
 its edges put it) and the firmware's position over it, made true by the formula
@@ -37,12 +37,13 @@ counting less (Huber).
 
 **The mesh.** At each point, the cube where the camera sees it, taken about the
 axis and turn, against where the formula puts the cup: further out (mm) and further
-round (degrees). Those rows are the mesh (`maxarm/mesh.py`): exact at a point,
-straight across the triangles its nearest points make, held beyond.
+round (degrees). Those rows are the correction (`maxarm/mesh.py`): the pattern they
+share over the whole desk, and a mesh of what it leaves at each, exact at a point,
+fading out beyond the points.
 
 **What does not fit.** Each point is judged without it, by its reach: how much
 further out the camera saw its cube than the formula put the cup, against what the
-mesh of the other points says there. The arm's reach is off by much the same all
+correction of the other points says there. The arm's reach is off by much the same all
 over the desk (+1 to +3 mm, 13 and 16 Nov), its turn is not (the sides up to ~1.5
 deg apart), so the reach is what shows a recording gone wrong -- the cube moved
 after RECORD, or the cup off it. The worst, if further than DOES_NOT_FIT_MM, is
