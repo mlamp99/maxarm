@@ -3,12 +3,16 @@
 No board.
 
 A servo stops short of a command, in the direction it was moving, by an amount set by the move: how far, which
-way, which servo (work/MAXARM_MECHANICS.md §4-7). A one-pulse correction is ignored. So a landing is made the same
-way every time, and aimed past by what that way falls short:
+way, which servo, and where it is (work/MAXARM_MECHANICS.md §4-7). A one-pulse correction is ignored. So a
+landing is made the same way every time, and aimed past by what that way falls short:
 
 1. across, at the travel height, to APPROACH_PULSES of the base to one side of the target: the side of lower
-   pulses, so that the last turn is made with them rising, where the planner allows;
-2. the base turned onto the target from there, aimed past it by AIM_PAST_* pulses;
+   pulses, so that the last turn is made with them rising, where the planner allows; the arm then read until it is
+   steady (`arm.py`), so that the swing there is spent;
+2. the base turned onto the target from there, aimed past it by AIM_PAST_* pulses, and read until steady. A turn
+   that settled too far off (`is_worth_again()`) is made again, once, from the same start, aimed a pulse against
+   its miss (`again()`): the base stops a little differently at each place on its turn, and the same way again at
+   the same place;
 3. straight down in one slow command, servos 2 and 3 given EXTRA_PULSES -- by reach -- beyond the target's.
 
 The target is the point asked for, its height included. What the library keeps as sent is that target, never the
@@ -19,7 +23,7 @@ Positions in and out are arm space, true (`raw.py`). The pulses are the firmware
 """
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import List, Tuple
 
 from . import geometry, raw
@@ -31,7 +35,7 @@ from .geometry import Position
 # way; from 20, 0.75 and 1.5 short, 0.7-0.8 either way; from 60, round the command, 0.8 either way).
 APPROACH_PULSES = 6
 # How far past the target the base is aimed, in pulses: turning onto it with its pulses falling, and rising. Rising
-# is the steadier and its shortfall a whole pulse, so it is the first way down.
+# is the steadier (STATUS-jackal §25), so it is the first way down.
 AIM_PAST_FALLING = 1
 AIM_PAST_RISING = 2
 # Servo 2's and servo 3's extra pulses on the way down, by the target's reach in mm: straight between rows, held
@@ -39,9 +43,9 @@ AIM_PAST_RISING = 2
 EXTRA_PULSES = ((120.0, 0.0, 3.1), (140.0, -0.25, 3.05), (160.0, -0.5, 2.9), (175.0, -0.5, 2.6),
                 (190.0, -0.5, 2.0), (205.0, -0.5, 2.0), (220.0, -0.5, 2.25), (235.0, -0.5, 2.1),
                 (250.0, -0.5, 2.0), (265.0, -0.5, 2.0))
-# A landing is lifted and made again, once, the other way round, when its base settled further than RESETTLE_MM
-# sideways at the cup from the target and a whole pulse at least half a pulse nearer was there to be had: the base
-# stops on whole pulses, so nothing nearer than the nearest one is asked for (the owner's, 9 Nov).
+# A base turn is made again, once, when it settled further than RESETTLE_MM sideways at the cup from the target and a
+# whole pulse at least half a pulse nearer was there to be had: the base stops on whole pulses, so nothing nearer
+# than the nearest one is asked for (the owner's, 9 Nov).
 RESETTLE_MM = 0.75
 BASE_PULSE_DEG = 240.0 / 1000.0
 
@@ -53,6 +57,7 @@ class Landing:
     down: Position           # what the descent is sent to: the target, servos 2 and 3 beyond it
     target: Position         # where the cup is to end: the point asked for
     base: float              # the target's exact base pulse
+    aimed: float = 0.0       # the base pulse `over` and `down` are given
 
 
 def plans(target: Position, travel_z: float) -> List[Landing]:
@@ -71,16 +76,25 @@ def plans(target: Position, travel_z: float) -> List[Landing]:
         ways.append(Landing(approach=_point((exact[0] + side * APPROACH_PULSES, high[1], high[2])),
                             over=_point((aimed, high[1], high[2])),
                             down=_point((aimed, exact[1] + extra2, exact[2] + extra3)),
-                            target=target, base=exact[0]))
+                            target=target, base=exact[0], aimed=aimed))
     return ways
 
 
 def is_worth_again(way: Landing, base_read: float) -> bool:
-    """Whether a landing made `way` whose base reads `base_read` is to be made again (RESETTLE_MM)."""
+    """Whether a turn made `way` whose base reads `base_read` is to be made again (RESETTLE_MM)."""
     off = abs(base_read - way.base)
     nearest = abs(way.base - round(way.base))
     sideways = off * math.radians(BASE_PULSE_DEG) * math.hypot(way.target[0], way.target[1])
     return sideways > RESETTLE_MM and off - nearest >= 0.5
+
+
+def again(way: Landing, base_read: float) -> Landing:
+    """`way` after its turn settled at `base_read`: from the same start, aimed one pulse the other way from its miss.
+    The turn then settles about as far the other side of the target, within a pulse (STATUS-jackal §25)."""
+    shift = -1 if base_read > way.base else 1
+    over, down = _pulses(way.over), _pulses(way.down)
+    return replace(way, over=_point((over[0] + shift, over[1], over[2])),
+                   down=_point((down[0] + shift, down[1], down[2])), aimed=way.aimed + shift)
 
 
 def extra_pulses(reach: float) -> Tuple[float, float]:

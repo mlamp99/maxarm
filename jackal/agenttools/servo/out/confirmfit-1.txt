@@ -1,0 +1,12 @@
+desk +5
+   before (lib passes), study places  n 88 | side within 0.5 mm  74%, 1 mm  94%; base on the nearest pulse  59% | rms side 0.46 z 0.30 reach 0.32; mean z -0.02 reach -0.21 | turned again  0%, 3.8 s
+   after, study places                n 44 | side within 0.5 mm  82%, 1 mm 100%; base on the nearest pulse  66% | rms side 0.39 z 0.41 reach 0.37; mean z -0.11 reach -0.07 | turned again  7%, 6.7 s
+   after, between them                n 18 | side within 0.5 mm  83%, 1 mm 100%; base on the nearest pulse  72% | rms side 0.31 z 0.42 reach 0.37; mean z +0.01 reach -0.14 | turned again  0%, 6.4 s
+      after, by reach: 120: z -0.14 reach +0.43  135: z -0.06 reach -0.52  150: z -0.00 reach -0.37  180: z +0.32 reach -0.32  195: z -0.45 reach +0.20  210: z -0.34 reach -0.06  240: z +0.04 reach -0.20  255: z +0.55 reach -0.09  265: z -0.50 reach +0.07
+desk +41
+   before (lib passes), study places  n 88 | side within 0.5 mm  74%, 1 mm  93%; base on the nearest pulse  51% | rms side 0.50 z 0.32 reach 0.46; mean z -0.13 reach -0.15 | turned again  0%, 4.4 s
+   after, study places                n 44 | side within 0.5 mm  82%, 1 mm 100%; base on the nearest pulse  64% | rms side 0.37 z 0.36 reach 0.56; mean z -0.04 reach -0.22 | turned again 11%, 6.9 s
+   after, between them                n 18 | side within 0.5 mm  94%, 1 mm 100%; base on the nearest pulse  78% | rms side 0.26 z 0.31 reach 0.25; mean z +0.15 reach -0.16 | turned again  6%, 6.9 s
+      after, by reach: 120: z +0.11 reach -0.78  135: z +0.30 reach -0.18  150: z -0.01 reach +0.34  180: z +0.11 reach -0.74  195: z +0.28 reach -0.24  210: z -0.32 reach -0.60  240: z -0.49 reach +0.28  255: z -0.14 reach -0.06  265: z +0.38 reach +0.08
+
+turned again: 9 of 124; the first turn's miss, then where the base ended: -0.86 -> +0.52, +1.30 -> -0.61, +1.27 -> -0.64, +1.12 -> -0.79, +1.00 -> -0.89, +1.27 -> -0.73, +1.18 -> -0.73, -1.12 -> +0.68, +1.27 -> -0.73

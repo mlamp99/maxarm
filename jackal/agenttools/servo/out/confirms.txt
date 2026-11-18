@@ -1,0 +1,8 @@
+desk +41
+   tables by reach and height     n 62 side within 0.5 / 1 mm  85% 100%, nearest pulse  68% | rms side 0.34 z 0.35 reach 0.49 | mean z +0.02 reach -0.20 | worst side 0.82 z 1.11 reach 1.05
+   6 Nov table + mean by height   n 62 side within 0.5 / 1 mm  82%  97%, nearest pulse  69% | rms side 0.38 z 0.34 reach 0.61 | mean z -0.02 reach -0.34 | worst side 1.18 z 0.78 reach 1.49
+   6 Nov table (kept)             n 62 side within 0.5 / 1 mm  82%  98%, nearest pulse  68% | rms side 0.39 z 0.42 reach 0.65 | mean z -0.18 reach -0.45 | worst side 1.22 z 1.05 reach 1.34
+desk +5
+   tables by reach and height     n 62 side within 0.5 / 1 mm  82% 100%, nearest pulse  68% | rms side 0.37 z 0.41 reach 0.37 | mean z -0.07 reach -0.09 | worst side 0.99 z 1.30 reach 0.88
+   6 Nov table + mean by height   n 62 side within 0.5 / 1 mm  87% 100%, nearest pulse  68% | rms side 0.35 z 0.44 reach 0.37 | mean z -0.24 reach +0.13 | worst side 0.88 z 1.16 reach 1.40
+   6 Nov table (kept)             n 62 side within 0.5 / 1 mm  85%  97%, nearest pulse  65% | rms side 0.40 z 0.36 reach 0.31 | mean z +0.10 reach -0.15 | worst side 1.37 z 0.87 reach 0.69

@@ -5,7 +5,7 @@
     found.by_nuts, found.sure_mm                 # laid on its nuts (else the whole shape), and how far to trust it
     found.parts                                  # each nut and cup rim looked for alone
 
-The base's shape is the owner's (work/PILOT-kiwi-idea.md): four suction cups, 42 mm
+The base's shape is the owner's (work/PILOT-kiwi-idea.md): four suction cups, 41 mm
 across, flush on the desk, their centres on a 120 mm square round the arm's axis,
 its sides along the arm's x and y; over each, on the black plate's top 10 mm up, a
 steel nut 7 mm across its flats and 3 mm tall under a rounded tip, 5 mm across
@@ -48,7 +48,8 @@ from .model import project
 
 # The base (the owner's, work/PILOT-kiwi-idea.md), mm, round the arm's axis, sides along its x and y.
 CUP_SPACING_MM = 120.0          # the nuts' centres, and the cups' under them
-CUP_RADIUS_MM = 21.0            # 162 mm across the outer rims, flush on the desk
+BASE_SUCTION_CUP_RADIUS_MM = 20.5   # the base's four suction cups holding it to the desk (not the arm's cup): 41 mm,
+                                   # 161 mm across their outer rims on the 120 mm square
 PLATE_TOP_MM = 10.0
 NUT_TOP_MM = 13.0               # the hex, 3 mm tall on the plate
 NUT_HALF_MM = 3.5               # 7 mm across the flats, drawn as a circle
@@ -181,7 +182,7 @@ def part_shapes() -> List[Tuple[str, Tuple[int, int], np.ndarray]]:
         nut = np.vstack([ring((cx, cy), radius, z, 16) for radius, z in
                          ((NUT_HALF_MM, PLATE_TOP_MM), (NUT_HALF_MM, NUT_TOP_MM), (TIP_TOP_HALF_MM, TIP_TOP_MM))])
         parts.append((f"nut {label}", corner, nut))
-        parts.append((f"cup {label}", corner, ring((cx, cy), CUP_RADIUS_MM, 0.0, 48)))
+        parts.append((f"cup {label}", corner, ring((cx, cy), BASE_SUCTION_CUP_RADIUS_MM, 0.0, 48)))
     return parts
 
 

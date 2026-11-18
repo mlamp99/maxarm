@@ -598,9 +598,11 @@ class MaxArm:
 
     def _visit(self, target: Position, travel: float, servo: Optional[float]) -> MoveResult:
         """Slowly up to `travel` if below it, then down onto `target` as `landing.py` comes down, and read there
-        as PRECISE is. A landing whose base settled too far off to the side, with a nearer whole pulse to be had
-        (`landing.is_worth_again()`), is lifted and made again, once, the other way round where the planner allows:
-        other gear faces, another shortfall, not the same miss again."""
+        as PRECISE is. The base is read until steady beside the target before its last turn -- the swing there
+        spent -- and after it: one whose turn settled too far off to the side, with a nearer whole pulse to be had
+        (`landing.is_worth_again()`), goes back beside the target and turns onto it again, once, from the same side
+        (the base's play taken up the same way), aimed a pulse against its miss (`landing.again()`), before anything
+        comes down."""
         problem = self._visit_problem(target, travel, servo)
         if problem:
             return self._result(MoveStatus.REFUSED, problem)
@@ -609,28 +611,32 @@ class MaxArm:
             result = self._move((here[0], here[1], travel), MoveType.SLOW)
             if not result:
                 return result
-        ways = self._landings(target, travel)
-        way = ways[0]
+        way = self._landings(target, travel)[0]
+        result = self._move(self._spaces.arm.to_desk(way.approach), MoveType.FAST, servo)
+        if not result:
+            return result
         for attempt in (1, 2):
-            result = self._move(self._spaces.arm.to_desk(way.approach), MoveType.FAST, servo)
-            if not result:
-                return result
-            servo = None
-            for point, speed in ((way.over, MOVE_FAST_MM_S), (way.down, MOVE_SLOW_MM_S)):
-                failed = self._drive(point, speed, None)
-                if failed is not None:
-                    return failed
-            result = self._land(self._spaces.arm.from_desk(target))
-            if attempt == 2 or not result or not self._settled or not landing.is_worth_again(way, self._settled[0]):
-                return result
+            if self._steady() is None and self._abort.is_set():
+                return self._result(MoveStatus.STOPPED)
+            failed = self._drive(way.over, MOVE_FAST_MM_S, None)
+            if failed is not None:
+                return failed
+            turned = self._steady()
+            if turned is None and self._abort.is_set():
+                return self._result(MoveStatus.STOPPED)
+            if attempt == 2 or turned is None or not landing.is_worth_again(way, turned[0]):
+                break
             if IS_TRACED:
-                trace_note(f"landing: the base settled {self._settled[0] - way.base:+.1f} pulses off the target; "
-                           f"lifting to land again the other way round")
-            way = ways[-1]
-            result = self._move((target[0], target[1], travel), MoveType.SLOW)
-            if not result:
-                return result
-        return result
+                trace_note(f"landing: the base settled {turned[0] - way.base:+.1f} pulses off the target; "
+                           f"turning onto it again from beside it")
+            way = landing.again(way, turned[0])
+            failed = self._drive(way.approach, MOVE_FAST_MM_S, None)
+            if failed is not None:
+                return failed
+        failed = self._drive(way.down, MOVE_SLOW_MM_S, None)
+        if failed is not None:
+            return failed
+        return self._land(self._spaces.arm.from_desk(target))
 
     def _visit_problem(self, target: Position, travel: float, servo: Optional[float]) -> Optional[str]:
         problem = (self._planner.problem_with((target[0], target[1], travel)) or self._planner.problem_with(target)

@@ -49,7 +49,7 @@ HIDDEN_OPACITY = 0.25                   # the edges a cube hides, and the X unde
 DOT_STEP_MM = 50
 LABEL_STEP_MM = 100
 # The MaxArm's base (the owner, work/PILOT-kiwi-idea.md; applib/camera/base.py), mm, round the arm's axis.
-BASE_CUP_SPACING_MM, BASE_CUP_RADIUS_MM = base.CUP_SPACING_MM, base.CUP_RADIUS_MM
+BASE_CUP_SPACING_MM, BASE_CUP_RADIUS_MM = base.CUP_SPACING_MM, base.BASE_SUCTION_CUP_RADIUS_MM
 PLATE_TOP_MM, NUT_TOP_MM, NUT_HALF_MM = base.PLATE_TOP_MM, base.NUT_TOP_MM, base.NUT_HALF_MM
 TIP_BOTTOM_HALF_MM, TIP_TOP_HALF_MM, TIP_TOP_MM, TIP_MM = (base.TIP_BOTTOM_HALF_MM, base.TIP_TOP_HALF_MM,
                                                            base.TIP_TOP_MM, base.TIP_MM)

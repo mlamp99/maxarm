@@ -1,0 +1,28 @@
+{"what": "start", "servo_methods": ["stop", "load", "run", "uart", "rx_buf", "unload", "get_position", "tx_en", "rx_en", "isAutoEnableRT", "rx_enable", "tx_enable", "check_sum", "send_data", "run_mult", "run_add_or_dec", "set_ID", "get_ID", "servo_receive_handle", "set_mode", "get_vin", "adjust_offset", "save_offset", "get_offset"], "pulses": [501, 498, 503], "supply_mv": 12260, "t": "15:35:55"}
+{"what": "step", "leg": "left", "target": 550, "at": 548, "reads": [548, 548, 548, 548, 548], "short": 2, "supply_mv": 12280, "stopped": false, "t": "15:35:57"}
+{"what": "step", "leg": "left", "target": 600, "at": 597, "reads": [597, 597, 596, 597, 598], "short": 3, "supply_mv": 12300, "stopped": false, "t": "15:35:59"}
+{"what": "step", "leg": "left", "target": 650, "at": 648, "reads": [648, 648, 648, 648, 648], "short": 2, "supply_mv": 12291, "stopped": false, "t": "15:36:01"}
+{"what": "step", "leg": "left", "target": 700, "at": 697, "reads": [697, 697, 697, 697, 697], "short": 3, "supply_mv": 12325, "stopped": false, "t": "15:36:03"}
+{"what": "step", "leg": "left", "target": 750, "at": 747, "reads": [747, 747, 747, 748, 747], "short": 3, "supply_mv": 12298, "stopped": false, "t": "15:36:05"}
+{"what": "step", "leg": "left", "target": 800, "at": 797, "reads": [797, 797, 797, 798, 797], "short": 3, "supply_mv": 12314, "stopped": false, "t": "15:36:06"}
+{"what": "step", "leg": "left", "target": 850, "at": 846, "reads": [846, 846, 846, 847, 847], "short": 4, "supply_mv": 12325, "stopped": false, "t": "15:36:08"}
+{"what": "step", "leg": "left", "target": 900, "at": 896, "reads": [896, 896, 896, 896, 896], "short": 4, "supply_mv": 12322, "stopped": false, "t": "15:36:10"}
+{"what": "step", "leg": "left", "target": 925, "at": 922, "reads": [922, 922, 922, 923, 922], "short": 3, "supply_mv": 12327, "stopped": false, "t": "15:36:12"}
+{"what": "step", "leg": "left", "target": 950, "at": 947, "reads": [947, 947, 947, 947, 947], "short": 3, "supply_mv": 12329, "stopped": false, "t": "15:36:14"}
+{"what": "step", "leg": "left", "target": 975, "at": 974, "reads": [974, 974, 975, 972, 971], "short": 1, "supply_mv": 12322, "stopped": false, "t": "15:36:16"}
+{"what": "step", "leg": "left", "target": 1000, "at": 997, "reads": [997, 998, 997, 997, 997], "short": 3, "supply_mv": 12291, "stopped": false, "t": "15:36:18"}
+{"what": "back", "leg": "left", "at": 501, "reads": [502, 502, 501, 501, 501], "t": "15:36:21"}
+{"what": "step", "leg": "right", "target": 450, "at": 453, "reads": [453, 453, 453, 453, 453], "short": -3, "supply_mv": 12316, "stopped": false, "t": "15:36:23"}
+{"what": "step", "leg": "right", "target": 400, "at": 401, "reads": [401, 401, 401, 401, 401], "short": -1, "supply_mv": 12327, "stopped": false, "t": "15:36:25"}
+{"what": "step", "leg": "right", "target": 350, "at": 352, "reads": [353, 352, 353, 352, 352], "short": -2, "supply_mv": 12320, "stopped": false, "t": "15:36:27"}
+{"what": "step", "leg": "right", "target": 300, "at": 303, "reads": [303, 303, 303, 302, 303], "short": -3, "supply_mv": 12338, "stopped": false, "t": "15:36:29"}
+{"what": "step", "leg": "right", "target": 250, "at": 253, "reads": [253, 254, 252, 252, 253], "short": -3, "supply_mv": 12325, "stopped": false, "t": "15:36:31"}
+{"what": "step", "leg": "right", "target": 200, "at": 203, "reads": [203, 202, 202, 203, 203], "short": -3, "supply_mv": 12309, "stopped": false, "t": "15:36:33"}
+{"what": "step", "leg": "right", "target": 150, "at": 153, "reads": [153, 153, 152, 153, 152], "short": -3, "supply_mv": 12298, "stopped": false, "t": "15:36:35"}
+{"what": "step", "leg": "right", "target": 100, "at": 102, "reads": [102, 102, 101, 103, 102], "short": -2, "supply_mv": 12282, "stopped": false, "t": "15:36:37"}
+{"what": "step", "leg": "right", "target": 75, "at": 77, "reads": [77, 77, 77, 77, 76], "short": -2, "supply_mv": 12322, "stopped": false, "t": "15:36:38"}
+{"what": "step", "leg": "right", "target": 50, "at": 53, "reads": [53, 52, 53, 52, 53], "short": -3, "supply_mv": 12278, "stopped": false, "t": "15:36:40"}
+{"what": "step", "leg": "right", "target": 25, "at": 28, "reads": [28, 28, 28, 28, 28], "short": -3, "supply_mv": 12294, "stopped": false, "t": "15:36:42"}
+{"what": "step", "leg": "right", "target": 0, "at": 1, "reads": [1, 1, 1, 1, 1], "short": -1, "supply_mv": 12322, "stopped": false, "t": "15:36:44"}
+{"what": "back", "leg": "right", "at": 498, "reads": [498, 498, 498, 498, 499], "t": "15:36:47"}
+{"what": "end", "pulses": [499, 498, 504], "t": "15:36:53"}

@@ -1,0 +1,599 @@
+{"t": "15:42:10", "command": "read", "reply": {"pulses": [498.5, 498.25, 503.5], "raw": [1.03, -163.86, 210.77], "true": [0.97, -165.28, 203.72], "supply_mv": 12256}}
+{"t": "15:42:20", "command": "down 0 -160 44", "reply": {"status": "done", "detail": "", "pulses": [499.44, 320.89, 802.89], "raw": [0.36, -153.54, 46.57], "true": [0.35, -159.8, 44.01], "supply_mv": 12282}}
+{"t": "15:43:57", "command": "down 0 -250 44", "reply": {"status": "done", "detail": "", "pulses": [500.83, 224.0, 679.33], "raw": [-0.85, -243.32, 41.95], "true": [-0.82, -249.58, 43.92], "supply_mv": 12325}}
+{"t": "15:44:23", "command": "down 0 -240 44", "reply": {"status": "done", "detail": "", "pulses": [500.0, 238.0, 693.56], "raw": [0.0, -234.3, 42.91], "true": [0.0, -240.5, 44.5], "supply_mv": 12269}}
+{"t": "15:45:11", "command": "down 0 -250 44", "reply": {"status": "done", "detail": "", "pulses": [500.0, 224.11, 679.0], "raw": [0.0, -243.43, 42.14], "true": [0.0, -249.67, 44.12], "supply_mv": 12331}}
+{"t": "15:45:27", "command": "down 0 -160 44", "reply": {"status": "done", "detail": "", "pulses": [500.0, 321.0, 803.0], "raw": [0.0, -153.43, 46.6], "true": [0.0, -159.69, 44.03], "supply_mv": 12318}}
+{"t": "15:47:19", "command": "down 0 -90 44", "reply": {"status": "refused", "detail": "90 mm from the base axis, inside the 95 mm reach limit", "pulses": [500.0, 321.0, 803.75], "raw": [0.0, -153.02, 46.47], "true": [0.0, -159.28, 43.87], "supply_mv": 12271}}
+{"t": "15:47:26", "command": "down 0 -96 44", "reply": {"status": "refused", "detail": "the cup could not be brought down to it from either side", "pulses": [500.0, 321.0, 803.5], "raw": [0.0, -153.16, 46.51], "true": [0.0, -159.42, 43.92], "supply_mv": 12287}}
+{"t": "15:47:36", "command": "down 0 -100 44", "reply": {"status": "done", "detail": "", "pulses": [499.88, 352.0, 884.62], "raw": [0.05, -93.98, 51.02], "true": [0.05, -100.22, 44.17], "supply_mv": 12325}}
+{"t": "15:48:18", "command": "move 0 -100 49 slow", "reply": {"status": "done", "detail": "", "pulses": [500.0, 365.67, 871.92], "raw": [0.0, -95.22, 55.01], "true": [0.0, -101.01, 48.23], "supply_mv": 12285}}
+{"t": "15:48:21", "command": "down 0 -100 44", "reply": {"status": "done", "detail": "", "pulses": [500.0, 352.0, 884.89], "raw": [0.0, -93.82, 51.02], "true": [0.0, -100.07, 44.16], "supply_mv": 12296}}
+{"t": "15:49:44", "command": "down -0.98 -249.98 44", "reply": {"status": "done", "detail": "", "pulses": [501.0, 223.89, 678.78], "raw": [-1.02, -243.56, 42.13], "true": [-0.99, -249.81, 44.11], "supply_mv": 12307}}
+{"t": "15:50:12", "command": "down -0.95 -239.98 44", "reply": {"status": "done", "detail": "", "pulses": [500.42, 238.0, 693.83], "raw": [-0.41, -234.18, 42.8], "true": [-0.4, -240.4, 44.38], "supply_mv": 12267}}
+{"t": "15:50:23", "command": "move -0.95 -240 49 slow", "reply": {"status": "done", "detail": "", "pulses": [501.0, 239.7, 692.2], "raw": [-0.98, -234.44, 44.26], "true": [-0.95, -240.5, 45.85], "supply_mv": false}}
+{"t": "15:50:29", "command": "down -0.95 -239.98 44", "reply": {"status": "done", "detail": "", "pulses": [501.0, 238.67, 694.22], "raw": [-0.98, -233.85, 42.96], "true": [-0.95, -240.05, 44.53], "supply_mv": 12298}}
+{"t": "15:51:52", "command": "down -0.39 -99.99 44", "reply": {"status": "done", "detail": "", "pulses": [499.62, 351.88, 884.62], "raw": [0.15, -94.03, 50.98], "true": [0.15, -100.28, 44.13], "supply_mv": 12294}}
+{"t": "15:52:02", "command": "move -0.39 -100 49 slow", "reply": {"status": "done", "detail": "", "pulses": [500.42, 365.92, 872.17], "raw": [-0.17, -94.96, 55.08], "true": [-0.17, -100.75, 48.29], "supply_mv": 12311}}
+{"t": "15:52:05", "command": "down -0.39 -99.99 44", "reply": {"status": "done", "detail": "", "pulses": [501.0, 351.8, 884.8], "raw": [-0.39, -93.96, 50.96], "true": [-0.4, -100.21, 44.11], "supply_mv": 12254}}
+{"t": "15:52:46", "command": "down 0.39 -99.99 44", "reply": {"status": "done", "detail": "", "pulses": [499.12, 352.0, 884.75], "raw": [0.34, -93.9, 51.02], "true": [0.34, -100.15, 44.16], "supply_mv": 12285}}
+{"t": "15:52:55", "command": "move 0.39 -100 49 slow", "reply": {"status": "done", "detail": "", "pulses": [499.0, 365.8, 871.6], "raw": [0.4, -95.34, 55.06], "true": [0.4, -101.13, 48.28], "supply_mv": 12305}}
+{"t": "15:52:58", "command": "down 0.39 -99.99 44", "reply": {"status": "done", "detail": "", "pulses": [499.0, 352.0, 884.89], "raw": [0.39, -93.82, 51.02], "true": [0.39, -100.07, 44.16], "supply_mv": 12256}}
+{"t": "15:53:40", "command": "down 0 -100 44", "reply": {"status": "done", "detail": "", "pulses": [499.67, 352.0, 885.25], "raw": [0.13, -93.62, 51.03], "true": [0.13, -99.86, 44.16], "supply_mv": 12234}}
+{"t": "15:53:48", "command": "move 0 -100 49 slow", "reply": {"status": "done", "detail": "", "pulses": [500.0, 365.75, 871.83], "raw": [0.0, -95.23, 55.04], "true": [0.0, -101.02, 48.26], "supply_mv": 12269}}
+{"t": "15:53:51", "command": "down 0 -100 44", "reply": {"status": "done", "detail": "", "pulses": [499.78, 352.0, 884.89], "raw": [0.09, -93.82, 51.02], "true": [0.09, -100.07, 44.16], "supply_mv": 12314}}
+{"t": "15:54:22", "command": "move 0 -100 49 slow", "reply": {"status": "done", "detail": "", "pulses": [500.0, 365.58, 871.92], "raw": [0.0, -95.26, 54.99], "true": [0.0, -101.05, 48.21], "supply_mv": 12267}}
+{"t": "15:54:24", "command": "pulse 1 510 600", "reply": {"pulses": [507.83, 365.67, 871.67], "raw": [-3.13, -95.31, 55.02], "true": [-3.13, -101.11, 48.24], "supply_mv": 12287}}
+{"t": "15:54:26", "command": "pulse 1 500 600", "reply": {"pulses": [501.5, 366.67, 871.83], "raw": [-0.6, -94.81, 55.3], "true": [-0.6, -100.58, 48.5], "supply_mv": 12291}}
+{"t": "15:54:33", "command": "pulse 1 499 400", "reply": {"pulses": [500.0, 365.5, 872.0], "raw": [0.0, -95.25, 54.97], "true": [0.0, -101.05, 48.19], "supply_mv": 12289}}
+{"t": "15:54:43", "command": "move 0 -100 44 slow", "reply": {"status": "done", "detail": "", "pulses": [500.0, 352.0, 881.0], "raw": [0.0, -96.07, 50.95], "true": [0.0, -102.31, 44.22], "supply_mv": 12285}}
+{"t": "15:55:28", "command": "down 0.94 -239.98 44", "reply": {"status": "done", "detail": "", "pulses": [499.11, 239.0, 695.0], "raw": [0.87, -233.44, 42.81], "true": [0.84, -239.66, 44.36], "supply_mv": 12327}}
+{"t": "15:55:36", "command": "move 0.94 -240 49 slow", "reply": {"status": "done", "detail": "", "pulses": [498.92, 239.58, 693.42], "raw": [1.06, -233.96, 43.72], "true": [1.02, -240.08, 45.29], "supply_mv": 12282}}
+{"t": "15:55:39", "command": "down 0.94 -239.98 44", "reply": {"status": "done", "detail": "", "pulses": [499.11, 239.0, 695.0], "raw": [0.87, -233.44, 42.81], "true": [0.84, -239.66, 44.36], "supply_mv": 12318}}
+{"t": "16:04:25", "command": "down 0 -240 44", "reply": {"status": "done", "detail": "", "pulses": [499.67, 238.89, 695.0], "raw": [0.33, -233.47, 42.76], "true": [0.31, -239.7, 44.31], "supply_mv": 12285}}
+{"t": "16:04:31", "command": "move 0 -240 49 slow", "reply": {"status": "done", "detail": "", "pulses": [499.83, 239.33, 693.5], "raw": [0.16, -233.99, 43.57], "true": [0.16, -240.13, 45.14], "supply_mv": 12245}}
+{"t": "16:04:34", "command": "down 0 -240 44", "reply": {"status": "done", "detail": "", "pulses": [499.33, 239.0, 694.89], "raw": [0.65, -233.49, 42.86], "true": [0.63, -239.71, 44.41], "supply_mv": 12278}}
+{"t": "16:04:43", "command": "move 0 -240 49 slow", "reply": {"status": "done", "detail": "", "pulses": [499.92, 239.33, 693.5], "raw": [0.08, -233.99, 43.57], "true": [0.08, -240.13, 45.14], "supply_mv": 12234}}
+{"t": "16:04:45", "command": "pulse 1 510 600", "reply": {"pulses": [507.83, 239.17, 693.67], "raw": [-7.68, -233.84, 43.42], "true": [-7.43, -240.0, 44.99], "supply_mv": 12274}}
+{"t": "16:04:47", "command": "pulse 1 500 600", "reply": {"pulses": [502.0, 239.5, 693.5], "raw": [-1.96, -233.94, 43.65], "true": [-1.9, -240.07, 45.22], "supply_mv": 12236}}
+{"t": "16:04:59", "command": "pulse 1 499 400", "reply": {"pulses": [500.0, 240.0, 692.75], "raw": [0.0, -234.14, 44.18], "true": [0.0, -240.21, 45.76], "supply_mv": 12260}}
+{"t": "16:05:08", "command": "down 0 -240 44", "reply": {"status": "done", "detail": "", "pulses": [500.0, 239.0, 694.44], "raw": [0.0, -233.68, 43.03], "true": [0.0, -239.87, 44.59], "supply_mv": 12282}}
+{"t": "16:06:34", "command": "down 0 -100 44", "reply": {"status": "done", "detail": "", "pulses": [499.7, 352.0, 884.1], "raw": [0.12, -94.28, 51.01], "true": [0.12, -100.52, 44.17], "supply_mv": 12302}}
+{"t": "16:06:40", "command": "move 0 -100 49 slow", "reply": {"status": "done", "detail": "", "pulses": [499.9, 365.7, 872.2], "raw": [0.04, -95.04, 55.02], "true": [0.04, -100.84, 48.23], "supply_mv": 12289}}
+{"t": "16:06:42", "command": "pulse 1 510 600", "reply": {"pulses": [507.83, 366.0, 872.0], "raw": [-3.12, -94.97, 55.11], "true": [-3.12, -100.76, 48.32], "supply_mv": 12280}}
+{"t": "16:06:44", "command": "pulse 1 500 600", "reply": {"pulses": [501.67, 365.17, 872.17], "raw": [-0.67, -95.3, 54.87], "true": [-0.67, -101.11, 48.09], "supply_mv": 12274}}
+{"t": "16:06:51", "command": "pulse 1 499 400", "reply": {"pulses": [500.17, 365.67, 872.33], "raw": [-0.07, -94.98, 55.01], "true": [-0.07, -100.77, 48.22], "supply_mv": 12278}}
+{"t": "16:06:54", "command": "down 0 -100 44", "reply": {"status": "done", "detail": "", "pulses": [499.5, 351.83, 885.17], "raw": [0.2, -93.74, 50.98], "true": [0.2, -99.98, 44.11], "supply_mv": 12267}}
+{"t": "16:07:04", "command": "move 0 -100 49 slow", "reply": {"status": "done", "detail": "", "pulses": [500.0, 365.88, 871.88], "raw": [0.0, -95.15, 55.07], "true": [0.0, -100.94, 48.29], "supply_mv": 12329}}
+{"t": "16:07:06", "command": "pulse 1 510 600", "reply": {"pulses": [508.0, 365.25, 872.0], "raw": [-3.19, -95.31, 54.89], "true": [-3.2, -101.12, 48.12], "supply_mv": 12294}}
+{"t": "16:07:08", "command": "pulse 1 500 600", "reply": {"pulses": [501.5, 365.5, 871.83], "raw": [-0.6, -95.34, 54.97], "true": [-0.6, -101.14, 48.19], "supply_mv": 12300}}
+{"t": "16:07:10", "command": "pulse 1 499 400", "reply": {"pulses": [500.0, 365.67, 872.0], "raw": [0.0, -95.17, 55.01], "true": [0.0, -100.97, 48.23], "supply_mv": 12282}}
+{"t": "16:07:18", "command": "down 0 -100 44", "reply": {"status": "done", "detail": "", "pulses": [499.33, 352.11, 884.11], "raw": [0.26, -94.22, 51.04], "true": [0.26, -100.46, 44.2], "supply_mv": 12380}}
+{"t": "16:07:58", "command": "eval (bus_servo.run(2, 366, 800), bus_servo.run(3, 872, 800))", "reply": {"value": "(None, None)"}}
+{"t": "16:08:02", "command": "pulse 1 510 600", "reply": {"pulses": [508.17, 362.0, 874.0], "raw": [-3.27, -95.62, 53.94], "true": [-3.28, -101.53, 47.19], "supply_mv": 12245}}
+{"t": "16:08:04", "command": "pulse 1 500 600", "reply": {"pulses": [502.0, 362.33, 874.0], "raw": [-0.8, -95.52, 54.04], "true": [-0.8, -101.42, 47.27], "supply_mv": 12291}}
+{"t": "16:08:05", "command": "pulse 1 499 400", "reply": {"pulses": [500.0, 362.25, 874.0], "raw": [0.0, -95.56, 54.01], "true": [0.0, -101.46, 47.25], "supply_mv": 12260}}
+{"t": "16:08:11", "command": "eval (bus_servo.run(2, 352, 800), bus_servo.run(3, 885, 800))", "reply": {"value": "(None, None)"}}
+{"t": "16:08:14", "command": "read", "reply": {"pulses": [500.0, 352.0, 881.0], "raw": [0.0, -96.07, 50.95], "true": [0.0, -102.31, 44.22], "supply_mv": 12267}}
+{"t": "16:08:22", "command": "pulse 3 888 400", "reply": {"pulses": [500.0, 352.0, 883.67], "raw": [0.0, -94.53, 51.0], "true": [0.0, -100.77, 44.18], "supply_mv": 12267}}
+{"t": "16:09:04", "command": "home", "reply": {"status": "done", "pulses": [499.8, 500.1, 502.1], "raw": [0.14, -162.88, 211.59], "true": [0.13, -164.3, 204.46], "supply_mv": 12325}}
+{"t": "16:32:10", "command": "move -240 0 60 slow", "reply": {"status": "done", "detail": "", "pulses": [871.64, 257.18, 676.0], "raw": [-236.3, -3.33, 59.15], "true": [-240.73, -2.5, 60.75], "supply_mv": 12331}}
+{"t": "16:32:11", "command": "move -240 0 60 fast", "reply": {"status": "done", "detail": "", "pulses": [871.22, 257.44, 676.0], "raw": [-236.22, -3.74, 59.27], "true": [-240.64, -2.93, 60.86], "supply_mv": 12289}}
+{"t": "16:32:12", "command": "pulse 1 884 400", "reply": {"pulses": [881.5, 257.0, 676.0], "raw": [-236.29, 6.43, 59.06], "true": [-240.68, 7.56, 60.67], "supply_mv": 12300}}
+{"t": "16:32:14", "command": "pulse 1 874 400", "reply": {"pulses": [874.0, 257.33, 676.0], "raw": [-236.28, -0.99, 59.22], "true": [-240.69, -0.0, 60.81], "supply_mv": 12325}}
+{"t": "16:32:20", "command": "eval (bus_servo.run(2, 239, 800), bus_servo.run(3, 695, 800))", "reply": {"value": "(None, None)"}}
+{"t": "16:32:22", "command": "read", "reply": {"pulses": [874.17, 239.5, 693.5], "raw": [-233.95, -0.82, 43.65], "true": [-240.08, 0.17, 45.22], "supply_mv": 12298}}
+{"t": "16:32:30", "command": "pulse 3 697 300", "reply": {"pulses": [874.0, 239.33, 694.0], "raw": [-233.78, -0.98, 43.37], "true": [-239.94, -0.0, 44.93], "supply_mv": 12271}}
+{"t": "16:33:45", "command": "eval (bus_servo.run(2, 257, 400), bus_servo.run(3, 676, 400))", "reply": {"value": "(None, None)"}}
+{"t": "16:33:47", "command": "pulse 1 881 300", "reply": {"pulses": [878.17, 252.5, 679.0], "raw": [-236.43, 3.14, 55.72], "true": [-241.21, 4.21, 57.35], "supply_mv": 12256}}
+{"t": "16:33:49", "command": "pulse 1 871 300", "reply": {"pulses": [870.67, 252.83, 679.0], "raw": [-236.32, -4.29, 55.87], "true": [-241.11, -3.53, 57.5], "supply_mv": 12245}}
+{"t": "16:33:56", "command": "eval (bus_servo.run(2, 239, 600), bus_servo.run(3, 697, 600))", "reply": {"value": "(None, None)"}}
+{"t": "16:33:57", "command": "read", "reply": {"pulses": [871.0, 240.0, 695.0], "raw": [-233.16, -3.91, 43.29], "true": [-239.34, -3.15, 44.83], "supply_mv": 12300}}
+{"t": "16:34:16", "command": "eval (bus_servo.run(2, 257, 400), bus_servo.run(3, 676, 400))", "reply": {"value": "(None, None)"}}
+{"t": "16:34:18", "command": "pulse 1 879 300", "reply": {"pulses": [876.75, 252.75, 679.0], "raw": [-236.38, 1.73, 55.83], "true": [-241.15, 2.78, 57.46], "supply_mv": 12240}}
+{"t": "16:34:20", "command": "pulse 1 869 300", "reply": {"pulses": [870.0, 253.0, 679.0], "raw": [-236.26, -4.95, 55.95], "true": [-241.04, -4.23, 57.57], "supply_mv": 12223}}
+{"t": "16:34:27", "command": "pulse 1 868 300", "reply": {"pulses": [870.0, 253.0, 679.0], "raw": [-236.26, -4.95, 55.95], "true": [-241.04, -4.23, 57.57], "supply_mv": 12249}}
+{"t": "16:34:27", "command": "eval (bus_servo.run(2, 239, 600), bus_servo.run(3, 697, 600))", "reply": {"value": "(None, None)"}}
+{"t": "16:34:29", "command": "read", "reply": {"pulses": [870.0, 239.83, 695.0], "raw": [-233.19, -4.88, 43.21], "true": [-239.38, -4.2, 44.75], "supply_mv": 12302}}
+{"t": "16:34:34", "command": "eval (bus_servo.run(2, 257, 400), bus_servo.run(3, 676, 400))", "reply": {"value": "(None, None)"}}
+{"t": "16:34:37", "command": "pulse 1 867 300", "reply": {"pulses": [867.83, 252.83, 679.0], "raw": [-236.25, -7.09, 55.87], "true": [-241.05, -6.52, 57.5], "supply_mv": 12254}}
+{"t": "16:34:48", "command": "pulse 1 871 300", "reply": {"pulses": [869.0, 253.0, 679.17], "raw": [-236.17, -5.94, 55.88], "true": [-240.97, -5.29, 57.5], "supply_mv": 12240}}
+{"t": "16:34:57", "command": "eval (bus_servo.run(2, 239, 600), bus_servo.run(3, 697, 600))", "reply": {"value": "(None, None)"}}
+{"t": "16:34:59", "command": "read", "reply": {"pulses": [868.83, 239.83, 695.0], "raw": [-233.16, -6.02, 43.21], "true": [-239.35, -5.43, 44.75], "supply_mv": 12331}}
+{"t": "16:36:00", "command": "read", "reply": {"pulses": [869.0, 239.83, 695.0], "raw": [-233.16, -5.86, 43.21], "true": [-239.36, -5.25, 44.75], "supply_mv": 12276}}
+{"t": "16:36:28", "command": "eval (bus_servo.run(2, 243, 500), bus_servo.run(3, 693, 500))", "reply": {"value": "(None, None)"}}
+{"t": "16:36:30", "command": "read", "reply": {"pulses": [869.0, 239.83, 694.5], "raw": [-233.37, -5.87, 43.41], "true": [-239.54, -5.26, 44.96], "supply_mv": 12278}}
+{"t": "16:36:35", "command": "eval (bus_servo.run(2, 246, 500), bus_servo.run(3, 692, 500))", "reply": {"value": "(None, None)"}}
+{"t": "16:36:37", "command": "read", "reply": {"pulses": [869.0, 241.17, 692.5], "raw": [-233.88, -5.88, 44.84], "true": [-239.89, -5.26, 46.41], "supply_mv": 12243}}
+{"t": "16:36:59", "command": "eval (bus_servo.run(2, 270, 500), bus_servo.run(3, 660, 500))", "reply": {"value": "(None, None)"}}
+{"t": "16:37:01", "command": "read", "reply": {"pulses": [869.0, 266.0, 663.67], "raw": [-238.33, -5.99, 68.53], "true": [-241.74, -5.3, 70.12], "supply_mv": 12231}}
+{"t": "16:37:31", "command": "eval (bus_servo.run(2, 241, 500), bus_servo.run(3, 693, 500))", "reply": {"value": "(None, None)"}}
+{"t": "16:37:32", "command": "read", "reply": {"pulses": [869.0, 241.0, 691.0], "raw": [-234.54, -5.9, 45.36], "true": [-240.49, -5.28, 46.96], "supply_mv": 12318}}
+{"t": "16:38:23", "command": "eval (bus_servo.run(2, 245, 400), bus_servo.run(3, 688, 400))", "reply": {"value": "(None, None)"}}
+{"t": "16:38:25", "command": "read", "reply": {"pulses": [869.0, 241.4, 690.6], "raw": [-234.61, -5.9, 45.71], "true": [-240.52, -5.28, 47.32], "supply_mv": 12223}}
+{"t": "16:38:29", "command": "eval (bus_servo.run(2, 249, 400), bus_servo.run(3, 685, 400))", "reply": {"value": "(None, None)"}}
+{"t": "16:38:30", "command": "read", "reply": {"pulses": [869.0, 244.67, 686.33], "raw": [-235.53, -5.92, 49.0], "true": [-241.07, -5.29, 50.63], "supply_mv": 12309}}
+{"t": "16:39:44", "command": "pulse 1 881 300", "reply": {"pulses": [879.0, 245.5, 686.83], "raw": [-235.15, 3.94, 49.18], "true": [-240.64, 5.04, 50.8], "supply_mv": 12260}}
+{"t": "16:39:46", "command": "pulse 1 871 300", "reply": {"pulses": [870.83, 245.17, 686.67], "raw": [-235.3, -4.11, 49.1], "true": [-240.83, -3.35, 50.72], "supply_mv": 12229}}
+{"t": "16:39:51", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "16:39:53", "command": "read", "reply": {"pulses": [870.17, 240.17, 693.67], "raw": [-233.67, -4.73, 43.9], "true": [-239.78, -4.03, 45.46], "supply_mv": 12325}}
+{"t": "16:40:30", "command": "eval (bus_servo.run(2, 249, 400), bus_servo.run(3, 685, 400))", "reply": {"value": "(None, None)"}}
+{"t": "16:40:33", "command": "pulse 1 880 300", "reply": {"pulses": [877.17, 244.33, 687.33], "raw": [-235.27, 2.14, 48.43], "true": [-240.85, 3.19, 50.05], "supply_mv": 12227}}
+{"t": "16:40:34", "command": "pulse 1 870 300", "reply": {"pulses": [870.0, 244.0, 687.17], "raw": [-235.38, -4.93, 48.34], "true": [-241.0, -4.23, 49.97], "supply_mv": 12240}}
+{"t": "16:40:42", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "16:40:43", "command": "read", "reply": {"pulses": [870.0, 239.5, 694.33], "raw": [-233.55, -4.89, 43.32], "true": [-239.73, -4.21, 44.87], "supply_mv": 12331}}
+{"t": "16:41:21", "command": "eval (bus_servo.run(2, 262, 400), bus_servo.run(3, 676, 400))", "reply": {"value": "(None, None)"}}
+{"t": "16:41:21", "command": "eval (bus_servo.run(2, 366, 900), bus_servo.run(3, 872, 900))", "reply": {"value": "(None, None)"}}
+{"t": "16:41:23", "command": "eval (bus_servo.run(2, 352, 500), bus_servo.run(3, 886, 500))", "reply": {"value": "(None, None)"}}
+{"t": "16:41:24", "command": "read", "reply": {"pulses": [870.0, 352.0, 881.5], "raw": [-95.76, -2.01, 50.96], "true": [-102.0, -1.79, 44.21], "supply_mv": 12305}}
+{"t": "16:43:24", "command": "eval (bus_servo.run(2, 360, 400), bus_servo.run(3, 877, 400))", "reply": {"value": "(None, None)"}}
+{"t": "16:43:25", "command": "read", "reply": {"pulses": [869.0, 356.0, 877.83], "raw": [-96.11, -2.42, 52.15], "true": [-102.22, -2.24, 45.43], "supply_mv": 12265}}
+{"t": "16:43:38", "command": "eval (bus_servo.run(2, 363, 400), bus_servo.run(3, 874, 400))", "reply": {"value": "(None, None)"}}
+{"t": "16:43:40", "command": "read", "reply": {"pulses": [869.0, 359.67, 874.67], "raw": [-96.31, -2.42, 53.25], "true": [-102.29, -2.24, 46.53], "supply_mv": 12305}}
+{"t": "16:44:07", "command": "pulse 1 880 300", "reply": {"pulses": [878.0, 360.17, 874.0], "raw": [-96.49, 1.21, 53.4], "true": [-102.45, 1.72, 46.69], "supply_mv": 12278}}
+{"t": "16:44:08", "command": "pulse 1 870 300", "reply": {"pulses": [870.67, 359.67, 874.0], "raw": [-96.71, -1.76, 53.25], "true": [-102.69, -1.5, 46.56], "supply_mv": 12271}}
+{"t": "16:44:15", "command": "pulse 1 868 300", "reply": {"pulses": [869.0, 359.75, 874.0], "raw": [-96.65, -2.43, 53.27], "true": [-102.64, -2.25, 46.58], "supply_mv": 12269}}
+{"t": "16:44:26", "command": "pulse 1 872 300", "reply": {"pulses": [870.0, 359.5, 874.0], "raw": [-96.78, -2.03, 53.2], "true": [-102.77, -1.8, 46.51], "supply_mv": 12282}}
+{"t": "16:45:13", "command": "eval (bus_servo.run(2, 366, 300), bus_servo.run(3, 868, 300))", "reply": {"value": "(None, None)"}}
+{"t": "16:45:14", "command": "eval (bus_servo.run(2, 247, 900), bus_servo.run(3, 686, 900))", "reply": {"value": "(None, None)"}}
+{"t": "16:45:15", "command": "read", "reply": {"pulses": [869.83, 247.83, 689.17], "raw": [-233.56, -5.06, 49.33], "true": [-239.08, -4.37, 50.88], "supply_mv": 12258}}
+{"t": "16:45:22", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "16:45:23", "command": "read", "reply": {"pulses": [870.0, 240.5, 693.67], "raw": [-233.58, -4.89, 44.06], "true": [-239.68, -4.21, 45.62], "supply_mv": 12316}}
+{"t": "16:45:59", "command": "eval (bus_servo.run(2, 247, 300), bus_servo.run(3, 686, 300))", "reply": {"value": "(None, None)"}}
+{"t": "16:45:59", "command": "eval (bus_servo.run(2, 366, 900), bus_servo.run(3, 872, 900))", "reply": {"value": "(None, None)"}}
+{"t": "16:46:01", "command": "eval (bus_servo.run(2, 352, 500), bus_servo.run(3, 886, 500))", "reply": {"value": "(None, None)"}}
+{"t": "16:46:02", "command": "read", "reply": {"pulses": [870.0, 352.33, 881.5], "raw": [-95.61, -2.0, 51.06], "true": [-101.85, -1.79, 44.31], "supply_mv": 12287}}
+{"t": "16:46:36", "command": "eval (bus_servo.run(2, 362, 400), bus_servo.run(3, 873, 400))", "reply": {"value": "(None, None)"}}
+{"t": "16:46:38", "command": "read", "reply": {"pulses": [869.83, 358.5, 874.17], "raw": [-97.12, -2.1, 52.9], "true": [-103.14, -1.89, 46.23], "supply_mv": 12254}}
+{"t": "16:51:07", "command": "home", "reply": {"status": "done", "pulses": [500.09, 503.0, 505.27], "raw": [-0.06, -161.29, 209.74], "true": [-0.06, -162.71, 202.67], "supply_mv": 12256}}
+{"t": "17:01:00", "command": "move 240 0 60 fast", "reply": {"error": "error: (5, 'Input/output error')"}}
+{"t": "17:01:00", "command": "pulse 1 104 300", "reply": {"error": "error: (5, 'Input/output error')"}}
+{"t": "17:01:00", "command": "pulse 1 114 300", "reply": {"error": "error: (5, 'Input/output error')"}}
+{"t": "17:01:24", "command": "read", "reply": {"pulses": [499.11, 499.78, 503.89], "raw": [0.61, -163.04, 210.55], "true": [0.57, -164.46, 203.49], "supply_mv": 12267}}
+{"t": "17:01:36", "command": "move 240 0 60 fast", "reply": {"status": "done", "detail": "", "pulses": [114.09, 255.91, 676.0], "raw": [236.43, 10.81, 58.56], "true": [241.16, -0.09, 60.18], "supply_mv": 12329}}
+{"t": "17:01:38", "command": "pulse 1 104 300", "reply": {"pulses": [106.83, 256.0, 676.0], "raw": [235.97, 17.99, 58.61], "true": [241.02, 7.24, 60.22], "supply_mv": 12322}}
+{"t": "17:01:39", "command": "pulse 1 114 300", "reply": {"pulses": [112.33, 256.0, 676.0], "raw": [236.32, 12.55, 58.61], "true": [241.12, 1.68, 60.22], "supply_mv": 12331}}
+{"t": "17:01:47", "command": "pulse 1 116 300", "reply": {"pulses": [113.33, 256.0, 676.0], "raw": [236.37, 11.56, 58.61], "true": [241.13, 0.67, 60.22], "supply_mv": 12307}}
+{"t": "17:01:54", "command": "pulse 1 117 300", "reply": {"pulses": [114.0, 256.0, 676.0], "raw": [236.4, 10.9, 58.61], "true": [241.13, -0.0, 60.22], "supply_mv": 12247}}
+{"t": "17:02:00", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:02:01", "command": "read", "reply": {"pulses": [115.0, 239.83, 694.17], "raw": [233.38, 9.78, 43.54], "true": [239.73, -0.96, 45.1], "supply_mv": 12318}}
+{"t": "17:02:10", "command": "eval (bus_servo.run(2, 247, 300), bus_servo.run(3, 686, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:02:13", "command": "pulse 1 112 300", "reply": {"pulses": [114.33, 242.0, 689.0], "raw": [234.96, 10.5, 46.65], "true": [240.98, -0.32, 48.27], "supply_mv": 12234}}
+{"t": "17:02:21", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:02:23", "command": "read", "reply": {"pulses": [114.5, 240.0, 693.5], "raw": [233.6, 10.28, 43.89], "true": [239.93, -0.48, 45.45], "supply_mv": 12287}}
+{"t": "17:03:46", "command": "eval (bus_servo.run(2, 247, 300), bus_servo.run(3, 686, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:03:48", "command": "pulse 1 130 400", "reply": {"pulses": [128.0, 242.17, 688.17], "raw": [235.47, -2.96, 47.06], "true": [240.86, -13.49, 48.7], "supply_mv": 12265}}
+{"t": "17:03:57", "command": "pulse 1 132 300", "reply": {"pulses": [129.5, 242.0, 687.83], "raw": [235.63, -4.44, 47.12], "true": [240.94, -14.95, 48.76], "supply_mv": 12287}}
+{"t": "17:04:04", "command": "pulse 1 133 300", "reply": {"pulses": [129.83, 241.83, 688.33], "raw": [235.46, -4.77, 46.84], "true": [240.79, -15.26, 48.47], "supply_mv": 12342}}
+{"t": "17:04:04", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:04:06", "command": "read", "reply": {"pulses": [130.0, 239.17, 693.83], "raw": [233.84, -4.9, 43.35], "true": [239.56, -15.34, 44.93], "supply_mv": 12309}}
+{"t": "17:28:53", "command": "eval (bus_servo.run(2, 247, 300), bus_servo.run(3, 686, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:28:55", "command": "pulse 1 100 300", "reply": {"pulses": [102.67, 242.0, 688.67], "raw": [234.3, 21.98, 46.78], "true": [240.83, 11.44, 48.41], "supply_mv": 12271}}
+{"t": "17:28:57", "command": "pulse 1 110 300", "reply": {"pulses": [108.5, 242.0, 688.33], "raw": [234.9, 16.26, 46.92], "true": [241.16, 5.56, 48.55], "supply_mv": 12287}}
+{"t": "17:29:08", "command": "pulse 1 112 300", "reply": {"pulses": [109.33, 242.33, 688.5], "raw": [234.81, 15.43, 47.01], "true": [241.02, 4.71, 48.63], "supply_mv": 12260}}
+{"t": "17:29:08", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:29:09", "command": "read", "reply": {"pulses": [109.0, 239.33, 693.67], "raw": [233.4, 15.67, 43.5], "true": [240.01, 5.03, 45.07], "supply_mv": 12322}}
+{"t": "17:29:20", "command": "eval (bus_servo.run(2, 247, 300), bus_servo.run(3, 686, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:29:22", "command": "pulse 1 90 300", "reply": {"pulses": [92.5, 242.0, 688.83], "raw": [233.08, 31.93, 46.71], "true": [240.07, 21.68, 48.34], "supply_mv": 12278}}
+{"t": "17:29:24", "command": "pulse 1 100 300", "reply": {"pulses": [98.0, 242.0, 689.0], "raw": [233.69, 26.54, 46.65], "true": [240.44, 16.14, 48.27], "supply_mv": 12311}}
+{"t": "17:29:35", "command": "pulse 1 103 300", "reply": {"pulses": [100.83, 242.0, 689.17], "raw": [233.92, 23.76, 46.58], "true": [240.56, 13.28, 48.2], "supply_mv": 12298}}
+{"t": "17:29:35", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:29:36", "command": "read", "reply": {"pulses": [100.33, 240.0, 693.17], "raw": [232.72, 24.13, 44.02], "true": [239.66, 13.73, 45.59], "supply_mv": 12325}}
+{"t": "17:29:44", "command": "eval (bus_servo.run(2, 247, 300), bus_servo.run(3, 686, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:29:46", "command": "pulse 1 109 300", "reply": {"pulses": [107.5, 242.0, 689.0], "raw": [234.56, 17.23, 46.65], "true": [240.89, 6.56, 48.27], "supply_mv": 12314}}
+{"t": "17:29:53", "command": "pulse 1 111 300", "reply": {"pulses": [108.33, 242.0, 688.83], "raw": [234.69, 16.41, 46.71], "true": [240.98, 5.72, 48.34], "supply_mv": 12276}}
+{"t": "17:29:53", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:29:54", "command": "read", "reply": {"pulses": [108.83, 239.33, 694.0], "raw": [233.25, 15.82, 43.37], "true": [239.88, 5.19, 44.93], "supply_mv": 12331}}
+{"t": "17:30:10", "command": "eval (bus_servo.run(2, 247, 300), bus_servo.run(3, 686, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:30:12", "command": "pulse 1 97 300", "reply": {"pulses": [98.17, 242.0, 689.0], "raw": [233.71, 26.38, 46.65], "true": [240.45, 15.97, 48.27], "supply_mv": 12282}}
+{"t": "17:30:14", "command": "pulse 1 107 300", "reply": {"pulses": [104.67, 242.0, 688.83], "raw": [234.41, 20.01, 46.71], "true": [240.86, 9.42, 48.34], "supply_mv": 12294}}
+{"t": "17:30:21", "command": "pulse 1 109 300", "reply": {"pulses": [107.67, 242.0, 689.0], "raw": [234.57, 17.06, 46.65], "true": [240.9, 6.39, 48.27], "supply_mv": 12314}}
+{"t": "17:30:21", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:30:22", "command": "read", "reply": {"pulses": [107.83, 240.0, 693.83], "raw": [233.08, 16.79, 43.75], "true": [239.72, 6.19, 45.31], "supply_mv": 12329}}
+{"t": "17:30:32", "command": "eval (bus_servo.run(2, 245, 300), bus_servo.run(3, 688, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:30:34", "command": "pulse 1 105 300", "reply": {"pulses": [106.83, 241.0, 690.33], "raw": [234.21, 17.86, 45.63], "true": [240.69, 7.23, 47.24], "supply_mv": 12258}}
+{"t": "17:30:41", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:30:42", "command": "read", "reply": {"pulses": [106.5, 239.33, 693.33], "raw": [233.36, 18.12, 43.63], "true": [240.07, 7.54, 45.21], "supply_mv": 12311}}
+{"t": "17:30:50", "command": "eval (bus_servo.run(2, 245, 300), bus_servo.run(3, 688, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:30:52", "command": "pulse 1 111 300", "reply": {"pulses": [108.83, 240.67, 691.0], "raw": [234.16, 15.88, 45.2], "true": [240.6, 5.21, 46.81], "supply_mv": 12307}}
+{"t": "17:30:59", "command": "pulse 1 106 300", "reply": {"pulses": [108.0, 240.83, 691.0], "raw": [234.07, 16.7, 45.28], "true": [240.53, 6.05, 46.88], "supply_mv": 12254}}
+{"t": "17:31:01", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:31:03", "command": "read", "reply": {"pulses": [108.0, 239.25, 693.5], "raw": [233.42, 16.65, 43.53], "true": [240.08, 6.04, 45.1], "supply_mv": 12329}}
+{"t": "17:31:32", "command": "eval (bus_servo.run(2, 245, 300), bus_servo.run(3, 688, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:31:34", "command": "pulse 1 112 300", "reply": {"pulses": [109.2, 241.0, 689.8], "raw": [234.6, 15.55, 45.85], "true": [240.94, 4.85, 47.47], "supply_mv": 12309}}
+{"t": "17:31:44", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:31:45", "command": "read", "reply": {"pulses": [110.33, 239.33, 693.67], "raw": [233.48, 14.36, 43.5], "true": [240.04, 3.69, 45.07], "supply_mv": 12325}}
+{"t": "17:31:51", "command": "eval (bus_servo.run(2, 245, 300), bus_servo.run(3, 688, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:31:53", "command": "pulse 1 107 300", "reply": {"pulses": [109.0, 240.33, 690.5], "raw": [234.46, 15.74, 45.25], "true": [240.88, 5.05, 46.86], "supply_mv": 12276}}
+{"t": "17:31:59", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:32:00", "command": "read", "reply": {"pulses": [108.33, 239.0, 694.17], "raw": [233.23, 16.31, 43.14], "true": [239.91, 5.7, 44.71], "supply_mv": 12327}}
+{"t": "17:32:29", "command": "eval (bus_servo.run(2, 245, 300), bus_servo.run(3, 688, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:32:31", "command": "pulse 1 113 300", "reply": {"pulses": [111.0, 240.5, 690.67], "raw": [234.48, 13.77, 45.26], "true": [240.81, 3.03, 46.87], "supply_mv": 12309}}
+{"t": "17:32:42", "command": "pulse 1 107 300", "reply": {"pulses": [108.67, 240.33, 690.83], "raw": [234.3, 16.06, 45.11], "true": [240.75, 5.38, 46.72], "supply_mv": 12296}}
+{"t": "17:32:42", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:32:44", "command": "read", "reply": {"pulses": [108.67, 239.83, 693.67], "raw": [233.25, 15.98, 43.74], "true": [239.85, 5.36, 45.31], "supply_mv": 12322}}
+{"t": "17:32:54", "command": "eval (bus_servo.run(2, 245, 300), bus_servo.run(3, 688, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:32:56", "command": "pulse 1 112 300", "reply": {"pulses": [109.0, 241.0, 690.5], "raw": [234.3, 15.73, 45.56], "true": [240.68, 5.04, 47.17], "supply_mv": 12314}}
+{"t": "17:32:56", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:32:58", "command": "read", "reply": {"pulses": [109.0, 239.67, 693.33], "raw": [233.45, 15.67, 43.79], "true": [240.04, 5.03, 45.37], "supply_mv": 12325}}
+{"t": "17:33:05", "command": "eval (bus_servo.run(2, 245, 300), bus_servo.run(3, 688, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:33:07", "command": "pulse 1 120 300", "reply": {"pulses": [117.5, 240.67, 690.83], "raw": [234.65, 7.37, 45.27], "true": [240.69, -3.37, 46.88], "supply_mv": 12369}}
+{"t": "17:33:09", "command": "pulse 1 110 300", "reply": {"pulses": [111.83, 240.83, 690.83], "raw": [234.37, 12.94, 45.35], "true": [240.65, 2.18, 46.95], "supply_mv": 12274}}
+{"t": "17:33:16", "command": "pulse 1 106 300", "reply": {"pulses": [107.75, 241.0, 690.75], "raw": [234.11, 16.95, 45.46], "true": [240.56, 6.3, 47.07], "supply_mv": 12325}}
+{"t": "17:33:24", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:33:26", "command": "read", "reply": {"pulses": [107.33, 239.83, 693.5], "raw": [233.23, 17.29, 43.81], "true": [239.88, 6.7, 45.38], "supply_mv": 12325}}
+{"t": "17:33:48", "command": "eval (bus_servo.run(2, 245, 300), bus_servo.run(3, 688, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:33:49", "command": "read", "reply": {"pulses": [107.67, 240.17, 691.0], "raw": [234.21, 17.03, 44.97], "true": [240.72, 6.39, 46.57], "supply_mv": 12280}}
+{"t": "17:33:51", "command": "pulse 1 111 300", "reply": {"pulses": [108.17, 240.83, 690.83], "raw": [234.15, 16.54, 45.35], "true": [240.59, 5.88, 46.95], "supply_mv": 12267}}
+{"t": "17:33:51", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:33:53", "command": "read", "reply": {"pulses": [108.83, 239.83, 693.67], "raw": [233.26, 15.82, 43.74], "true": [239.86, 5.19, 45.31], "supply_mv": 12314}}
+{"t": "17:33:53", "command": "eval (bus_servo.run(2, 245, 300), bus_servo.run(3, 688, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:33:54", "command": "read", "reply": {"pulses": [108.67, 240.0, 690.83], "raw": [234.39, 16.06, 44.95], "true": [240.85, 5.38, 46.57], "supply_mv": 12260}}
+{"t": "17:33:56", "command": "pulse 1 105 300", "reply": {"pulses": [106.0, 240.83, 690.83], "raw": [233.99, 18.66, 45.35], "true": [240.53, 8.06, 46.95], "supply_mv": 12254}}
+{"t": "17:33:57", "command": "pulse 1 111 300", "reply": {"pulses": [108.83, 240.83, 690.83], "raw": [234.19, 15.88, 45.35], "true": [240.61, 5.21, 46.95], "supply_mv": 12291}}
+{"t": "17:33:59", "command": "pulse 1 105 300", "reply": {"pulses": [105.5, 240.5, 690.67], "raw": [234.1, 19.16, 45.26], "true": [240.67, 8.57, 46.87], "supply_mv": 12267}}
+{"t": "17:34:01", "command": "pulse 1 108 300", "reply": {"pulses": [105.5, 240.83, 690.83], "raw": [233.95, 19.15, 45.35], "true": [240.51, 8.57, 46.95], "supply_mv": 12152}}
+{"t": "17:34:01", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:34:02", "command": "read", "reply": {"pulses": [105.67, 240.0, 693.5], "raw": [233.06, 18.92, 43.89], "true": [239.78, 8.37, 45.45], "supply_mv": 12316}}
+{"t": "17:34:02", "command": "eval (bus_servo.run(2, 245, 300), bus_servo.run(3, 688, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:34:03", "command": "read", "reply": {"pulses": [105.83, 241.17, 691.0], "raw": [233.82, 18.81, 45.44], "true": [240.36, 8.23, 47.04], "supply_mv": 12285}}
+{"t": "17:34:05", "command": "pulse 1 111 300", "reply": {"pulses": [108.83, 241.0, 691.0], "raw": [234.08, 15.88, 45.36], "true": [240.5, 5.21, 46.96], "supply_mv": 12216}}
+{"t": "17:34:07", "command": "pulse 1 105 300", "reply": {"pulses": [106.0, 240.83, 691.0], "raw": [233.92, 18.66, 45.28], "true": [240.47, 8.06, 46.88], "supply_mv": 12298}}
+{"t": "17:34:09", "command": "pulse 1 111 300", "reply": {"pulses": [108.17, 241.0, 690.83], "raw": [234.1, 16.53, 45.43], "true": [240.54, 5.88, 47.03], "supply_mv": 12247}}
+{"t": "17:34:09", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:34:10", "command": "read", "reply": {"pulses": [108.83, 240.0, 693.17], "raw": [233.43, 15.83, 44.02], "true": [239.99, 5.19, 45.59], "supply_mv": 12333}}
+{"t": "17:34:10", "command": "eval (bus_servo.run(2, 245, 300), bus_servo.run(3, 688, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:34:11", "command": "read", "reply": {"pulses": [108.67, 240.5, 691.0], "raw": [234.19, 16.05, 45.12], "true": [240.64, 5.38, 46.73], "supply_mv": 12282}}
+{"t": "17:34:13", "command": "pulse 1 105 300", "reply": {"pulses": [106.0, 240.83, 690.83], "raw": [233.99, 18.66, 45.35], "true": [240.53, 8.06, 46.95], "supply_mv": 12258}}
+{"t": "17:34:15", "command": "pulse 1 111 300", "reply": {"pulses": [108.83, 240.83, 690.83], "raw": [234.19, 15.88, 45.35], "true": [240.61, 5.21, 46.95], "supply_mv": 12358}}
+{"t": "17:34:17", "command": "pulse 1 105 300", "reply": {"pulses": [106.0, 241.0, 690.83], "raw": [233.94, 18.66, 45.43], "true": [240.48, 8.06, 47.03], "supply_mv": 12265}}
+{"t": "17:34:18", "command": "pulse 1 111 300", "reply": {"pulses": [108.67, 240.83, 691.0], "raw": [234.11, 16.04, 45.28], "true": [240.54, 5.37, 46.88], "supply_mv": 12276}}
+{"t": "17:34:18", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:34:20", "command": "read", "reply": {"pulses": [108.83, 240.0, 693.5], "raw": [233.29, 15.82, 43.89], "true": [239.87, 5.19, 45.45], "supply_mv": 12314}}
+{"t": "17:34:20", "command": "eval (bus_servo.run(2, 245, 300), bus_servo.run(3, 688, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:34:21", "command": "read", "reply": {"pulses": [108.75, 240.5, 691.0], "raw": [234.2, 15.97, 45.12], "true": [240.64, 5.29, 46.73], "supply_mv": 12382}}
+{"t": "17:34:23", "command": "pulse 1 105 300", "reply": {"pulses": [106.0, 241.0, 691.0], "raw": [233.88, 18.65, 45.36], "true": [240.42, 8.06, 46.96], "supply_mv": 12302}}
+{"t": "17:34:24", "command": "pulse 1 111 300", "reply": {"pulses": [109.0, 240.75, 691.0], "raw": [234.15, 15.72, 45.24], "true": [240.57, 5.04, 46.85], "supply_mv": 12289}}
+{"t": "17:34:26", "command": "pulse 1 105 300", "reply": {"pulses": [106.0, 240.83, 691.0], "raw": [233.92, 18.66, 45.28], "true": [240.47, 8.06, 46.88], "supply_mv": 12276}}
+{"t": "17:34:28", "command": "pulse 1 111 300", "reply": {"pulses": [109.0, 240.0, 690.75], "raw": [234.44, 15.74, 44.99], "true": [240.89, 5.05, 46.6], "supply_mv": 12263}}
+{"t": "17:34:28", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:34:29", "command": "read", "reply": {"pulses": [109.0, 238.75, 694.0], "raw": [233.4, 15.67, 43.09], "true": [240.06, 5.03, 44.66], "supply_mv": 12285}}
+{"t": "17:34:29", "command": "eval (bus_servo.run(2, 245, 300), bus_servo.run(3, 688, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:34:31", "command": "read", "reply": {"pulses": [109.0, 241.0, 691.0], "raw": [234.09, 15.71, 45.36], "true": [240.5, 5.04, 46.96], "supply_mv": 12238}}
+{"t": "17:34:32", "command": "pulse 1 105 300", "reply": {"pulses": [106.0, 240.5, 691.0], "raw": [234.0, 18.66, 45.12], "true": [240.57, 8.06, 46.73], "supply_mv": 12249}}
+{"t": "17:34:34", "command": "pulse 1 111 300", "reply": {"pulses": [108.5, 241.0, 691.0], "raw": [234.06, 16.2, 45.36], "true": [240.49, 5.54, 46.96], "supply_mv": 12258}}
+{"t": "17:34:36", "command": "pulse 1 105 300", "reply": {"pulses": [106.0, 240.83, 690.67], "raw": [234.05, 18.67, 45.42], "true": [240.59, 8.07, 47.02], "supply_mv": 12294}}
+{"t": "17:34:37", "command": "pulse 1 111 300", "reply": {"pulses": [109.0, 241.0, 691.0], "raw": [234.09, 15.71, 45.36], "true": [240.5, 5.04, 46.96], "supply_mv": 12247}}
+{"t": "17:34:37", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 696, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:34:39", "command": "read", "reply": {"pulses": [109.0, 238.75, 693.0], "raw": [233.82, 15.69, 43.49], "true": [240.43, 5.04, 45.08], "supply_mv": 12316}}
+{"t": "17:35:09", "command": "eval (bus_servo.run(2, 242, 300), bus_servo.run(3, 690, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:35:11", "command": "pulse 1 96 400", "reply": {"pulses": [98.0, 239.17, 691.67], "raw": [233.3, 26.5, 44.22], "true": [240.32, 16.13, 45.83], "supply_mv": 12291}}
+{"t": "17:35:13", "command": "pulse 1 108 400", "reply": {"pulses": [105.0, 239.17, 691.17], "raw": [234.18, 19.66, 44.42], "true": [240.87, 9.08, 46.04], "supply_mv": 12274}}
+{"t": "17:35:15", "command": "pulse 1 120 400", "reply": {"pulses": [117.0, 239.0, 691.17], "raw": [234.92, 7.88, 44.34], "true": [241.07, -2.89, 45.96], "supply_mv": 12289}}
+{"t": "17:35:17", "command": "pulse 1 108 400", "reply": {"pulses": [110.33, 239.0, 691.33], "raw": [234.53, 14.43, 44.28], "true": [241.0, 3.7, 45.89], "supply_mv": 12305}}
+{"t": "17:35:27", "command": "pulse 1 106 400", "reply": {"pulses": [109.0, 239.67, 691.83], "raw": [234.08, 15.71, 44.39], "true": [240.59, 5.04, 45.99], "supply_mv": 12302}}
+{"t": "17:35:36", "command": "pulse 1 105 400", "reply": {"pulses": [107.5, 238.83, 691.67], "raw": [234.25, 17.2, 44.06], "true": [240.87, 6.56, 45.67], "supply_mv": 12282}}
+{"t": "17:35:46", "command": "pulse 1 110 400", "reply": {"pulses": [107.67, 239.33, 692.0], "raw": [234.0, 17.02, 44.17], "true": [240.6, 6.38, 45.77], "supply_mv": 12305}}
+{"t": "17:35:52", "command": "pulse 1 111 400", "reply": {"pulses": [108.17, 238.83, 692.0], "raw": [234.16, 16.54, 43.93], "true": [240.76, 5.88, 45.53], "supply_mv": 12331}}
+{"t": "17:35:57", "command": "eval (bus_servo.run(2, 239, 400), bus_servo.run(3, 695, 400))", "reply": {"value": "(None, None)"}}
+{"t": "17:35:58", "command": "read", "reply": {"pulses": [108.25, 239.75, 693.0], "raw": [233.52, 16.41, 43.97], "true": [240.12, 5.78, 45.54], "supply_mv": 12296}}
+{"t": "17:36:43", "command": "read", "reply": {"pulses": [108.0, 238.83, 693.0], "raw": [233.73, 16.67, 43.53], "true": [240.39, 6.04, 45.12], "supply_mv": 12271}}
+{"t": "17:37:00", "command": "eval (bus_servo.run(2, 242, 300), bus_servo.run(3, 690, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:37:02", "command": "pulse 1 112 400", "reply": {"pulses": [109.0, 239.0, 691.5], "raw": [234.38, 15.73, 44.21], "true": [240.92, 5.05, 45.82], "supply_mv": 12316}}
+{"t": "17:37:04", "command": "read", "reply": {"pulses": [109.0, 239.0, 691.83], "raw": [234.24, 15.72, 44.07], "true": [240.79, 5.04, 45.68], "supply_mv": 12369}}
+{"t": "17:37:09", "command": "eval (bus_servo.run(2, 239, 400), bus_servo.run(3, 695, 400))", "reply": {"value": "(None, None)"}}
+{"t": "17:37:11", "command": "read", "reply": {"pulses": [109.2, 239.0, 692.8], "raw": [233.85, 15.5, 43.69], "true": [240.44, 4.83, 45.28], "supply_mv": 12333}}
+{"t": "17:41:26", "command": "eval (bus_servo.run(2, 247, 300), bus_servo.run(3, 686, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:41:27", "command": "eval (bus_servo.run(2, 366, 900), bus_servo.run(3, 872, 900))", "reply": {"value": "(None, None)"}}
+{"t": "17:41:28", "command": "eval (bus_servo.run(2, 352, 500), bus_servo.run(3, 886, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:41:29", "command": "read", "reply": {"pulses": [109.67, 351.83, 882.0], "raw": [95.37, 6.13, 50.91], "true": [101.79, 1.85, 44.15], "supply_mv": 12325}}
+{"t": "17:42:18", "command": "eval (bus_servo.run(2, 357, 300), bus_servo.run(3, 878, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:42:20", "command": "pulse 1 107 400", "reply": {"pulses": [109.2, 355.0, 879.0], "raw": [95.7, 6.34, 51.85], "true": [102.02, 2.05, 45.12], "supply_mv": 12329}}
+{"t": "17:42:25", "command": "eval (bus_servo.run(2, 352, 400), bus_servo.run(3, 886, 400))", "reply": {"value": "(None, None)"}}
+{"t": "17:42:26", "command": "read", "reply": {"pulses": [109.0, 352.0, 882.0], "raw": [95.28, 6.4, 50.97], "true": [101.71, 2.13, 44.2], "supply_mv": 12265}}
+{"t": "17:42:53", "command": "eval (bus_servo.run(2, 366, 300), bus_servo.run(3, 872, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:42:54", "command": "eval (bus_servo.run(2, 247, 900), bus_servo.run(3, 686, 900))", "reply": {"value": "(None, None)"}}
+{"t": "17:42:55", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 695, 500))", "reply": {"value": "(None, None)"}}
+{"t": "17:42:57", "command": "read", "reply": {"pulses": [109.0, 240.0, 693.17], "raw": [233.44, 15.67, 44.02], "true": [240.0, 5.03, 45.59], "supply_mv": 12285}}
+{"t": "17:45:18", "command": "eval (bus_servo.run(2, 242, 300), bus_servo.run(3, 690, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:45:21", "command": "pulse 1 106 400", "reply": {"pulses": [108.2, 240.0, 692.0], "raw": [233.87, 16.49, 44.48], "true": [240.41, 5.84, 46.08], "supply_mv": 12269}}
+{"t": "17:45:26", "command": "eval (bus_servo.run(2, 239, 400), bus_servo.run(3, 695, 400))", "reply": {"value": "(None, None)"}}
+{"t": "17:45:28", "command": "read", "reply": {"pulses": [107.83, 240.0, 692.83], "raw": [233.5, 16.82, 44.15], "true": [240.09, 6.2, 45.73], "supply_mv": 12331}}
+{"t": "17:52:57", "command": "eval (bus_servo.run(2, 242, 300), bus_servo.run(3, 690, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:52:59", "command": "pulse 1 112 400", "reply": {"pulses": [108.83, 240.0, 691.83], "raw": [233.98, 15.87, 44.55], "true": [240.49, 5.21, 46.15], "supply_mv": 12318}}
+{"t": "17:53:04", "command": "eval (bus_servo.run(2, 239, 400), bus_servo.run(3, 695, 400))", "reply": {"value": "(None, None)"}}
+{"t": "17:53:06", "command": "read", "reply": {"pulses": [108.83, 239.5, 692.0], "raw": [234.04, 15.87, 44.25], "true": [240.58, 5.21, 45.85], "supply_mv": 12309}}
+{"t": "17:53:36", "command": "eval (bus_servo.run(2, 242, 300), bus_servo.run(3, 690, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:53:38", "command": "pulse 1 113 400", "reply": {"pulses": [110.0, 239.67, 691.5], "raw": [234.28, 14.74, 44.53], "true": [240.74, 4.03, 46.13], "supply_mv": 12296}}
+{"t": "17:53:43", "command": "eval (bus_servo.run(2, 239, 400), bus_servo.run(3, 695, 400))", "reply": {"value": "(None, None)"}}
+{"t": "17:53:45", "command": "read", "reply": {"pulses": [109.5, 239.5, 692.0], "raw": [234.08, 15.22, 44.25], "true": [240.59, 4.54, 45.85], "supply_mv": 12302}}
+{"t": "17:53:51", "command": "eval (bus_servo.run(2, 242, 300), bus_servo.run(3, 690, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:53:53", "command": "pulse 1 112 400", "reply": {"pulses": [110.17, 240.5, 691.83], "raw": [233.94, 14.55, 44.79], "true": [240.36, 3.86, 46.38], "supply_mv": 12318}}
+{"t": "17:53:53", "command": "eval (bus_servo.run(2, 239, 400), bus_servo.run(3, 695, 400))", "reply": {"value": "(None, None)"}}
+{"t": "17:53:55", "command": "read", "reply": {"pulses": [111.75, 239.0, 692.75], "raw": [234.03, 13.0, 43.71], "true": [240.49, 2.27, 45.3], "supply_mv": 12331}}
+{"t": "17:55:00", "command": "eval (bus_servo.run(2, 241, 300), bus_servo.run(3, 691, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:55:02", "command": "pulse 1 108 400", "reply": {"pulses": [110.67, 239.5, 692.17], "raw": [234.09, 14.07, 44.18], "true": [240.55, 3.36, 45.78], "supply_mv": 12318}}
+{"t": "17:55:09", "command": "pulse 1 107 400", "reply": {"pulses": [110.67, 239.5, 692.17], "raw": [234.09, 14.07, 44.18], "true": [240.55, 3.36, 45.78], "supply_mv": 12302}}
+{"t": "17:55:15", "command": "pulse 1 106 400", "reply": {"pulses": [109.0, 239.5, 692.17], "raw": [233.98, 15.71, 44.18], "true": [240.52, 5.04, 45.78], "supply_mv": 12305}}
+{"t": "17:55:22", "command": "pulse 1 113 400", "reply": {"pulses": [108.83, 239.83, 692.0], "raw": [233.96, 15.87, 44.41], "true": [240.48, 5.21, 46.0], "supply_mv": 12320}}
+{"t": "17:55:30", "command": "pulse 1 114 400", "reply": {"pulses": [111.0, 239.5, 691.83], "raw": [234.24, 13.75, 44.31], "true": [240.68, 3.02, 45.91], "supply_mv": 12285}}
+{"t": "17:55:30", "command": "eval bus_servo.get_position(1)", "reply": {"value": "111"}}
+{"t": "17:56:23", "command": "eval (bus_servo.run(2, 242, 300), bus_servo.run(3, 690, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:56:25", "command": "pulse 1 125 400", "reply": {"pulses": [121.0, 239.33, 692.0], "raw": [234.59, 3.93, 44.17], "true": [240.59, -6.73, 45.77], "supply_mv": 12309}}
+{"t": "17:56:27", "command": "pulse 1 108 400", "reply": {"pulses": [110.0, 239.5, 692.0], "raw": [234.11, 14.73, 44.25], "true": [240.6, 4.03, 45.85], "supply_mv": 12294}}
+{"t": "17:56:27", "command": "eval (bus_servo.run(2, 239, 400), bus_servo.run(3, 695, 400))", "reply": {"value": "(None, None)"}}
+{"t": "17:56:28", "command": "read", "reply": {"pulses": [110.5, 239.33, 692.83], "raw": [233.84, 14.22, 43.83], "true": [240.35, 3.52, 45.42], "supply_mv": 12311}}
+{"t": "17:56:29", "command": "eval (bus_servo.run(2, 242, 300), bus_servo.run(3, 690, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:56:31", "command": "pulse 1 95 400", "reply": {"pulses": [97.33, 239.33, 691.83], "raw": [233.11, 27.14, 44.23], "true": [240.16, 16.79, 45.84], "supply_mv": 12287}}
+{"t": "17:56:33", "command": "pulse 1 113 400", "reply": {"pulses": [109.0, 239.5, 691.17], "raw": [234.4, 15.73, 44.58], "true": [240.89, 5.05, 46.19], "supply_mv": 12267}}
+{"t": "17:56:33", "command": "eval (bus_servo.run(2, 242, 300), bus_servo.run(3, 690, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:56:35", "command": "pulse 1 125 400", "reply": {"pulses": [122.0, 239.6, 691.0], "raw": [234.95, 2.95, 44.7], "true": [240.85, -7.71, 46.31], "supply_mv": 12322}}
+{"t": "17:56:37", "command": "pulse 1 109 400", "reply": {"pulses": [109.8, 239.2, 691.0], "raw": [234.59, 14.96, 44.5], "true": [241.06, 4.24, 46.12], "supply_mv": 12251}}
+{"t": "17:56:37", "command": "eval (bus_servo.run(2, 242, 300), bus_servo.run(3, 690, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:56:39", "command": "pulse 1 95 400", "reply": {"pulses": [97.33, 239.67, 691.0], "raw": [233.38, 27.17, 44.73], "true": [240.37, 16.81, 46.34], "supply_mv": 12300}}
+{"t": "17:56:41", "command": "pulse 1 112 400", "reply": {"pulses": [109.0, 239.5, 691.0], "raw": [234.47, 15.74, 44.65], "true": [240.95, 5.05, 46.26], "supply_mv": 12260}}
+{"t": "17:56:41", "command": "eval (bus_servo.run(2, 242, 300), bus_servo.run(3, 690, 300))", "reply": {"value": "(None, None)"}}
+{"t": "17:56:43", "command": "pulse 1 130 400", "reply": {"pulses": [126.5, 239.5, 691.5], "raw": [234.78, -1.48, 44.45], "true": [240.52, -12.03, 46.05], "supply_mv": 12285}}
+{"t": "17:56:45", "command": "pulse 1 108 400", "reply": {"pulses": [110.17, 239.33, 691.5], "raw": [234.37, 14.58, 44.37], "true": [240.84, 3.87, 45.98], "supply_mv": 12289}}
+{"t": "17:56:45", "command": "eval (bus_servo.run(2, 239, 400), bus_servo.run(3, 695, 400))", "reply": {"value": "(None, None)"}}
+{"t": "17:56:57", "command": "read", "reply": {"pulses": [109.83, 239.17, 692.5], "raw": [233.98, 14.88, 43.89], "true": [240.51, 4.2, 45.48], "supply_mv": 12314}}
+{"t": "17:57:28", "command": "eval (bus_servo.run(2, 244, 400), bus_servo.run(3, 688, 400))", "reply": {"value": "(None, None)"}}
+{"t": "17:57:29", "command": "read", "reply": {"pulses": [110.0, 240.17, 691.0], "raw": [234.36, 14.74, 44.97], "true": [240.77, 4.03, 46.57], "supply_mv": 12309}}
+{"t": "17:57:35", "command": "eval (bus_servo.run(2, 247, 400), bus_servo.run(3, 686, 400))", "reply": {"value": "(None, None)"}}
+{"t": "17:57:36", "command": "read", "reply": {"pulses": [110.0, 241.5, 689.33], "raw": [234.72, 14.77, 46.27], "true": [240.98, 4.04, 47.9], "supply_mv": 12309}}
+{"t": "17:57:59", "command": "eval (bus_servo.run(2, 239, 600), bus_servo.run(3, 695, 600))", "reply": {"value": "(None, None)"}}
+{"t": "17:58:01", "command": "read", "reply": {"pulses": [110.0, 239.67, 693.17], "raw": [233.59, 14.7, 43.86], "true": [240.12, 4.02, 45.44], "supply_mv": 12331}}
+{"t": "17:58:31", "command": "eval (bus_servo.run(2, 247, 400), bus_servo.run(3, 686, 400))", "reply": {"value": "(None, None)"}}
+{"t": "17:58:33", "command": "pulse 1 113 400", "reply": {"pulses": [112.0, 242.0, 689.17], "raw": [234.77, 12.8, 46.58], "true": [240.91, 2.02, 48.2], "supply_mv": 12254}}
+{"t": "17:58:40", "command": "pulse 1 110 400", "reply": {"pulses": [111.5, 242.33, 689.5], "raw": [234.53, 13.28, 46.6], "true": [240.69, 2.52, 48.21], "supply_mv": 12300}}
+{"t": "17:58:46", "command": "pulse 1 109 400", "reply": {"pulses": [110.17, 242.0, 689.33], "raw": [234.6, 14.6, 46.51], "true": [240.83, 3.87, 48.13], "supply_mv": 12276}}
+{"t": "17:58:53", "command": "pulse 1 112 400", "reply": {"pulses": [109.83, 242.0, 689.17], "raw": [234.65, 14.93, 46.58], "true": [240.88, 4.2, 48.2], "supply_mv": 12285}}
+{"t": "17:59:01", "command": "pulse 1 114 400", "reply": {"pulses": [111.5, 241.67, 689.17], "raw": [234.83, 13.29, 46.42], "true": [241.01, 2.52, 48.04], "supply_mv": 12309}}
+{"t": "17:59:03", "command": "pulse 1 110 400", "reply": {"pulses": [111.0, 241.67, 689.0], "raw": [234.87, 13.79, 46.49], "true": [241.06, 3.03, 48.11], "supply_mv": 12265}}
+{"t": "17:59:08", "command": "eval (bus_servo.run(2, 239, 600), bus_servo.run(3, 695, 600))", "reply": {"value": "(None, None)"}}
+{"t": "17:59:10", "command": "read", "reply": {"pulses": [110.83, 239.33, 693.33], "raw": [233.65, 13.88, 43.63], "true": [240.17, 3.19, 45.21], "supply_mv": 12325}}
+{"t": "17:59:40", "command": "eval (bus_servo.run(2, 247, 400), bus_servo.run(3, 686, 400))", "reply": {"value": "(None, None)"}}
+{"t": "17:59:43", "command": "pulse 1 108 400", "reply": {"pulses": [108.5, 241.75, 689.0], "raw": [234.69, 16.25, 46.53], "true": [240.99, 5.55, 48.15], "supply_mv": 12249}}
+{"t": "17:59:49", "command": "pulse 1 112 400", "reply": {"pulses": [110.17, 242.0, 689.0], "raw": [234.74, 14.6, 46.65], "true": [240.95, 3.87, 48.27], "supply_mv": 12278}}
+{"t": "17:59:53", "command": "eval (bus_servo.run(2, 239, 600), bus_servo.run(3, 695, 600))", "reply": {"value": "(None, None)"}}
+{"t": "17:59:55", "command": "read", "reply": {"pulses": [110.0, 240.0, 693.0], "raw": [233.57, 14.7, 44.08], "true": [240.08, 4.02, 45.66], "supply_mv": 12258}}
+{"t": "18:00:49", "command": "eval [bus_servo.get_position(1) for i in range(40)]", "reply": {"value": "[110, 110, 110, 110, 110, 110, False, 110, 111, 110, 110, 110, 110, 110, 110, 110, 110, 110, 111, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110]"}}
+{"t": "18:00:53", "command": "eval [bus_servo.get_position(1) for i in range(40)]", "reply": {"value": "[110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110]"}}
+{"t": "18:02:08", "command": "eval [bus_servo.get_offset(i) for i in (1, 2, 3)]", "reply": {"value": "[4, -4, -13]"}}
+{"t": "18:02:15", "command": "eval (bus_servo.run(2, 262, 500), bus_servo.run(3, 676, 500))", "reply": {"value": "(None, None)"}}
+{"t": "18:02:17", "command": "read", "reply": {"pulses": [110.0, 258.33, 678.83], "raw": [234.42, 14.75, 58.47], "true": [239.35, 4.01, 60.01], "supply_mv": 12296}}
+{"t": "18:02:19", "command": "pulse 1 90 1500", "reply": {"pulses": [91.67, 258.0, 678.67], "raw": [232.76, 32.71, 58.39], "true": [238.51, 22.38, 59.94], "supply_mv": 12294}}
+{"t": "18:02:22", "command": "pulse 1 130 1500", "reply": {"pulses": [128.0, 258.0, 678.83], "raw": [234.96, -2.95, 58.31], "true": [239.12, -13.4, 59.87], "supply_mv": 12307}}
+{"t": "18:02:25", "command": "pulse 1 90 1500", "reply": {"pulses": [91.83, 259.17, 679.0], "raw": [232.32, 32.49, 58.78], "true": [238.02, 22.16, 60.31], "supply_mv": 12260}}
+{"t": "18:02:28", "command": "pulse 1 130 1500", "reply": {"pulses": [128.0, 258.33, 679.0], "raw": [234.8, -2.95, 58.4], "true": [238.95, -13.39, 59.94], "supply_mv": 12287}}
+{"t": "18:02:31", "command": "pulse 1 90 1500", "reply": {"pulses": [91.17, 258.33, 678.67], "raw": [232.6, 33.19, 58.54], "true": [238.35, 22.87, 60.09], "supply_mv": 12251}}
+{"t": "18:02:34", "command": "pulse 1 130 1500", "reply": {"pulses": [128.0, 258.17, 679.0], "raw": [234.85, -2.95, 58.32], "true": [239.01, -13.39, 59.87], "supply_mv": 12238}}
+{"t": "18:02:37", "command": "pulse 1 90 1500", "reply": {"pulses": [91.67, 258.33, 679.0], "raw": [232.54, 32.68, 58.4], "true": [238.28, 22.36, 59.94], "supply_mv": 12276}}
+{"t": "18:02:40", "command": "pulse 1 130 1500", "reply": {"pulses": [127.83, 258.0, 679.0], "raw": [234.9, -2.79, 58.24], "true": [239.07, -13.23, 59.79], "supply_mv": 12225}}
+{"t": "18:02:47", "command": "eval bus_servo.run(1, 96, 800)", "reply": {"value": "None"}}
+{"t": "18:02:48", "command": "eval bus_servo.run(1, 100, 300)", "reply": {"value": "None"}}
+{"t": "18:02:49", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[97, 98, 97, 97, 97, 97, 98, 97]"}}
+{"t": "18:02:49", "command": "eval bus_servo.run(1, 101, 300)", "reply": {"value": "None"}}
+{"t": "18:02:50", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[100, 99, 100, 100, 100, 100, 100, 99]"}}
+{"t": "18:02:50", "command": "eval bus_servo.run(1, 102, 300)", "reply": {"value": "None"}}
+{"t": "18:02:51", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[100, 99, 100, 100, 100, 99, 99, 100]"}}
+{"t": "18:02:51", "command": "eval bus_servo.run(1, 103, 300)", "reply": {"value": "None"}}
+{"t": "18:02:51", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[102, 101, 102, 102, 102, 101, 102, 102]"}}
+{"t": "18:02:51", "command": "eval bus_servo.run(1, 104, 300)", "reply": {"value": "None"}}
+{"t": "18:02:52", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[102, 102, 102, 102, 101, 102, 101, 102]"}}
+{"t": "18:02:52", "command": "eval bus_servo.run(1, 105, 300)", "reply": {"value": "None"}}
+{"t": "18:02:53", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[104, 104, 103, 103, 104, 104, 104, 104]"}}
+{"t": "18:02:53", "command": "eval bus_servo.run(1, 106, 300)", "reply": {"value": "None"}}
+{"t": "18:02:54", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[103, 103, 103, 104, 104, 104, 103, 104]"}}
+{"t": "18:02:54", "command": "eval bus_servo.run(1, 107, 300)", "reply": {"value": "None"}}
+{"t": "18:02:55", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[104, 105, 105, 104, 104, 105, 104, 105]"}}
+{"t": "18:02:55", "command": "eval bus_servo.run(1, 108, 300)", "reply": {"value": "None"}}
+{"t": "18:02:56", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[106, 106, 106, 106, 106, 106, 106, 106]"}}
+{"t": "18:02:56", "command": "eval bus_servo.run(1, 109, 300)", "reply": {"value": "None"}}
+{"t": "18:02:56", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[108, 108, 108, 108, 108, 108, 108, 108]"}}
+{"t": "18:02:56", "command": "eval bus_servo.run(1, 110, 300)", "reply": {"value": "None"}}
+{"t": "18:02:57", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[107, 108, 108, 108, 108, 108, 108, 108]"}}
+{"t": "18:02:57", "command": "eval bus_servo.run(1, 111, 300)", "reply": {"value": "None"}}
+{"t": "18:02:58", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[109, 109, 109, False, 109, 109, 109, 109]"}}
+{"t": "18:02:58", "command": "eval bus_servo.run(1, 112, 300)", "reply": {"value": "None"}}
+{"t": "18:02:59", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[109, 109, 110, 109, 109, 109, 110, 109]"}}
+{"t": "18:02:59", "command": "eval bus_servo.run(1, 113, 300)", "reply": {"value": "None"}}
+{"t": "18:03:00", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[112, 112, 112, 112, 112, 112, 112, 112]"}}
+{"t": "18:03:00", "command": "eval bus_servo.run(1, 114, 300)", "reply": {"value": "None"}}
+{"t": "18:03:01", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[112, 113, 112, 111, 112, 111, 112, 112]"}}
+{"t": "18:03:01", "command": "eval bus_servo.run(1, 115, 300)", "reply": {"value": "None"}}
+{"t": "18:03:01", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[113, 113, 113, 113, 114, 113, 113, 113]"}}
+{"t": "18:03:01", "command": "eval bus_servo.run(1, 116, 300)", "reply": {"value": "None"}}
+{"t": "18:03:02", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[114, 114, 114, 114, 114, 114, 114, 114]"}}
+{"t": "18:03:02", "command": "eval bus_servo.run(1, 117, 300)", "reply": {"value": "None"}}
+{"t": "18:03:03", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[115, 115, 115, 115, 116, 115, 115, 115]"}}
+{"t": "18:03:03", "command": "eval bus_servo.run(1, 118, 300)", "reply": {"value": "None"}}
+{"t": "18:03:04", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[115, 115, 115, 115, 115, 116, 115, 115]"}}
+{"t": "18:03:04", "command": "eval bus_servo.run(1, 119, 300)", "reply": {"value": "None"}}
+{"t": "18:03:05", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[118, 118, 118, 118, 119, 118, 119, 118]"}}
+{"t": "18:03:05", "command": "eval bus_servo.run(1, 120, 300)", "reply": {"value": "None"}}
+{"t": "18:03:06", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[118, 118, 119, 118, 118, 118, 118, 118]"}}
+{"t": "18:03:06", "command": "eval bus_servo.run(1, 119, 300)", "reply": {"value": "None"}}
+{"t": "18:03:06", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[118, 118, 119, 118, 118, 118, 118, 118]"}}
+{"t": "18:03:06", "command": "eval bus_servo.run(1, 118, 300)", "reply": {"value": "None"}}
+{"t": "18:03:07", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[118, 118, 118, 118, 118, 118, 118, 118]"}}
+{"t": "18:03:07", "command": "eval bus_servo.run(1, 117, 300)", "reply": {"value": "None"}}
+{"t": "18:03:08", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[118, 118, 118, 119, 118, 118, 118, 118]"}}
+{"t": "18:03:08", "command": "eval bus_servo.run(1, 116, 300)", "reply": {"value": "None"}}
+{"t": "18:03:09", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[118, 117, 117, 118, 117, 117, 118, 117]"}}
+{"t": "18:03:09", "command": "eval bus_servo.run(1, 115, 300)", "reply": {"value": "None"}}
+{"t": "18:03:10", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[115, 115, 115, 115, 115, 115, 115, 115]"}}
+{"t": "18:03:10", "command": "eval bus_servo.run(1, 114, 300)", "reply": {"value": "None"}}
+{"t": "18:03:11", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[115, 116, 115, 115, 115, 115, 115, 115]"}}
+{"t": "18:03:11", "command": "eval bus_servo.run(1, 113, 300)", "reply": {"value": "None"}}
+{"t": "18:03:12", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[114, 114, 114, 114, 114, 114, 114, 114]"}}
+{"t": "18:03:12", "command": "eval bus_servo.run(1, 112, 300)", "reply": {"value": "None"}}
+{"t": "18:03:12", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[114, 114, 114, 114, 114, 114, 114, 114]"}}
+{"t": "18:03:12", "command": "eval bus_servo.run(1, 111, 300)", "reply": {"value": "None"}}
+{"t": "18:03:13", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[112, 112, 112, 112, 112, 112, 112, 112]"}}
+{"t": "18:03:13", "command": "eval bus_servo.run(1, 110, 300)", "reply": {"value": "None"}}
+{"t": "18:03:14", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[111, 111, 112, 112, 112, 112, 112, 112]"}}
+{"t": "18:03:14", "command": "eval bus_servo.run(1, 109, 300)", "reply": {"value": "None"}}
+{"t": "18:03:15", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[109, 109, 110, 110, 109, 109, 109, 109]"}}
+{"t": "18:03:15", "command": "eval bus_servo.run(1, 108, 300)", "reply": {"value": "None"}}
+{"t": "18:03:16", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[110, 109, 109, 110, 110, 110, 109, 109]"}}
+{"t": "18:03:16", "command": "eval bus_servo.run(1, 107, 300)", "reply": {"value": "None"}}
+{"t": "18:03:17", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[110, 109, 109, 109, 109, 109, 109, 110]"}}
+{"t": "18:03:17", "command": "eval bus_servo.run(1, 106, 300)", "reply": {"value": "None"}}
+{"t": "18:03:17", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[106, 106, 107, 106, 106, 106, 106, 107]"}}
+{"t": "18:03:17", "command": "eval bus_servo.run(1, 105, 300)", "reply": {"value": "None"}}
+{"t": "18:03:18", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[106, 106, 106, 107, 106, 106, 106, 106]"}}
+{"t": "18:03:18", "command": "eval bus_servo.run(1, 104, 300)", "reply": {"value": "None"}}
+{"t": "18:03:19", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[106, 106, 106, 106, 106, 106, 106, 106]"}}
+{"t": "18:03:19", "command": "eval bus_servo.run(1, 103, 300)", "reply": {"value": "None"}}
+{"t": "18:03:20", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[104, 104, 104, 104, 105, 104, 103, 104]"}}
+{"t": "18:03:20", "command": "eval bus_servo.run(1, 102, 300)", "reply": {"value": "None"}}
+{"t": "18:03:21", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[104, 104, 104, 104, 104, 104, 104, 103]"}}
+{"t": "18:03:21", "command": "eval bus_servo.run(1, 101, 300)", "reply": {"value": "None"}}
+{"t": "18:03:22", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[102, 102, 103, 102, 102, 102, 102, 102]"}}
+{"t": "18:03:22", "command": "eval bus_servo.run(1, 100, 300)", "reply": {"value": "None"}}
+{"t": "18:03:22", "command": "eval [bus_servo.get_position(1) for i in range(8)]", "reply": {"value": "[102, 101, 101, 102, 101, 102, 101, 102]"}}
+{"t": "18:04:35", "command": "pulse 1 870 3000", "reply": {"pulses": [869.0, 258.33, 678.5], "raw": [-234.94, -5.91, 58.61], "true": [-239.44, -5.25, 60.16], "supply_mv": 12265}}
+{"t": "18:04:45", "command": "pulse 1 500 2000", "reply": {"pulses": [501.0, 258.67, 678.33], "raw": [-0.98, -234.99, 58.83], "true": [-0.95, -239.45, 60.38], "supply_mv": 12254}}
+{"t": "18:09:07", "command": "eval [bus_servo.get_position(i) for i in (1, 1, 1, 1, 1, 1, 2, 3)]", "reply": {"value": "[500, 500, 500, 500, 500, 500, 259, 676]"}}
+{"t": "18:10:05", "command": "eval [bus_servo.get_position(i) for i in (1, 1, 1, 1, 1, 1, 2, 3)]", "reply": {"value": "[501, 501, 501, 501, 501, 501, 259, 676]"}}
+{"t": "18:11:15", "command": "eval [bus_servo.get_position(1) for i in range(20)]", "reply": {"value": "[500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500]"}}
+{"t": "18:11:45", "command": "eval [bus_servo.get_position(1) for i in range(20)]", "reply": {"value": "[501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501]"}}
+{"t": "18:12:17", "command": "pulse 1 110 2500", "reply": {"pulses": [111.25, 258.75, 676.0], "raw": [235.49, 13.58, 59.86], "true": [240.2, 2.77, 61.44], "supply_mv": 12314}}
+{"t": "18:13:19", "command": "pulse 1 130 800", "reply": {"pulses": [127.5, 258.83, 676.0], "raw": [235.84, -2.47, 59.9], "true": [239.84, -12.96, 61.47], "supply_mv": 12289}}
+{"t": "18:13:21", "command": "pulse 1 110 800", "reply": {"pulses": [112.0, 259.0, 676.0], "raw": [235.46, 12.83, 59.98], "true": [240.13, 2.01, 61.55], "supply_mv": 12305}}
+{"t": "18:14:18", "command": "eval [bus_servo.get_position(1) for i in range(20)]", "reply": {"value": "[109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 108, 109, 109, 109, 109, 109, 109, 109, 109, 109]"}}
+{"t": "18:14:57", "command": "eval [bus_servo.get_position(1) for i in range(20)]", "reply": {"value": "[109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 108, 108, 109, 109, 109, 109, 109, 109, 109]"}}
+{"t": "18:15:25", "command": "eval [bus_servo.get_position(1) for i in range(20)]", "reply": {"value": "[109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109]"}}
+{"t": "18:15:53", "command": "eval [bus_servo.get_position(1) for i in range(20)]", "reply": {"value": "[109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, False]"}}
+{"t": "18:16:58", "command": "eval [bus_servo.get_position(1) for i in range(20)]", "reply": {"value": "[109, 108, 108, 108, 108, 108, 108, 108, 108, 109, False, 108, 108, 109, 108, 108, 108, 109, 109, 108]"}}
+{"t": "18:23:04", "command": "pulse 1 95 800", "reply": {"pulses": [97.5, 259.0, 676.0], "raw": [234.24, 27.1, 59.98], "true": [239.56, 16.58, 61.55], "supply_mv": 12305}}
+{"t": "18:23:06", "command": "pulse 1 111 600", "reply": {"pulses": [109.0, 259.0, 676.0], "raw": [235.28, 15.79, 59.98], "true": [240.08, 5.03, 61.55], "supply_mv": 12267}}
+{"t": "18:23:10", "command": "eval (bus_servo.run(2, 241, 700), bus_servo.run(3, 692, 700))", "reply": {"value": "(None, None)"}}
+{"t": "18:23:11", "command": "read", "reply": {"pulses": [109.0, 242.0, 691.0], "raw": [233.84, 15.7, 45.84], "true": [240.2, 5.03, 47.43], "supply_mv": 12278}}
+{"t": "18:23:17", "command": "eval (bus_servo.run(2, 239, 500), bus_servo.run(3, 694, 500))", "reply": {"value": "(None, None)"}}
+{"t": "18:23:18", "command": "read", "reply": {"pulses": [109.0, 240.0, 691.33], "raw": [234.2, 15.72, 44.75], "true": [240.68, 5.04, 46.36], "supply_mv": 12307}}
+{"t": "18:40:33", "command": "eval (bus_servo.run(2, 258, 500), bus_servo.run(3, 679, 500))", "reply": {"value": "(None, None)"}}
+{"t": "18:40:35", "command": "read", "reply": {"pulses": [111.67, 252.33, 681.17], "raw": [235.27, 13.15, 54.73], "true": [240.53, 2.35, 56.33], "supply_mv": 12247}}
+{"t": "18:51:57", "command": "pulse 1 125 800", "reply": {"pulses": [124.33, 255.5, 679.67], "raw": [235.36, 0.66, 56.82], "true": [239.83, -9.91, 58.4], "supply_mv": 12269}}
+{"t": "18:51:59", "command": "pulse 1 106 600", "reply": {"pulses": [106.67, 255.83, 680.0], "raw": [234.44, 18.04, 56.83], "true": [239.7, 7.37, 58.4], "supply_mv": 12269}}
+{"t": "18:52:07", "command": "pulse 1 125 800", "reply": {"pulses": [123.17, 255.83, 679.83], "raw": [235.19, 1.81, 56.9], "true": [239.71, -8.79, 58.47], "supply_mv": 12289}}
+{"t": "18:52:09", "command": "pulse 1 107 600", "reply": {"pulses": [108.5, 254.67, 679.83], "raw": [234.96, 16.27, 56.36], "true": [240.19, 5.53, 57.95], "supply_mv": 12225}}
+{"t": "18:52:19", "command": "pulse 1 125 800", "reply": {"pulses": [123.67, 255.5, 680.0], "raw": [235.22, 1.31, 56.68], "true": [239.74, -9.27, 58.25], "supply_mv": 12316}}
+{"t": "18:52:21", "command": "pulse 1 106 600", "reply": {"pulses": [106.83, 255.0, 679.83], "raw": [234.75, 17.9, 56.52], "true": [240.03, 7.21, 58.1], "supply_mv": 12265}}
+{"t": "18:52:29", "command": "pulse 1 125 800", "reply": {"pulses": [123.0, 255.5, 680.0], "raw": [235.22, 1.97, 56.68], "true": [239.76, -8.63, 58.25], "supply_mv": 12220}}
+{"t": "18:52:31", "command": "pulse 1 107 600", "reply": {"pulses": [108.0, 255.83, 679.83], "raw": [234.6, 16.73, 56.9], "true": [239.79, 6.03, 58.47], "supply_mv": 12320}}
+{"t": "18:52:33", "command": "pulse 1 125 800", "reply": {"pulses": [123.0, 255.25, 680.0], "raw": [235.29, 1.97, 56.56], "true": [239.85, -8.63, 58.14], "supply_mv": 12278}}
+{"t": "18:52:35", "command": "pulse 1 107 600", "reply": {"pulses": [108.33, 256.17, 679.83], "raw": [234.53, 16.4, 57.05], "true": [239.69, 5.69, 58.62], "supply_mv": 12322}}
+{"t": "18:52:38", "command": "pulse 1 125 800", "reply": {"pulses": [123.0, 255.33, 679.83], "raw": [235.33, 1.97, 56.67], "true": [239.88, -8.63, 58.25], "supply_mv": 12278}}
+{"t": "18:52:40", "command": "pulse 1 107 600", "reply": {"pulses": [108.75, 255.5, 679.75], "raw": [234.78, 16.01, 56.78], "true": [239.95, 5.28, 58.36], "supply_mv": 12294}}
+{"t": "18:52:48", "command": "pulse 1 125 800", "reply": {"pulses": [123.17, 255.17, 679.83], "raw": [235.38, 1.81, 56.59], "true": [239.93, -8.8, 58.18], "supply_mv": 12309}}
+{"t": "18:52:50", "command": "pulse 1 107 600", "reply": {"pulses": [108.17, 255.67, 679.83], "raw": [234.66, 16.57, 56.82], "true": [239.85, 5.86, 58.4], "supply_mv": 12307}}
+{"t": "18:52:53", "command": "pulse 1 125 800", "reply": {"pulses": [123.83, 255.33, 679.67], "raw": [235.4, 1.15, 56.74], "true": [239.9, -9.44, 58.32], "supply_mv": 12318}}
+{"t": "18:52:55", "command": "pulse 1 107 600", "reply": {"pulses": [108.33, 255.83, 680.0], "raw": [234.56, 16.4, 56.83], "true": [239.74, 5.69, 58.4], "supply_mv": 12282}}
+{"t": "18:52:57", "command": "pulse 1 125 800", "reply": {"pulses": [123.83, 255.67, 679.83], "raw": [235.24, 1.15, 56.82], "true": [239.74, -9.43, 58.4], "supply_mv": 12309}}
+{"t": "18:52:59", "command": "pulse 1 107 600", "reply": {"pulses": [108.33, 255.83, 679.83], "raw": [234.63, 16.41, 56.9], "true": [239.8, 5.69, 58.47], "supply_mv": 12291}}
+{"t": "18:53:01", "command": "pulse 1 125 800", "reply": {"pulses": [123.83, 255.5, 679.67], "raw": [235.36, 1.15, 56.82], "true": [239.85, -9.43, 58.4], "supply_mv": 12329}}
+{"t": "18:53:03", "command": "pulse 1 107 600", "reply": {"pulses": [108.67, 255.67, 679.83], "raw": [234.7, 16.08, 56.82], "true": [239.86, 5.36, 58.4], "supply_mv": 12276}}
+{"t": "18:53:05", "command": "pulse 1 125 800", "reply": {"pulses": [123.0, 255.5, 679.67], "raw": [235.35, 1.97, 56.82], "true": [239.88, -8.63, 58.4], "supply_mv": 12271}}
+{"t": "18:53:07", "command": "pulse 1 107 600", "reply": {"pulses": [108.0, 255.33, 680.0], "raw": [234.68, 16.74, 56.6], "true": [239.9, 6.03, 58.18], "supply_mv": 12294}}
+{"t": "18:53:13", "command": "eval (bus_servo.run(2, 242, 700), bus_servo.run(3, 691, 700))", "reply": {"value": "(None, None)"}}
+{"t": "18:53:14", "command": "read", "reply": {"pulses": [108.5, 242.75, 689.0], "raw": [234.44, 16.23, 47.0], "true": [240.69, 5.55, 48.61], "supply_mv": 12325}}
+{"t": "18:53:20", "command": "eval (bus_servo.run(2, 240, 500), bus_servo.run(3, 692, 500))", "reply": {"value": "(None, None)"}}
+{"t": "18:53:22", "command": "read", "reply": {"pulses": [108.17, 240.33, 691.0], "raw": [234.2, 16.54, 45.05], "true": [240.68, 5.88, 46.65], "supply_mv": 12325}}
+{"t": "18:53:28", "command": "eval (bus_servo.run(2, 243, 400), bus_servo.run(3, 689, 400))", "reply": {"value": "(None, None)"}}
+{"t": "18:53:29", "command": "read", "reply": {"pulses": [108.33, 241.0, 691.0], "raw": [234.05, 16.37, 45.36], "true": [240.48, 5.71, 46.96], "supply_mv": 12271}}
+{"t": "18:53:35", "command": "eval (bus_servo.run(2, 244, 400), bus_servo.run(3, 688, 400))", "reply": {"value": "(None, None)"}}
+{"t": "18:53:36", "command": "read", "reply": {"pulses": [108.33, 240.83, 691.0], "raw": [234.09, 16.37, 45.28], "true": [240.53, 5.71, 46.88], "supply_mv": 12282}}
+{"t": "18:54:52", "command": "eval [bus_servo.get_position(1) for i in range(20)]", "reply": {"value": "[106, False, 106, 106, 106, 106, 106, 106, 106, 106, 106, 106, 106, 106, 106, 106, 106, 106, 106, 106]"}}
+{"t": "18:55:25", "command": "eval [bus_servo.get_position(1) for i in range(20)]", "reply": {"value": "[105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105]"}}
+{"t": "18:57:53", "command": "eval [bus_servo.get_position(1) for i in range(20)]", "reply": {"value": "[105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 106, 105, 105, 106, 105, 105, 105]"}}
+{"t": "19:04:27", "command": "eval (bus_servo.run(2, 256, 400), bus_servo.run(3, 680, 400))", "reply": {"value": "(None, None)"}}
+{"t": "19:04:30", "command": "pulse 1 125 800", "reply": {"pulses": [123.33, 250.83, 682.0], "raw": [235.71, 1.65, 53.68], "true": [240.57, -8.98, 55.3], "supply_mv": 12238}}
+{"t": "19:04:32", "command": "pulse 1 108 600", "reply": {"pulses": [109.0, 251.17, 682.0], "raw": [235.1, 15.78, 53.84], "true": [240.57, 5.04, 55.45], "supply_mv": 12316}}
+{"t": "19:04:36", "command": "eval (bus_servo.run(2, 241, 700), bus_servo.run(3, 691, 700))", "reply": {"value": "(None, None)"}}
+{"t": "19:04:38", "command": "read", "reply": {"pulses": [109.0, 242.0, 689.17], "raw": [234.6, 15.75, 46.58], "true": [240.87, 5.05, 48.2], "supply_mv": 12274}}
+{"t": "19:07:50", "command": "eval [bus_servo.get_position(i) for i in (1,1,1,1,1,1,1,1,1,1,2,3)]", "reply": {"value": "[109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 242, 689]"}}
+{"t": "19:09:00", "command": "eval [bus_servo.get_position(1) for i in range(12)]", "reply": {"value": "[106, 106, 106, 106, 106, 106, 106, 107, 107, 106, 106, 107]"}}
+{"t": "19:09:20", "command": "eval [bus_servo.get_position(1) for i in range(12)]", "reply": {"value": "[106, 107, 106, 107, 107, 106, 107, 106, 107, 106, 107, 106]"}}
+{"t": "19:10:23", "command": "eval (bus_servo.run(2, 256, 400), bus_servo.run(3, 680, 400))", "reply": {"value": "(None, None)"}}
+{"t": "19:10:26", "command": "pulse 1 95 800", "reply": {"pulses": [96.67, 251.5, 682.0], "raw": [233.88, 27.89, 53.99], "true": [239.89, 17.45, 55.6], "supply_mv": 12278}}
+{"t": "19:10:28", "command": "pulse 1 111 600", "reply": {"pulses": [109.0, 252.0, 682.0], "raw": [234.87, 15.76, 54.22], "true": [240.31, 5.03, 55.82], "supply_mv": 12269}}
+{"t": "19:10:28", "command": "eval (bus_servo.run(2, 241, 700), bus_servo.run(3, 691, 700))", "reply": {"value": "(None, None)"}}
+{"t": "19:10:30", "command": "read", "reply": {"pulses": [109.0, 241.5, 689.17], "raw": [234.72, 15.75, 46.34], "true": [241.02, 5.05, 47.97], "supply_mv": 12263}}
+{"t": "19:11:02", "command": "eval (bus_servo.run(2, 256, 400), bus_servo.run(3, 680, 400))", "reply": {"value": "(None, None)"}}
+{"t": "19:11:05", "command": "pulse 1 95 800", "reply": {"pulses": [96.83, 251.0, 683.17], "raw": [233.57, 27.69, 53.27], "true": [239.65, 17.26, 54.87], "supply_mv": 12271}}
+{"t": "19:11:07", "command": "pulse 1 111 600", "reply": {"pulses": [108.75, 251.25, 683.0], "raw": [234.66, 16.0, 53.46], "true": [240.19, 5.28, 55.05], "supply_mv": 12240}}
+{"t": "19:11:09", "command": "pulse 1 95 800", "reply": {"pulses": [96.0, 251.17, 683.0], "raw": [233.49, 28.5, 53.42], "true": [239.59, 18.1, 55.01], "supply_mv": 12254}}
+{"t": "19:11:11", "command": "pulse 1 111 600", "reply": {"pulses": [109.0, 252.0, 683.0], "raw": [234.47, 15.74, 53.81], "true": [239.95, 5.03, 55.39], "supply_mv": 12282}}
+{"t": "19:11:11", "command": "eval (bus_servo.run(2, 241, 700), bus_servo.run(3, 691, 700))", "reply": {"value": "(None, None)"}}
+{"t": "19:11:13", "command": "read", "reply": {"pulses": [109.0, 241.83, 690.67], "raw": [234.02, 15.71, 45.89], "true": [240.37, 5.04, 47.49], "supply_mv": 12329}}
+{"t": "19:12:26", "command": "eval [bus_servo.get_position(1) for i in range(12)]", "reply": {"value": "[109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109]"}}
+{"t": "19:12:59", "command": "eval [bus_servo.get_position(1) for i in range(12)]", "reply": {"value": "[110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110]"}}
+{"t": "19:15:39", "command": "eval (bus_servo.run(2, 256, 400), bus_servo.run(3, 680, 400))", "reply": {"value": "(None, None)"}}
+{"t": "19:15:42", "command": "pulse 1 127 800", "reply": {"pulses": [125.33, 251.33, 682.83], "raw": [235.25, -0.33, 53.57], "true": [240.03, -10.88, 55.16], "supply_mv": 12247}}
+{"t": "19:15:44", "command": "pulse 1 110 600", "reply": {"pulses": [111.67, 251.5, 682.0], "raw": [235.17, 13.15, 53.99], "true": [240.51, 2.35, 55.6], "supply_mv": 12236}}
+{"t": "19:15:46", "command": "pulse 1 127 800", "reply": {"pulses": [125.67, 252.0, 682.33], "raw": [235.26, -0.66, 54.08], "true": [239.98, -11.2, 55.68], "supply_mv": 12305}}
+{"t": "19:15:48", "command": "pulse 1 110 600", "reply": {"pulses": [110.83, 252.0, 682.17], "raw": [234.92, 13.96, 54.15], "true": [240.28, 3.19, 55.75], "supply_mv": 12243}}
+{"t": "19:15:50", "command": "pulse 1 127 800", "reply": {"pulses": [125.17, 251.67, 682.17], "raw": [235.42, -0.16, 54.0], "true": [240.17, -10.73, 55.6], "supply_mv": 12285}}
+{"t": "19:15:52", "command": "pulse 1 109 600", "reply": {"pulses": [109.83, 252.0, 682.33], "raw": [234.79, 14.94, 54.08], "true": [240.2, 4.19, 55.68], "supply_mv": 12289}}
+{"t": "19:15:54", "command": "pulse 1 127 800", "reply": {"pulses": [125.0, 251.5, 682.25], "raw": [235.43, -0.0, 53.89], "true": [240.2, -10.57, 55.49], "supply_mv": 12302}}
+{"t": "19:15:56", "command": "pulse 1 110 600", "reply": {"pulses": [110.67, 251.83, 682.17], "raw": [234.95, 14.12, 54.08], "true": [240.33, 3.36, 55.67], "supply_mv": 12298}}
+{"t": "19:15:59", "command": "pulse 1 127 800", "reply": {"pulses": [126.0, 252.0, 682.5], "raw": [235.2, -0.99, 54.01], "true": [239.91, -11.52, 55.6], "supply_mv": 12234}}
+{"t": "19:16:01", "command": "pulse 1 109 600", "reply": {"pulses": [110.0, 252.0, 682.17], "raw": [234.87, 14.78, 54.15], "true": [240.27, 4.03, 55.75], "supply_mv": 12251}}
+{"t": "19:16:03", "command": "pulse 1 127 800", "reply": {"pulses": [125.5, 252.0, 682.17], "raw": [235.33, -0.49, 54.15], "true": [240.05, -11.04, 55.75], "supply_mv": 12291}}
+{"t": "19:16:05", "command": "pulse 1 110 600", "reply": {"pulses": [110.5, 251.5, 682.0], "raw": [235.1, 14.3, 53.99], "true": [240.49, 3.53, 55.6], "supply_mv": 12291}}
+{"t": "19:16:07", "command": "pulse 1 127 800", "reply": {"pulses": [125.67, 252.0, 682.17], "raw": [235.33, -0.66, 54.15], "true": [240.04, -11.2, 55.75], "supply_mv": 12265}}
+{"t": "19:16:09", "command": "pulse 1 109 600", "reply": {"pulses": [110.0, 251.83, 682.17], "raw": [234.91, 14.78, 54.08], "true": [240.32, 4.03, 55.67], "supply_mv": 12254}}
+{"t": "19:16:11", "command": "pulse 1 127 800", "reply": {"pulses": [125.5, 252.0, 682.0], "raw": [235.4, -0.49, 54.22], "true": [240.1, -11.05, 55.82], "supply_mv": 12278}}
+{"t": "19:16:13", "command": "pulse 1 110 600", "reply": {"pulses": [111.2, 252.0, 682.2], "raw": [234.93, 13.6, 54.14], "true": [240.27, 2.82, 55.73], "supply_mv": 12309}}
+{"t": "19:16:13", "command": "eval (bus_servo.run(2, 241, 700), bus_servo.run(3, 691, 700))", "reply": {"value": "(None, None)"}}
+{"t": "19:16:15", "command": "read", "reply": {"pulses": [111.17, 242.0, 690.0], "raw": [234.39, 13.6, 46.24], "true": [240.6, 2.86, 47.85], "supply_mv": 12316}}
+{"t": "19:17:09", "command": "eval [bus_servo.get_position(1) for i in range(12)]", "reply": {"value": "[110, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111]"}}
+{"t": "19:17:23", "command": "eval [bus_servo.get_position(1) for i in range(12)]", "reply": {"value": "[109, 109, 109, 109, 109, 109, 109, False, 109, 109, 109, 109]"}}
+{"t": "19:18:25", "command": "eval (bus_servo.run(2, 256, 400), bus_servo.run(3, 680, 400))", "reply": {"value": "(None, None)"}}
+{"t": "19:18:28", "command": "pulse 1 129 800", "reply": {"pulses": [127.0, 252.0, 682.17], "raw": [235.32, -1.97, 54.15], "true": [239.98, -12.48, 55.75], "supply_mv": 12251}}
+{"t": "19:18:30", "command": "pulse 1 112 600", "reply": {"pulses": [113.17, 252.0, 683.0], "raw": [234.71, 11.64, 53.81], "true": [240.0, 0.84, 55.39], "supply_mv": 12267}}
+{"t": "19:18:32", "command": "pulse 1 129 800", "reply": {"pulses": [127.0, 252.0, 682.0], "raw": [235.39, -1.97, 54.22], "true": [240.03, -12.49, 55.82], "supply_mv": 12240}}
+{"t": "19:18:34", "command": "pulse 1 111 600", "reply": {"pulses": [112.5, 253.0, 682.33], "raw": [234.67, 12.3, 54.55], "true": [239.91, 1.51, 56.13], "supply_mv": 12300}}
+{"t": "19:18:36", "command": "pulse 1 129 800", "reply": {"pulses": [127.0, 252.17, 682.67], "raw": [235.08, -1.97, 54.02], "true": [239.75, -12.47, 55.61], "supply_mv": 12238}}
+{"t": "19:18:38", "command": "pulse 1 112 600", "reply": {"pulses": [113.0, 252.0, 682.17], "raw": [235.03, 11.82, 54.15], "true": [240.3, 1.01, 55.75], "supply_mv": 12276}}
+{"t": "19:18:38", "command": "eval (bus_servo.run(2, 241, 700), bus_servo.run(3, 691, 700))", "reply": {"value": "(None, None)"}}
+{"t": "19:18:40", "command": "read", "reply": {"pulses": [113.33, 241.5, 689.5], "raw": [234.83, 11.49, 46.21], "true": [240.95, 0.67, 47.82], "supply_mv": 12285}}
+{"t": "19:19:39", "command": "eval [bus_servo.get_position(1) for i in range(12)]", "reply": {"value": "[113, 113, 113, 114, 113, 113, 113, 113, 113, 113, 113, 113]"}}
+{"t": "19:20:20", "command": "eval (bus_servo.run(2, 256, 400), bus_servo.run(3, 680, 400))", "reply": {"value": "(None, None)"}}
+{"t": "19:20:23", "command": "pulse 1 132 800", "reply": {"pulses": [129.67, 251.5, 682.67], "raw": [235.22, -4.6, 53.71], "true": [239.81, -15.04, 55.31], "supply_mv": 12269}}
+{"t": "19:20:25", "command": "pulse 1 115 600", "reply": {"pulses": [116.17, 251.83, 682.83], "raw": [234.95, 8.7, 53.8], "true": [240.11, -2.08, 55.39], "supply_mv": 12265}}
+{"t": "19:20:27", "command": "pulse 1 132 800", "reply": {"pulses": [130.0, 251.33, 682.83], "raw": [235.2, -4.93, 53.57], "true": [239.79, -15.36, 55.16], "supply_mv": 12245}}
+{"t": "19:20:29", "command": "pulse 1 114 600", "reply": {"pulses": [115.25, 252.0, 683.0], "raw": [234.8, 9.59, 53.81], "true": [240.0, -1.2, 55.39], "supply_mv": 12254}}
+{"t": "19:20:31", "command": "pulse 1 132 800", "reply": {"pulses": [129.83, 252.0, 683.0], "raw": [234.95, -4.76, 53.81], "true": [239.53, -15.18, 55.39], "supply_mv": 12251}}
+{"t": "19:20:33", "command": "pulse 1 115 600", "reply": {"pulses": [115.0, 251.75, 683.0], "raw": [234.86, 9.84, 53.69], "true": [240.08, -0.96, 55.28], "supply_mv": 12251}}
+{"t": "19:20:36", "command": "pulse 1 132 800", "reply": {"pulses": [130.0, 251.83, 683.0], "raw": [234.99, -4.92, 53.73], "true": [239.57, -15.34, 55.31], "supply_mv": 12269}}
+{"t": "19:20:38", "command": "pulse 1 114 600", "reply": {"pulses": [115.0, 252.5, 682.75], "raw": [234.76, 9.84, 54.14], "true": [239.93, -0.96, 55.72], "supply_mv": 12263}}
+{"t": "19:20:40", "command": "pulse 1 132 800", "reply": {"pulses": [130.0, 251.83, 683.0], "raw": [234.99, -4.92, 53.73], "true": [239.57, -15.34, 55.31], "supply_mv": 12251}}
+{"t": "19:20:42", "command": "pulse 1 115 600", "reply": {"pulses": [115.67, 252.0, 683.0], "raw": [234.82, 9.19, 53.81], "true": [240.0, -1.6, 55.39], "supply_mv": 12240}}
+{"t": "19:20:44", "command": "pulse 1 132 800", "reply": {"pulses": [129.83, 252.0, 683.0], "raw": [234.95, -4.76, 53.81], "true": [239.53, -15.18, 55.39], "supply_mv": 12271}}
+{"t": "19:20:46", "command": "pulse 1 114 600", "reply": {"pulses": [115.0, 252.0, 683.0], "raw": [234.79, 9.84, 53.81], "true": [240.0, -0.96, 55.39], "supply_mv": 12267}}
+{"t": "19:20:48", "command": "pulse 1 132 800", "reply": {"pulses": [130.0, 252.17, 683.0], "raw": [234.9, -4.92, 53.88], "true": [239.46, -15.34, 55.46], "supply_mv": 12271}}
+{"t": "19:20:50", "command": "pulse 1 115 600", "reply": {"pulses": [115.83, 252.0, 683.0], "raw": [234.83, 9.02, 53.81], "true": [240.0, -1.76, 55.39], "supply_mv": 12245}}
+{"t": "19:20:52", "command": "pulse 1 132 800", "reply": {"pulses": [130.0, 252.0, 683.0], "raw": [234.95, -4.92, 53.81], "true": [239.51, -15.34, 55.39], "supply_mv": 12287}}
+{"t": "19:20:55", "command": "pulse 1 114 600", "reply": {"pulses": [115.33, 252.0, 683.0], "raw": [234.81, 9.51, 53.81], "true": [240.0, -1.28, 55.39], "supply_mv": 12280}}
+{"t": "19:20:55", "command": "eval (bus_servo.run(2, 241, 700), bus_servo.run(3, 691, 700))", "reply": {"value": "(None, None)"}}
+{"t": "19:20:56", "command": "read", "reply": {"pulses": [115.17, 241.33, 690.17], "raw": [234.68, 9.67, 45.86], "true": [240.76, -1.12, 47.47], "supply_mv": 12391}}
+{"t": "19:21:03", "command": "eval (bus_servo.run(2, 256, 400), bus_servo.run(3, 680, 400))", "reply": {"value": "(None, None)"}}
+{"t": "19:21:06", "command": "pulse 1 132 800", "reply": {"pulses": [130.0, 251.17, 683.0], "raw": [235.17, -4.93, 53.42], "true": [239.78, -15.36, 55.01], "supply_mv": 12267}}
+{"t": "19:21:08", "command": "pulse 1 115 600", "reply": {"pulses": [116.0, 251.17, 683.0], "raw": [235.06, 8.87, 53.42], "true": [240.27, -1.92, 55.01], "supply_mv": 12243}}
+{"t": "19:21:08", "command": "eval (bus_servo.run(2, 241, 700), bus_servo.run(3, 691, 700))", "reply": {"value": "(None, None)"}}
+{"t": "19:21:10", "command": "read", "reply": {"pulses": [116.0, 241.83, 690.17], "raw": [234.59, 8.85, 46.09], "true": [240.6, -1.92, 47.7], "supply_mv": 12307}}
+{"t": "19:22:46", "command": "eval [bus_servo.get_position(i) for i in (1,1,1,1,1,1,1,1,1,1,2,3)]", "reply": {"value": "[116, 115, 115, 115, 115, 115, 116, 115, 115, 116, 242, 690]"}}
+{"t": "19:25:05", "command": "eval [bus_servo.get_position(1) for i in range(12)]", "reply": {"value": "[113, 113, 113, 113, 114, 112, 113, 113, 113, 113, 113, 113]"}}
+{"t": "19:30:31", "command": "eval (bus_servo.run(2, 256, 400), bus_servo.run(3, 680, 400))", "reply": {"value": "(None, None)"}}
+{"t": "19:30:34", "command": "pulse 1 132 800", "reply": {"pulses": [129.67, 252.0, 683.0], "raw": [234.95, -4.59, 53.81], "true": [239.54, -15.02, 55.39], "supply_mv": 12318}}
+{"t": "19:30:36", "command": "pulse 1 115 600", "reply": {"pulses": [115.0, 252.0, 682.5], "raw": [234.99, 9.85, 54.01], "true": [240.18, -0.96, 55.6], "supply_mv": 12269}}
+{"t": "19:30:38", "command": "pulse 1 132 800", "reply": {"pulses": [130.0, 252.0, 683.0], "raw": [234.95, -4.92, 53.81], "true": [239.51, -15.34, 55.39], "supply_mv": 12254}}
+{"t": "19:30:40", "command": "pulse 1 115 600", "reply": {"pulses": [116.0, 251.67, 682.83], "raw": [234.99, 8.86, 53.72], "true": [240.16, -1.92, 55.31], "supply_mv": 12269}}
+{"t": "19:30:40", "command": "eval (bus_servo.run(2, 241, 700), bus_servo.run(3, 691, 700))", "reply": {"value": "(None, None)"}}
+{"t": "19:30:42", "command": "read", "reply": {"pulses": [116.0, 241.5, 690.0], "raw": [234.74, 8.85, 46.0], "true": [240.76, -1.93, 47.61], "supply_mv": 12329}}
+{"t": "19:33:05", "command": "eval [bus_servo.get_position(1) for i in range(12)]", "reply": {"value": "[116, 115, 116, 115, 115, 115, 115, 115, 115, 116, 115, 115]"}}
+{"t": "19:34:15", "command": "eval [bus_servo.get_position(1) for i in range(12)]", "reply": {"value": "[113, 113, 113, 113, 113, 113, 113, 113, 113, False, 113, 113]"}}
+{"t": "19:39:14", "command": "eval (bus_servo.run(2, 256, 400), bus_servo.run(3, 680, 400))", "reply": {"value": "(None, None)"}}
+{"t": "19:39:15", "command": "eval bus_servo.run(1, 100, 250)", "reply": {"value": "None"}}
+{"t": "19:39:15", "command": "eval bus_servo.run(1, 132, 250)", "reply": {"value": "None"}}
+{"t": "19:39:16", "command": "eval bus_servo.run(1, 100, 250)", "reply": {"value": "None"}}
+{"t": "19:39:16", "command": "eval bus_servo.run(1, 132, 250)", "reply": {"value": "None"}}
+{"t": "19:39:17", "command": "eval bus_servo.run(1, 100, 250)", "reply": {"value": "None"}}
+{"t": "19:39:17", "command": "eval bus_servo.run(1, 132, 250)", "reply": {"value": "None"}}
+{"t": "19:39:17", "command": "eval bus_servo.run(1, 100, 250)", "reply": {"value": "None"}}
+{"t": "19:39:18", "command": "eval bus_servo.run(1, 132, 250)", "reply": {"value": "None"}}
+{"t": "19:39:18", "command": "eval bus_servo.run(1, 100, 250)", "reply": {"value": "None"}}
+{"t": "19:39:19", "command": "eval bus_servo.run(1, 132, 250)", "reply": {"value": "None"}}
+{"t": "19:39:19", "command": "eval bus_servo.run(1, 100, 250)", "reply": {"value": "None"}}
+{"t": "19:39:19", "command": "eval bus_servo.run(1, 132, 250)", "reply": {"value": "None"}}
+{"t": "19:39:22", "command": "pulse 1 132 800", "reply": {"pulses": [131.0, 252.0, 682.0], "raw": [235.32, -5.92, 54.22], "true": [239.8, -16.32, 55.82], "supply_mv": 12296}}
+{"t": "19:39:24", "command": "pulse 1 115 600", "reply": {"pulses": [116.0, 251.83, 682.0], "raw": [235.28, 8.87, 54.15], "true": [240.4, -1.92, 55.75], "supply_mv": 12249}}
+{"t": "19:39:24", "command": "eval (bus_servo.run(2, 241, 700), bus_servo.run(3, 691, 700))", "reply": {"value": "(None, None)"}}
+{"t": "19:39:26", "command": "read", "reply": {"pulses": [115.83, 241.83, 690.0], "raw": [234.65, 9.01, 46.16], "true": [240.66, -1.76, 47.77], "supply_mv": 12331}}
+{"t": "20:23:16", "command": "read", "reply": {"pulses": [115.83, 241.67, 689.5], "raw": [234.9, 9.02, 46.29], "true": [240.89, -1.77, 47.9], "supply_mv": 12331}}
+{"t": "20:23:27", "command": "move 240.89 -1.77 104 slow", "reply": {"status": "done", "detail": "", "pulses": [116.0, 298.83, 625.92], "raw": [239.85, 9.05, 100.39], "true": [241.44, -1.93, 101.35], "supply_mv": 12243}}
+{"t": "20:23:29", "command": "home", "reply": {"status": "done", "pulses": [498.73, 497.82, 504.0], "raw": [0.87, -164.09, 210.48], "true": [0.83, -165.51, 203.46], "supply_mv": 12296}}
+{"t": "20:23:29", "command": "quit", "reply": {"bye": true}}

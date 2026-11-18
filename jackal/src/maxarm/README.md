@@ -110,9 +110,13 @@ anything moves.
 
 **down_to()** moves the cup down to the point given, exactly that height and never lower, as precisely as the arm
 lands (`landing.py`; the measurements behind
-it are in work/MAXARM_MECHANICS.md): slowly up to the travel height if below it, fast across to 20 base pulses beside
-the point (the side of higher pulses), the base turned onto it aimed past by what that turn falls short, then one slow command straight down,
-servos 2 and 3 aimed past by what a descent falls short; read there as PRECISE is. If the base settled more than 0.75 mm to the side at the cup, and a whole pulse nearer the target was there to be had (the base stops on whole pulses, so nothing better is asked for), it lifts and lands again, once, from the other side: other gear faces, not the same miss again. It stays down, suction as it was:
+it are in work/MAXARM_MECHANICS.md): slowly up to the travel height if below it, fast across to 6 base pulses beside
+the point (the side of lower pulses), read until the base is steady, the base turned onto it aimed past by what that
+turn falls short, read again; then one slow command straight down, servos 2 and 3 aimed past by what a descent falls
+short there (by reach and height); read there as PRECISE is. If the base's turn settled more than 0.75 mm to the side
+at the cup, and a whole pulse nearer the target was there to be had (the base stops on whole pulses, so nothing better
+is asked for), it goes back beside the point and turns onto it again, once, from the same side, before coming down:
+the base's play is then taken up the same way every time. It stays down, suction as it was:
 `get_position()` says where it came down. What it keeps as sent is the point given, never the aimed-past command.
 It is a move only: the suction, and how deep a grip should go, are not its business.
 

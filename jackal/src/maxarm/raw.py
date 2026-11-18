@@ -65,8 +65,10 @@ REACH_LESS_PER_MM = 0.110
 REACH_TOP_MM = 44.0
 # The base points this many degrees further round (+ toward +x) than the firmware's bearing says, by that bearing:
 # a cube's real place against the servos' reading over it, one row each; the rows at -15, 15 and 30 fitted to the
-# 3 Nov grid paper between them (STATUS-jackal §19).
-TURN_DEG = ((-89.76, -0.24), (-46.80, +1.80), (-30.29, +1.95), (-15.0, +0.86), (0.0, 0.0), (15.0, -0.92),
+# 3 Nov grid paper between them (STATUS-jackal §19). The left end: base pulse 870 is -90, matched by hand; the row at
+# -77 only holds the table as it was to just past the calibration's furthest-left point, so that the end changes
+# nothing the points measured (STATUS-jackal §24).
+TURN_DEG = ((-88.80, -1.20), (-77.0, +0.37), (-46.80, +1.80), (-30.29, +1.95), (-15.0, +0.86), (0.0, 0.0), (15.0, -0.92),
             (30.0, -2.10), (47.15, -2.15), (53.04, -0.99),
             (58.97, -0.98), (64.80, -1.37), (92.64, -2.64))
 BEARING_ROUNDS = 8                 # the raw bearing of a true one, found by repeating; each round 15 times closer

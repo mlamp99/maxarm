@@ -1,0 +1,13 @@
+confirm-1117-212704.jsonl
+desk +5
+   before (lib passes), study places  n 88 | side within 0.5 mm  74%, 1 mm  94%; base on the nearest pulse  59% | rms side 0.46 z 0.30 reach 0.32; mean z -0.02 reach -0.21 | turned again  0%, 3.8 s
+   after, study places                n 44 | side within 0.5 mm  84%, 1 mm 100%; base on the nearest pulse  61% | rms side 0.38 z 0.35 reach 0.41; mean z -0.17 reach +0.16 | turned again 14%, 6.6 s
+   after, between them                n 18 | side within 0.5 mm  94%, 1 mm 100%; base on the nearest pulse  83% | rms side 0.24 z 0.59 reach 0.26; mean z -0.43 reach +0.05 | turned again  6%, 6.5 s
+      after, by reach: 120: z +0.06 reach +0.86  135: z +0.07 reach -0.17  150: z +0.20 reach +0.08  180: z -0.16 reach -0.14  195: z -0.55 reach +0.16  210: z -0.37 reach -0.03  240: z -0.25 reach +0.04  255: z -0.81 reach +0.16  265: z -0.44 reach +0.13
+desk +41
+   before (lib passes), study places  n 88 | side within 0.5 mm  74%, 1 mm  93%; base on the nearest pulse  51% | rms side 0.50 z 0.32 reach 0.46; mean z -0.13 reach -0.15 | turned again  0%, 4.4 s
+   after, study places                n 44 | side within 0.5 mm  82%, 1 mm  95%; base on the nearest pulse  64% | rms side 0.40 z 0.38 reach 0.62; mean z -0.02 reach -0.28 | turned again 16%, 6.7 s
+   after, between them                n 18 | side within 0.5 mm  83%, 1 mm 100%; base on the nearest pulse  83% | rms side 0.31 z 0.23 reach 0.58; mean z -0.04 reach -0.50 | turned again  0%, 6.7 s
+      after, by reach: 120: z +0.10 reach -1.03  135: z -0.01 reach -0.75  150: z -0.54 reach -0.80  180: z -0.44 reach +0.54  195: z +0.04 reach -0.51  210: z +0.09 reach -0.35  240: z +0.30 reach -0.14  255: z -0.16 reach -0.22  265: z +0.32 reach +0.05
+
+turned again: 14 of 124; the first turn's miss, then where the base ended: -1.04 -> +0.32, -1.71 -> +1.88, -1.07 -> +0.38, -1.16 -> +0.47, +1.00 -> -0.73, +0.91 -> -1.00, +1.21 -> -0.71, +1.39 -> -0.61, +0.81 -> -0.79, -0.82 -> +0.59, -0.95 -> +0.78, +1.27 -> -0.91, -0.80 -> +0.20, +1.02 -> -0.82
