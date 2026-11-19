@@ -233,7 +233,7 @@ function wordLine(result, word) {
     return before + (result.on_offer ? `On the tiles ready to pick up: <b class="letters">${result.on_offer}</b> <span `
       + `class="note">· PLACE carries the letters typed, in order, to the arc ${fmt(TILES.word.arc, 0)} mm out, `
       + `${fmt(TILES.word.gap, 0)} mm apart, each letter turned for a reader ${READER_WORDS[$('reader').value]}; `
-      + `the cup grips at the height chosen in grip and lets go at ${fmt(TILES.word.drop, 0)} mm</span>`
+      + `the cup grips and lets go at the height chosen in grip</span>`
       : '<span class="note">No letters on tiles ready to pick up: nothing for PLACE to carry.</span>');
   }
   if (word.status === 'placing') {

@@ -8,12 +8,18 @@ For each tile:
 
 1. The ink (`ink.py`): none, and the tile is blank; a dot, and the letter's
    bottom right is that corner -- the owner's mark on the letters that are
-   others turned, M and W.
+   others turned, M and W. The ink is darker than the face, a marker's, or
+   lighter, white print on a dark tile.
 2. The reader (`reader.py`) on the face at its four quarter turns: each
-   capital's probability that turn is upright.
+   capital's probability that turn is upright. It was taught dark letters on
+   light faces, so a light letter is shown to it with the face's brightness
+   turned over.
 3. The letter: with a dot, the best capital at the quarter turn that puts the
    dot at the bottom right; without, the best capital at any quarter turn.
    It counts as read at `MIN_CONFIDENCE`; below, it is a guess, kept to show.
+4. A letter not read is shown to the reader once more, its strokes thinned:
+   print is bolder than the marker strokes the reader was taught, and bolder
+   still where the camera sees it less sharply. If it is read then, that counts.
 
 `upright` is where the letter's top points on the desk, degrees from desk +x,
 like the tile's `turn`. A capital that reads the same turned -- an N upside down,
@@ -26,6 +32,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
+import cv2
 import numpy as np
 
 from maxarm import Camera
@@ -35,6 +42,9 @@ from .reader import LETTERS, SAME_TURNED, SIZE, WINDOW_MM, Reader
 from ..tiles import Tile
 
 MIN_CONFIDENCE = 0.6
+# A letter not read is shown again with this much taken off each side of its strokes, the reader's pixels: 0.4 mm.
+# Twice as much breaks a Q's tail and an R's leg.
+THINNED_PX = 1
 
 
 @dataclass(frozen=True)
@@ -47,6 +57,7 @@ class Letter:
     runner_up: str                      # the best other capital at any quarter turn, "" if none
     runner_up_confidence: float
     ink_contrast: float                 # the strongest ink against the face round it
+    is_light: bool = False              # read as a letter lighter than its face: print, not marker
 
     @property
     def is_blank(self) -> bool:
@@ -61,7 +72,7 @@ class Letter:
                 "upright": None if self.upright is None else round(self.upright, 1),
                 "uprights": [round(angle, 1) for angle in self.uprights], "has_dot": self.has_dot,
                 "runner_up": self.runner_up, "runner_up_confidence": round(self.runner_up_confidence, 3),
-                "ink": round(self.ink_contrast, 2)}
+                "ink": round(self.ink_contrast, 2), "is_light": self.is_light}
 
 
 _READER: Optional[Reader] = None
@@ -81,8 +92,25 @@ def read_tile(frame: np.ndarray, camera: Camera, tile: Tile, reader: Reader) -> 
     found = ink.measure(face.window(frame, camera, tile, 0, ink.WINDOW_MM, ink.size_px()))
     if found.is_blank:
         return Letter("", 0.0, None, (), False, "", 0.0, found.contrast)
-    scores = np.array([reader.probabilities(face.window(frame, camera, tile, quarter, WINDOW_MM, SIZE))
-                       for quarter in range(4)])[:, :len(LETTERS)]
+    faces = np.array([face.window(frame, camera, tile, quarter, WINDOW_MM, SIZE) for quarter in range(4)])
+    if found.is_light:
+        faces = 255 - faces
+    letter = _letter(tile, found, reader, faces)
+    if letter.is_read:
+        return letter
+    thinned = _letter(tile, found, reader, _thinned(faces))
+    return thinned if thinned.is_read else letter
+
+
+def _thinned(faces: np.ndarray) -> np.ndarray:
+    """The faces with their ink, dark, THINNED_PX narrower each side."""
+    kernel = np.ones((2 * THINNED_PX + 1, 2 * THINNED_PX + 1), np.uint8)
+    return np.array([cv2.dilate(each, kernel) for each in faces])
+
+
+def _letter(tile: Tile, found: ink.Ink, reader: Reader, faces: np.ndarray) -> Letter:
+    """What the reader makes of a tile's face at its four quarter turns, ink dark."""
+    scores = np.array([reader.probabilities(each) for each in faces])[:, :len(LETTERS)]
     if found.dot:
         quarter = face.quarter_with(*found.dot)
         index = int(np.argmax(scores[quarter]))
@@ -96,4 +124,4 @@ def read_tile(frame: np.ndarray, camera: Camera, tile: Tile, reader: Reader) -> 
     runner_up = LETTERS[other_index + (other_index >= index)]
     return Letter(LETTERS[index], float(scores[quarter, index]), face.upright_deg(tile, quarter),
                   tuple(face.upright_deg(tile, each) for each in quarters), found.dot is not None,
-                  runner_up, float(others[other_quarter, other_index]), found.contrast)
+                  runner_up, float(others[other_quarter, other_index]), found.contrast, found.is_light)

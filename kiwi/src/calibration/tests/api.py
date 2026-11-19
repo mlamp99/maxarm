@@ -100,6 +100,7 @@ class TestsSession:
         self._loaded: Tuple[Optional[int], Optional[CameraFit]] = (None, None)
         self._base: Tuple[Optional[int], Optional[anchor.FoundBase]] = (None, None)   # CALIBRATE's base, per camera.json
         self._described: Tuple[Optional[tuple], Optional[dict]] = (None, None)
+        self._describing = threading.Lock()         # held by the one request working `_described` out
 
     def register(self, server: Server) -> None:
         server.add_state(self.state)
@@ -352,12 +353,15 @@ class TestsSession:
         return not points.exists() or points.stat().st_mtime_ns <= camera.stat().st_mtime_ns
 
     def _refinement(self, fit: CameraFit) -> dict:
-        """The points as `refine.describe()` has them, worked out again only when they or camera.json change."""
-        with self.lock:
-            key, points = (self._loaded[0], self._version), list(self.points)
-        if key != self._described[0]:
-            self._described = (key, refine.describe(fit, points, self._found(fit)))
-        return self._described[1]
+        """The points as `refine.describe()` has them, worked out again only when they or camera.json change, and by
+        one request at a time: the others wait for what it makes. Eighteen points take the i.MX95 20 s, and every
+        request working them out for itself beside the others takes as many times longer as there are requests."""
+        with self._describing:
+            with self.lock:
+                key, points = (self._loaded[0], self._version), list(self.points)
+            if key != self._described[0]:
+                self._described = (key, refine.describe(fit, points, self._found(fit)))
+            return self._described[1]
 
     def _found(self, fit: CameraFit) -> Optional[anchor.FoundBase]:
         """The base CALIBRATE found, as camera.json keeps it, or found again in CALIBRATE's frame for a camera.json from

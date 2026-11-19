@@ -121,7 +121,7 @@ the base's play is then taken up the same way every time. It stays down, suction
 It is a move only: the suction, and how deep a grip should go, are not its business.
 
 **grab()** lets go of anything held, then: `down_to()` the height given, exactly, while the cup centres itself, suction on and
-waited for (1.5 s), slowly back up. The travel height is `clearance + height + 5 mm`, so the piece clears the clearance by 5 mm. Its
+waited for (1.5 s), back up at three times the speed it came down at. The travel height is `clearance + height + 5 mm`, so the piece clears the clearance by 5 mm. Its
 `angle` says which way the piece faces.
 
 `retry_deeper_mm` (`grab()` and `carry()`, 0 to 2 mm, more is a ValueError; 0 by default, the grip not checked): a
@@ -131,7 +131,10 @@ The seal it goes by is told right only against what does not move -- the desk, a
 whether a light piece came along (see the seal, below).
 
 **drop()** is the same in reverse, `down_to()` the place: the piece is turned to `angle` on the way across, and the release is waited out
-(3 s, longer than a grip: the board vents the cup for a second and then shuts the valve) before the slow lift. The
+before the lift. The vent valve is held open through both, until the cup is up: left
+to the board it shuts after a second, and a cup still sealed to a smooth piece then draws it up after itself as its
+bellows stretch. Held open it leaves no vacuum to bleed away, and the wait is half a second. Firmware whose nozzle
+is built otherwise keeps the board's second, and waits 3 s. The
 travel height allows for the piece hanging under the cup. `angle=None` leaves the cup alone, so the piece turns with
 the arm. The cup turns 90 degrees either way from where `grab()` centred it; more is refused, the piece still held.
 
@@ -160,15 +163,17 @@ See [`path.py`](path.py).
 
 ## What you can tune
 
-Seven values answer to the environment, each one `MAXARM_` and the constant's name in the code:
+Nine values answer to the environment, each one `MAXARM_` and the constant's name in the code:
 
 | variable                      | default        | what it changes                                 |
 | ----------------------------- | -------------- | ----------------------------------------------- |
 | `MAXARM_DEVICE`               | `/dev/ttyUSB0` | the serial port                                 |
 | `MAXARM_MOVE_FAST_MM_S`       | 200            | fast moves                                      |
-| `MAXARM_MOVE_SLOW_MM_S`       | 10             | slow moves, and grab's and drop's ups and downs |
+| `MAXARM_MOVE_SLOW_MM_S`       | 10             | slow moves, and grab's and drop's ways down     |
+| `MAXARM_MOVE_LIFT_MM_S`       | 30             | grab's and drop's ways up                       |
 | `MAXARM_SUCTION_GRAB_MS`      | 1500           | the wait for a grip                             |
-| `MAXARM_SUCTION_RELEASE_MS`   | 3000           | the wait for a release                          |
+| `MAXARM_SUCTION_RELEASE_MS`   | 3000           | the wait for a release, the vent not held       |
+| `MAXARM_SUCTION_VENTED_MS`    | 500            | the same with the vent held open: a drop's      |
 | `MAXARM_BASE_LIMIT_HALF_MM`   | 70             | the arm-base limit's half-width                 |
 | `MAXARM_BASE_LIMIT_HEIGHT_MM` | 200            | its height                                      |
 

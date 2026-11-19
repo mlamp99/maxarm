@@ -1,0 +1,20 @@
+# The /IOTCONNECT app at boot. Installed by ../install-service.sh. It needs config/iotcDeviceConfig.json and a
+# calibration; without either it stops, and systemd tries again every 30 s.
+# Starting it connects the arm, which resets the arm's board and homes the arm.
+[Unit]
+Description=MaxArm /IOTCONNECT tiles app
+Wants=network-online.target
+After=network-online.target
+# Each holds the arm and the camera: starting one stops the other.
+Conflicts=maxarm-calibration.service
+
+[Service]
+Type=simple
+WorkingDirectory=@KIWI@
+ExecStartPre=@KIWI@/scripts/wait-for-rig.sh
+ExecStart=@KIWI@/run.sh
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

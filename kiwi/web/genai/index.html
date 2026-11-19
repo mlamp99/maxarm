@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GenAI · MaxArm</title>
+  <link rel="stylesheet" href="/common/page.css">
+  <link rel="stylesheet" href="/common/view.css">
+  <link rel="stylesheet" href="/tiles/tiles.css">
+  <link rel="stylesheet" href="genai.css">
+  <script type="module" src="genai.js"></script>
+</head>
+<body>
+<header class="top"></header>
+
+<main class="genai">
+
+  <section class="card blocked" id="blocked" hidden>
+    <svg class="blocked-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="12" width="36" height="26" rx="5"/>
+      <circle cx="24" cy="25" r="7.5"/><path d="M17 12l3-5h8l3 5"/><path d="M8 42 40 8"/></svg>
+    <h2>The camera is not calibrated yet</h2>
+    <p id="blocked-why"></p>
+    <a class="btn primary" href="/camera/">Go to the camera page</a>
+  </section>
+
+  <section class="card live">
+    <div class="card-head">
+      <h2>Camera</h2>
+      <span class="hint" id="feed-device"></span>
+      <div class="tools">
+        <button class="btn primary" id="locate"
+          title="Park the arm, take the snapshot at full size, find the tiles in it and read their letters"
+          >◎ LOCATE TILES</button>
+      </div>
+    </div>
+    <div class="feed-box" id="feed-box">
+      <img id="feed" alt="">
+      <img id="scene" class="layer" alt="">
+      <span class="feed-badge" id="feed-badge"></span>
+      <span class="feed-note" id="feed-note"></span>
+    </div>
+    <p class="locate-line" id="locate-line"></p>
+    <p class="word-line" id="word-line"></p>
+  </section>
+
+  <section class="card build">
+    <div class="card-head">
+      <h2>Build a word</h2>
+      <span class="hint">one of the library's, picked for you; or click any word in the list</span>
+    </div>
+    <div class="picks" id="picks">
+      <button class="btn primary pick" data-pick="longest"
+        title="The longest word of the library the tiles spell, set down along the dropoff arc">LONGEST WORD</button>
+      <button class="btn pick" data-pick="3" title="A word of three letters from the library">3 LETTERS</button>
+      <button class="btn pick" data-pick="4" title="A word of four letters from the library">4 LETTERS</button>
+      <button class="btn pick" data-pick="5" title="A word of five letters from the library">5 LETTERS</button>
+    </div>
+  </section>
+
+  <section class="card ask">
+    <div class="card-head">
+      <h2>Ask a question</h2>
+      <span class="hint">the model answers in one word, and the arm spells it if the tiles can</span>
+    </div>
+    <div class="ask-row">
+      <input id="question" type="text" autocomplete="off" maxlength="200" placeholder="What color is an apple?"
+        title="A question with a one-word answer; Enter asks it">
+      <button class="btn primary" id="ask" title="Ask the language model on the Ara240, and set its answer down"
+        >ASK</button>
+    </div>
+    <p class="answer-line" id="answer-line"></p>
+  </section>
+
+  <section class="card library">
+    <div class="card-head">
+      <h2>Words the tiles spell</h2>
+      <span class="counts" id="word-count"></span>
+      <div class="tools">
+        <span class="pill" id="model" title=""><span class="dot"></span><span></span></span>
+      </div>
+    </div>
+    <p class="hint library-line" id="library-line"></p>
+    <div class="words" id="words"></div>
+  </section>
+
+</main>
+<div id="toasts"></div>
+</body>
+</html>

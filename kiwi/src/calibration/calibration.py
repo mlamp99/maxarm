@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """The calibration web app. One page per calibration, each a tab: the desk first, then the camera; then the tests,
-and the tiles.
+the tiles, and GenAI: words of the tiles from the language model on the Ara240.
 
     ../.venv/bin/python src/calibration/calibration.py                  # then open http://localhost:8080
     ../.venv/bin/python src/calibration/calibration.py --host ::        # every address, for another machine's browser
@@ -31,12 +31,14 @@ from maxarm import MaxArm                                    # noqa: E402
 from maxarm.spaces import CONFIG_DIR                         # noqa: E402
 
 from applib.camera.feed import Feed                          # noqa: E402
+from applib.genai import Assistant                           # noqa: E402
 from applib.motion import Motion                             # noqa: E402
 from camera.api import CameraSession                         # noqa: E402
 from common import arm_api                                   # noqa: E402
 from common.server import Server                             # noqa: E402
 from common.worker import Worker                             # noqa: E402
 from desk.api import DeskSession                             # noqa: E402
+from genai.api import GenaiSession                           # noqa: E402
 from tests.api import TestsSession                           # noqa: E402
 from tiles.api import TilesSession                           # noqa: E402
 
@@ -44,14 +46,18 @@ from tiles.api import TilesSession                           # noqa: E402
 def run(host: str, port: int, config_dir: Path = CONFIG_DIR) -> None:
     worker = Worker(Motion(MaxArm(config_dir=None), config_dir))
     feed = Feed(config_dir)
-    server = Server(WEB, home="desk", pages=["camera", "tests", "tiles"])
+    server = Server(WEB, home="desk", pages=["camera", "tests", "tiles", "genai"])
     arm_api.register(server, worker)
     DeskSession(worker, config_dir).register(server)
     CameraSession(worker, feed, config_dir).register(server)
     TestsSession(worker, feed, config_dir).register(server)
-    TilesSession(worker, feed, config_dir).register(server)
+    tiles = TilesSession(worker, feed, config_dir)
+    tiles.register(server)
+    assistant = Assistant(config_dir)
+    GenaiSession(tiles, assistant).register(server)
     worker.start()
     feed.start()
+    assistant.start()
     print(f"calibration: http://localhost:{port}/  -- Ctrl-C to stop", flush=True)
     if host in ("0.0.0.0", "::"):
         for interface, address in local_addresses(is_ipv6_wanted=host == "::"):
@@ -61,6 +67,7 @@ def run(host: str, port: int, config_dir: Path = CONFIG_DIR) -> None:
     except KeyboardInterrupt:
         print("\nholding the arm where it is, and closing the port", flush=True)
     finally:
+        assistant.close()
         feed.close()
         worker.shutdown()
 

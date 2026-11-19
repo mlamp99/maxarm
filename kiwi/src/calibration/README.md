@@ -7,7 +7,8 @@ Specs: [`work/PILOT-falcon.md`](../../../work/PILOT-falcon.md), the desk page;
 [`work/PILOT-jackal.md`](../../../work/PILOT-jackal.md), what it shares with the /IOTCONNECT app.
 One web app with a page per calibration: the desk first, then the camera; then Fine Tune, which tries the camera's
 calibration and refines it; then Tiles, which finds the 25 mm letter tiles, reads their letters, says which the
-arm can pick up, and sets a word of them down.
+arm can pick up, and sets a word of them down; then GenAI, where a language model on the Ara240 lists the words
+the tiles can spell and answers a question in one of them.
 
 ```
 ../.venv/bin/python src/calibration/calibration.py                  # then open http://localhost:8080
@@ -155,7 +156,8 @@ MJPG, its own JPEGs passed on, faster. The choice is there only when the YUYV is
 a warning, sets the calibration and everything in its pixels aside, as `*-previous`: CALIBRATE again. Its focus is
 held still, since focusing moves the picture (the C920's by up to 4%): at the focus `camera.json` was calibrated
 at (`lens`), for the same camera; with none, the camera focuses itself once, until its picture keeps still, and
-CALIBRATE keeps where it stopped. Zoom is at its least, the widest view; pan and tilt at 0.
+CALIBRATE keeps where it stopped. Zoom is at its least, the widest view; pan and tilt at 0. Backlight compensation
+is off: over a dark desk it lightens the picture until a tile's white letter is washed out with its face.
 The camera is read through GStreamer (`applib/camera/feed.py`): a frame its driver marks damaged is dropped, and the
 camera's own JPEGs go to the page as they come. The snapshot is five fresh frames of the view averaged: nothing
 pauses for it. The document camera's raw format, YUYV, shows the same picture, at 2 frames a second
@@ -300,8 +302,10 @@ Left the view from above, with the work areas: **pickup**, green, the outer two 
 **dropoff**, blue, the inner third. The dashed lines are the line between
 them and the arm's centre line. Right the camera, LOCATE TILES in its heading. Across the bottom the tiles' table.
 
-1. **Set the tiles down**, letters up, where the camera sees them. A letter is a capital printed in black marker;
-   on a letter that is another turned -- M and W -- a dot at its bottom right says which it is.
+1. **Set the tiles down**, letters up, where the camera sees them. A letter is a capital printed in black marker
+   on a light tile, or in white on a dark one; on a letter that is another turned -- M and W -- a dot at its bottom
+   right says which it is. The dot is the letter's own colour or, beside a white letter, a marker's black: small
+   and round, 1 to 3 mm across, clear of the letter and 3 mm or more in from the tile's edges.
 2. **LOCATE TILES.** The arm parks the way CALIBRATE parks it, out of the picture; the camera takes its snapshot at
    full size -- under 2 s -- and the tiles are found in it, about 2 s more. The live view shows them outlined on
    it. Each tile is
@@ -321,16 +325,17 @@ them and the arm's centre line. Right the camera, LOCATE TILES in its heading. A
    points, degrees from desk +x, starred when it reads the same turned (N, S, Z upside down; O, X any way). The
    letters, left to right, are said under the picture.
 3. **Try a tile's centre.** A tile clicked, on the grid, over the picture full size, or its row's *go*: the cup
-   comes over its centre at 14 mm over the desk, then slowly down to 6, 4 mm over the tile's top. It should be
+   comes over its centre at 14 mm over the desk, then slowly down to 8, 4 mm over the tile's top. It should be
    centred on it. A tile out of reach is refused, nothing moved.
 4. **Set a word down.** Until letters are typed in the box beside PLACE, LOCATE TILES puts five there at random
    from the tiles ready to pick up; type any others, as many as there are ready tiles for. Letters typed stay, LOCATE
    after LOCATE; emptied, the box is offered letters again. PLACE checks them -- letters on ready tiles, read,
    each tile once, nothing found lying where they go -- and refuses, saying why, before the arm moves. Then each
-   tile in turn: the cup over it, slowly down to the height in the grip box beside PLACE -- 1 mm to start, under the
-   tile's top -- read there, grip, up; across to its place at 15 mm, turning it on the way, slowly down to 5 mm, 3 mm
-   over its top, let go, up. The places are along the dotted arc 130 mm from the base axis, 25 mm in from the dropoff
-   area's outer edge, 5 mm apart at their corners nearest the arm, centred on the arm's centre line, each letter
+   tile in turn: the cup over it, slowly down to the height in the grip box beside PLACE -- 2 mm to start, 2 mm
+   under the tile's top, the cup's bellows pressed in that far -- read there, grip, up; across to its place at
+   19 mm, turning it on the way, slowly down to the height it was gripped at, where it stands on the desk again,
+   let go, up. The places are along the dotted arc 130 mm from the base axis, 25 mm in from the dropoff
+   area's outer edge, 11 mm apart at their corners nearest the arm, centred on the arm's centre line, each letter
    turned and the word ordered for where its **reader** stands, the choice beside the grip box:
    - **back**, behind the arm: each letter's top away from the arm, the word from the arm's left to its right;
    - **front**, facing the arm: each letter's top towards it, the word from the arm's right to its left;
@@ -351,35 +356,79 @@ them and the arm's centre line. Right the camera, LOCATE TILES in its heading. A
 | LOCATE TILES        | park the arm, take the snapshot at full size, find the tiles, read and place them    |
 | PLACE               | the tiles with the letters typed to the dropoff arc, gripped at the grip box's z;   |
 |                     | then park, and find and read the tiles again                                         |
-| grip, reader        | where the cup grips a tile, desk mm; where the word's reader stands: `appcfg.json`   |
+| grip, reader        | where the cup grips a tile and lets it go, desk mm; where the word's reader stands   |
 | Areas               | the work areas and the arm's reach drawn on the desk, or not                         |
 | FULL SIZE           | the picture as large as the window allows; the tile under the pointer is said        |
 | a tile, *go*        | the cup over the tile's centre, down to 4 mm over its top                            |
 | RESET               | stop, let go, lift clear of the desk and of what is on it, and home                  |
 
-**How the tiles are found** (`applib/tiles/`). The snapshot is resampled onto the plane of the tiles' top faces,
-2 mm up, where every tile is the same 25 mm square, perspective gone. Every colour edge votes for the centre of a
+**How the tiles are found** (`applib/tiles/`). The tiles are 25 mm square and 4 mm thick (`TILE_MM` and
+`TILE_HEIGHT_MM` in `applib/tiles/find.py`, which other tiles need changed: the heights the cup grips, lets go and
+visits at are counted from them). The snapshot is resampled onto the plane of the tiles' top faces,
+4 mm up, where every tile is the same 25 mm square, perspective gone. Every colour edge votes for the centre of a
 square it could be a side of, either side of it: a tile's four sides all vote for its centre, and the seam between
 two touching tiles for both of theirs. A square is fitted to the edges round each place most voted for -- its
 centre to a few hundredths of a millimetre, its turn to a tenth of a degree, its size from 25 to 27.5 mm, as a face
 looks larger close to the camera -- and kept as a tile if each of its sides stands out from what lies just beyond
-it. Nothing is assumed of the tiles' or the desk's colour or
+it, beyond its side face where the camera sees one. Nothing is assumed of the tiles' or the desk's colour or
 brightness. A tile cut by the picture's edge, or behind the arm, is not looked for.
 
 **How a letter is read** (`applib/letters/`). The tile's face is resampled square-on from the snapshot, along its
-sides. Ink is what is darker than the face round it; a face with none is blank, and a small round blob of ink off a
-corner of the letter is the dot, which puts the letter's bottom right there. A small network (`files/letters.tflite`,
-int8, trained on drawn hand-printed capitals by `training/letters/train.py`) looks at the face at each of its four
-quarter turns and says which capital it is if that turn is upright, or that it is not; the best wins, at the dot's
-turn if there is one.
+sides. Ink is what is darker than the face round it, or lighter -- white print on a dark tile -- and of another tone
+than the bare face, which the face a letter closes in is not; a face with none is blank, and a small round blob of
+ink off a corner of the letter is the dot, which puts the letter's bottom right there. Beside a light letter the dot
+may be dark. A small network (`files/letters.tflite`, int8, trained on drawn hand-printed capitals, dark on light,
+by `training/letters/train.py`) looks at the face at each of its four quarter turns -- a light letter's with its
+brightness turned over -- and says which capital it is if that turn is upright, or that it is not; the best wins,
+at the dot's turn if there is one. A letter it is under 60% sure of is shown to it once more with its strokes
+thinned, print being bolder than the marker it was taught, and counts if it is read then.
 
 **How a tile is placed** (`applib/areas.py`). By its centre, in desk mm round the arm's base axis; the areas and the
-2 mm are the app's own, for now, and the reach the library's: `can_reach()` at the tile's top and over it.
+tiles' 4 mm are the app's own, for now, and the reach the library's: `can_reach()` at the tile's top and over it.
 
 **How a word is set down** (`applib/word.py`, the library's `carry()`). Of several ready tiles with a letter, the
 one whose letter needs the least turning goes; an N, an S or an O is turned to whichever of its ways up is nearest.
 The library's `carry()` picks the tile up and sets it down, and knowing both ends, shares out a turn the cup cannot
 make from centre.
+
+## The GenAI page
+
+`genai/`. Words of the tiles from a language model on the board's Ara240: the words the tiles can spell listed down
+the side, one of them set down at a press, and a question answered in one. The tiles are the Tiles page's -- the same
+LOCATE TILES, the same PLACE, the grip height and the reader chosen there -- and the letters a word is made of are
+those on the tiles ready to pick up, their letters read.
+
+1. **LOCATE TILES**, here or on the Tiles page. The list shows the words of the model's library that the letters
+   spell, each tile once in a word, by length, the longest first.
+2. **LONGEST WORD, 3 LETTERS, 4 LETTERS, 5 LETTERS** set one of those down along the dropoff arc: of several of the
+   length one at random, and not the one built last. A click on a word in the list sets that word down.
+3. **ASK** puts the question typed to the model, which answers in one word, about 2 s. If the tiles spell it, the
+   arm sets it down. If they do not, the best few words of the list are put to the model as answers, and the first
+   it holds right too is set down instead: asked the colour of an apple with no D among the tiles, RED becomes
+   GREEN. What the model said, and why that was not set down, is shown under the question.
+4. Take the word off the arc and LOCATE TILES again before the next: a word goes where the last one lies.
+
+| needs                         | where                                                                        |
+| ----------------------------- | ---------------------------------------------------------------------------- |
+| the Ara240 and its runtime    | NXP's rt-sdk-ara2, its proxy running (`rt-sdk-ara2.service`): with the image |
+| a model compiled for it       | `/usr/share/llm/Qwen2.5-7B-Instruct`: with the image, or `fetch_models`      |
+| the model's tokenizer         | `tokenizers`, in `src/requirements.txt`                                      |
+
+**The model loads when the app starts, in the background: 4 minutes**, its 8 GB going into the Ara240's own memory.
+The pill over the list counts them. Until then ASK waits; the list and its buttons do not, once the library has been
+made. Without an Ara240 the pill says what is missing, and the other pages are as before.
+
+**The library** (`applib/genai/library.py`) is made by the model once, 40 s after its first load, and kept in
+`config/words.json`. A language model does not count letters -- asked for words of given tiles, this one names words
+the tiles do not hold -- but it knows which words are everyday English. So it is shown the start of a list of such
+words, and its score for each of the twenty thousand words in its own vocabulary as the next one is read: those that
+score near its first choice are kept, 1900 of them, 3 to 9 letters. Which of them the tiles spell is counted, not
+asked. The cut is set where no fragments, names and foreign words were found above it, so some everyday words are
+missing too (WOMAN, HEAT); an answer to a question need not be in the library, only on the tiles. Words a demo
+should not spell in front of people are left out (`UNSUITABLE`), for the list and for answers.
+
+**An answer** (`applib/genai/answer.py`) is the model's own: it is sometimes wrong, and writes sums in digits, which
+are put in letters here, up to TWENTY and the tens.
 
 From the pilot's root:
 
@@ -388,14 +437,16 @@ From the pilot's root:
 | `src/calibration/`     | the app (`calibration.py`) and each page's requests: `common/` the web server, the     |
 |                        | arm's one thread (`worker.py`) and its controls (`arm_api.py`); `desk/` the plane and  |
 |                        | its files; `camera/` CALIBRATE, the check image (`check.py`), the                       |
-|                        | refinement (`refine.py`); `tests/` Fine Tune; `tiles/` the Tiles page                   |
+|                        | refinement (`refine.py`); `tests/` Fine Tune; `tiles/` the Tiles page; `genai/` the     |
+|                        | GenAI page                                                                              |
 | `web/`                 | the pages: `common/` the look, the view from above with the height beside it (`grid.js`,|
 |                        | `view.css`, `height.js`), desk space to the picture and back (`shares.js`), the marks  |
 |                        | drawn over it (`marks.js`), a layer drawn in Python laid over it (`layer.js`), the      |
 |                        | picture full size (`fullview.js`); `desk/`, `camera/` (its GUIDE, `guide.md`),          |
-|                        | `tests/`, `tiles/`, each page's `index.html`, script, styles and grid                   |
+|                        | `tests/`, `tiles/`, `genai/`, each page's `index.html`, script, styles and grid         |
 | `src/applib/`          | what the /IOTCONNECT app shares with the pages: the camera (`camera/`: which camera,    |
 |                        | the live view, the fit and its files, the cubes, the red cube), the arm's moves         |
 |                        | (`motion.py`), the tiles' flow (`tilework.py`), the red cube's (`redcube.py`), what is  |
 |                        | drawn over the picture (`overlay/`), the settings (`settings.py`); and the tiles found, |
-|                        | read, placed and a word of them planned (`tiles/`, `letters/`, `areas.py`, `word.py`)   |
+|                        | read, placed and a word of them planned (`tiles/`, `letters/`, `areas.py`, `word.py`);  |
+|                        | and the language model on the Ara240, its library of words and its answers (`genai/`)   |

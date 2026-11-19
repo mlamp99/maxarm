@@ -6,7 +6,8 @@ Started as a copy of `jackal/`, whose [`work/STATUS-jackal.md`](../work/STATUS-j
 references still point to.
 
 Two apps on one library. **The calibration app** (`src/calibration/`, its pages in `web/`) calibrates the desk and
-the camera and tries them: desk, camera, Fine Tune and Tiles pages, as impala left them. **The /IOTCONNECT app**
+the camera and tries them: desk, camera, Fine Tune and Tiles pages, as impala left them, and a GenAI page, where a
+language model on the Ara240 makes words of the tiles (`src/calibration/README.md`). **The /IOTCONNECT app**
 (`src/main.py`) takes commands from the dashboard or the console, sends what it found as telemetry, and streams the
 camera's picture with the tiles drawn over it over KVS WebRTC. Calibrate first; the two cannot run at once, as each
 holds the arm and the camera.
@@ -27,6 +28,7 @@ tar zxf tiles.tgz
 ./calibrate.sh          # calibrate, then try it: http://<board>:8080
 ./run.sh                # the app: /IOTCONNECT, the stream, the console
 ./run.sh --no-iotc      # the app without the cloud: commands at the console
+scripts/install-service.sh calibration   # or `app`: that one started at every boot; `none`: neither
 ```
 
 The package is made on a PC by `scripts/package.sh`. `config/` is not in it, so a newer one unpacked over the old
@@ -84,7 +86,8 @@ pages' live view as a layer.
 | `src/main.py`       | the /IOTCONNECT app: the composition root                                                |
 | `src/app/`          | what the app does, command by command (`app.py`)                                         |
 | `src/applib/`       | how, for both apps: the tiles, the letters, the camera, the arm's moves, the overlay,    |
-|                     | the settings; and the app's commands, telemetry, /IOTCONNECT, the stream and WebRTC      |
+|                     | the settings, the language model (`genai/`); and the app's commands, telemetry,          |
+|                     | /IOTCONNECT, the stream and WebRTC                                                       |
 | `src/maxarm/`       | the arm's library                                                                        |
 | `src/calibration/`  | the calibration app and its pages' requests; guide in its `README.md`                    |
 | `web/`              | the calibration app's pages: HTML, scripts, styles                                       |
@@ -93,6 +96,7 @@ pages' live view as a layer.
 |                     | `ch341/<uname -r>/ch341.ko`, the arm's USB serial driver for that i.MX95 image           |
 | `training/`         | `letters/`: the reader's recipe                                                          |
 | `scripts/`          | `install.sh`, `install-ch341.sh`; `package.sh` makes `tiles.tgz`, `build-ch341.sh` the driver |
+|                     | `install-service.sh` starts an app at boot (`systemd/`, `wait-for-rig.sh`)                |
 | `agenttools/`       | the fake board and camera, the overlay drawn on the owner's stills, checks; not shipped  |
 
 The arm's library, its calls and limits: [`src/maxarm/README.md`](src/maxarm/README.md).

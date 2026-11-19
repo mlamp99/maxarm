@@ -10,7 +10,8 @@ lays over the picture: the stream's overlay, the same code.
 | `POST /api/tiles/locate`      |               | park the arm, take the snapshot, find the tiles, read and place |
 | `POST /api/tiles/visit`       | n             | the cup over tile n's centre, down to 4 mm over its top face    |
 | `POST /api/tiles/place`       | letters, grip | the tiles that spell them carried to the dropoff arc, in order, |
-|                               |               | each gripped with the cup at desk height `grip`, mm, now kept   |
+|                               |               | each gripped and let go with the cup at desk height `grip`, mm, |
+|                               |               | now kept                                                        |
 | `POST /api/settings`          | name: value   | the app's settings, `config/appcfg.json`: `grip_mm`, `reader`   |
 | `GET /api/tiles/scene.png`    | w, s, areas   | the tiles drawn for a picture `w` px wide at pixel ratio `s`;   |
 |                               |               | the work areas unless `areas` is 0                              |
@@ -32,7 +33,7 @@ from applib.motion import Motion
 from applib.overlay import draw_tiles, inks, picture_layer
 from applib.settings import GRIP_RANGE_MM, GRIP_STEP_MM, Settings
 from applib.tiles import TILE_HEIGHT_MM, TILE_MM, Tile
-from applib.tilework import DROP_MM, TileWork
+from applib.tilework import TileWork
 from common.server import BadRequest, Server, number
 from common.worker import Refused, Worker
 
@@ -56,7 +57,7 @@ class TilesSession:
             "gap": areas.MIN_GAP_MM, "margin": areas.REACH_MARGIN_MM,
             "areas": [area.to_json() for area in (areas.PICKUP, areas.DROPOFF)],
             "word": {"arc": areas.WORD_ARC_MM, "gap": areas.WORD_GAP_MM, "most": areas.WORD_MAX_LETTERS,
-                     "readers": list(areas.READERS), "drop": DROP_MM, "grip_range": list(GRIP_RANGE_MM), "grip_step": GRIP_STEP_MM},
+                     "readers": list(areas.READERS), "grip_range": list(GRIP_RANGE_MM), "grip_step": GRIP_STEP_MM},
             "ink": inks.to_json()}})
         server.post("/api/tiles/locate", self.locate)
         server.post("/api/tiles/visit", self.visit)
@@ -98,10 +99,15 @@ class TilesSession:
             self.settings.set(grip_mm=number(body, "grip"))
         except ValueError as reason:
             raise BadRequest(str(reason)) from None
+        return self.place_word(str(body.get("letters", "")))
+
+    def place_word(self, letters: str) -> dict:
+        """The tiles that spell `letters` carried to the dropoff arc, as the settings kept have the grip and the
+        reader: PLACE, for any page."""
         grip, reader = self.settings.get("grip_mm"), self.settings.get("reader")
         try:
             fit = self._usable()
-            steps, stamp = self.work.plan(str(body.get("letters", "")), grip, reader)
+            steps, stamp = self.work.plan(letters, grip, reader)
         except (Refused, word.WordRefused) as reason:
             return {"status": "refused", "detail": str(reason)}
         spelled = "".join(step.letter for step in steps)
