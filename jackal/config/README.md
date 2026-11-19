@@ -126,7 +126,7 @@ The app's own settings, which the calibration app's Tiles page and the /IOTCONNE
 
 | setting   | default | what it is                                                                           |
 | --------- | ------- | ------------------------------------------------------------------------------------ |
-| `grip_mm` | 1.0     | the desk height the cup grips a tile at, mm: 0 to 6                                   |
+| `grip_mm` | 2.0     | the desk height the cup grips a tile at, and lets it go at, mm: 0 to 5               |
 | `reader`  | `back`  | where the person reading a word stands, round the arm: `back`, `front`, `left`, `right` |
 
 Only what differs from the defaults is written; a setting set back to its default is taken out, and with none left

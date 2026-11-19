@@ -50,12 +50,14 @@ DIVIDE_MM = TILE_REACH_MM[0] + (TILE_REACH_MM[1] - TILE_REACH_MM[0]) * DROPOFF_S
 PICKUP_SIDE = 0
 # Tiles in the pickup area are at least this far apart, edge to edge.
 MIN_GAP_MM = 2.0
-# The arm must reach the tile's top and this far over it, desk mm: it comes down onto the tile from there.
-OVER_TILE_MM = 14.0
+# The arm must reach the tile's top and this far over it, desk mm: it comes down onto the tile from there, having
+# crossed the desk at `word.CLEARANCE_MM`, the grip's height and the library's 5 mm.
+OVER_TILE_MM = 16.0
 # A word's tiles are set down along this arc, 25 mm in from the dropoff area's outer edge, this far apart along it:
-# 5 mm apart at their corners nearest the arm, as the tiles fan out.
+# 11 mm apart at their corners nearest the arm, as the tiles fan out, so that two set down 5 mm nearer each other
+# than their places, each turned 15 degrees off, still lie clear.
 WORD_ARC_MM = DIVIDE_MM - 25.0
-WORD_GAP_MM = 8.0
+WORD_GAP_MM = 15.0
 WORD_STEP_DEG = math.degrees((TILE_MM + WORD_GAP_MM) / WORD_ARC_MM)
 WORD_MAX_LETTERS = int(2 * BASE_FAN_DEG / WORD_STEP_DEG) + 1
 # Where the person reading a word stands, round the arm (the owner's, PILOT-jackal); for each, how far each letter

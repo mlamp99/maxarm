@@ -20,7 +20,7 @@ What it reproduces is how this board misleads its driver:
 
 Reachability uses the library's `geometry`. Everything the board is told lands in
 `FakeSerial.log`, in order: ("move", (x, y, z), ms), ("turn", angle, ms),
-("suction", is_on).
+("suction", is_on), ("vent", is_open).
 """
 
 import contextlib
@@ -122,15 +122,43 @@ class FakeBusServo:
         return self.voltage_mv
 
 
+class FakePwm:
+    """One of the nozzle's PWM pins: its duty set and read as MicroPython's `PWM.duty()` does, and told on."""
+
+    def __init__(self, on_set=None) -> None:
+        self.value = 0
+        self.on_set = on_set
+
+    def duty(self, value: Optional[int] = None) -> Optional[int]:
+        if value is None:
+            return self.value
+        self.value = value
+        if self.on_set is not None:
+            self.on_set(value)
+        return None
+
+
 class FakeNozzle:
+    """`nozzle` in the board's namespace, with the parts the firmware's SuctionNozzle has: the pump's pins and the
+    vent valve's. `off()`'s second of vent, on a board thread, is not played: only a valve set by its pin is
+    logged."""
+
     def __init__(self, log: list) -> None:
         self.log = log
+        self.hz = 1000
+        self.nozzle_st = False
+        self.pump_f = FakePwm(lambda duty: log.append(("suction", duty > 0)))
+        self.pump_b = FakePwm()
+        self.valve_f = FakePwm(lambda duty: log.append(("vent", duty > 0)))
+        self.valve_b = FakePwm()
 
     def on(self) -> None:
         self.log.append(("suction", True))
+        self.pump_f.value, self.valve_f.value, self.nozzle_st = self.hz, 0, True
 
     def off(self) -> None:
         self.log.append(("suction", False))
+        self.pump_f.value, self.nozzle_st = 0, False
 
     def set_angle(self, angle: float = 0.0, duration: int = 1000) -> None:
         self.log.append(("turn", float(angle), int(duration)))

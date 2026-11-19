@@ -1,7 +1,7 @@
 """The camera frame resampled onto a plane over the desk, as if seen from straight above.
 
 A calibrated camera maps any horizontal plane to pixels by a homography, so the
-plane the tiles' top faces lie on, 2 mm up, can be resampled into an image in
+plane the tiles' top faces lie on, 4 mm up, can be resampled into an image in
 millimetres. In it every tile's top face is the same 25 mm square wherever it
 lies, and perspective is gone.
 

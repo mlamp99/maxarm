@@ -41,6 +41,8 @@ PUMP_START_S = 0.75
 PULLED_MM = 0.5
 # The board's vent valve draws from the same supply for a second after the pump goes off.
 VENT_S = 1.2
+# A vent the library held open itself (`arm.py`, a drop) draws for as long as that, and this long after it is shut.
+VENT_SHUT_S = 0.2
 
 
 def level(supplies: Sequence[Optional[float]]) -> Optional[float]:

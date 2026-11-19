@@ -42,8 +42,11 @@ from .tunable import tunable
 
 # The owner's yardstick: about a second to cross the desk.
 MOVE_FAST_MM_S = tunable("MOVE_FAST_MM_S", 200.0)
-# Slow enough not to yank a heavy piece; every move onto or off the desk in grab() and drop().
+# Slow enough not to yank a heavy piece; every move onto the desk in grab() and drop().
 MOVE_SLOW_MM_S = tunable("MOVE_SLOW_MM_S", 10.0)
+# Off the desk again in grab() and drop(), and up to the travel height before a landing: nothing is landed on, so
+# three times the way down.
+MOVE_LIFT_MM_S = tunable("MOVE_LIFT_MM_S", 30.0)
 # A few millimetres at travel speed would ask the servos for a jerk at full speed.
 MOVE_MIN_MS = 150
 # The command carries two decimals: a move shorter than this is the same command.
@@ -56,9 +59,12 @@ MOVE_MAX_MS = 30000
 # A grip and a release are waits, the servos and the supply read all through them
 # (`seal.py`). A release is longer: the board vents the cup for 1 s and then shuts
 # the valve, and lifting before the residual vacuum bleeds away brings the piece
-# up with the cup.
+# up with the cup. A drop holds the vent open itself, through the wait and the lift
+# after it (`_let_go()`): no vacuum is left to bleed away, and its wait, SUCTION_VENTED_MS,
+# is for the bellows to let the piece down.
 SUCTION_GRAB_MS = tunable("SUCTION_GRAB_MS", 1500.0)
 SUCTION_RELEASE_MS = tunable("SUCTION_RELEASE_MS", 3000.0)
+SUCTION_VENTED_MS = tunable("SUCTION_VENTED_MS", 500.0)
 
 # grab()'s and carry()'s `retry_deeper_mm`: a grip that does not seal is let go and landed again `retry_step_mm`
 # deeper, RETRY_STEP_MM unless the caller says, up to the caller's limit, which may be at most RETRY_DEEPER_MAX_MM.
@@ -165,7 +171,7 @@ class MaxArm:
         self._supply_off: Optional[float] = None       # the supply where the arm stands, the pump off (`seal.py`)
         self._rest_z: Optional[float] = None           # and the cup's height read with it
         self._seal: Optional[Tuple[SealState, Optional[float], Optional[float]]] = None   # since the pump went on
-        self._suction_off_at = 0.0                     # time.monotonic() when the pump last went off
+        self._vent_over_at = 0.0                       # time.monotonic() from when the vent valve draws no more
 
     # --- session ----------------------------------------------------------
 
@@ -250,10 +256,10 @@ class MaxArm:
         """Pick up a piece, the cup brought down to (x, y, height) for the grip.
 
         `height` is where the cup is sent, exactly; nothing is added to it.
-        Lets go of anything held, then: slowly up to the travel height if below
+        Lets go of anything held, then: up to the travel height if below
         it, fast across to beside the piece with the cup centring itself, the
         base turned onto it, slowly straight down (`landing.py`) and read there
-        as PRECISE is, suction on and waited for, slowly back up. The travel height is `clearance + height + 5 mm`,
+        as PRECISE is, suction on and waited for, back up. The travel height is `clearance + height + 5 mm`,
         so the piece hangs 5 mm above the clearance.
 
         `angle` says which way the piece faces; `drop()` turns it from there.
@@ -279,7 +285,8 @@ class MaxArm:
         """Set the held piece down, the cup brought down to (x, y, height), facing `angle`.
 
         `grab()` in reverse: the piece is turned on the way across, and the
-        release is waited out -- longer than a grip -- before the slow lift.
+        release is waited out before the lift,
+        the cup's vent open until it is up.
         The cup turns 90 degrees either way from where `grab()` centred it; a
         bigger turn is refused before anything moves. `angle=None` leaves the
         cup alone, so the piece turns with the arm.
@@ -294,7 +301,7 @@ class MaxArm:
         A move and nothing more: `height` is where the cup is sent, exactly,
         never lower. The suction is left as it is, on or off, and so is
         anything held. It comes down the way `grab()` and `drop()` do
-        (`landing.py`): slowly up to the travel height if below it, fast across
+        (`landing.py`): up to the travel height if below it, fast across
         to beside the point, the base turned onto it, slowly straight down, and
         read there as PRECISE is. `get_position()` then says where the cup came
         down. The travel height is `clearance + height + 5 mm`; with no
@@ -333,7 +340,7 @@ class MaxArm:
         problem = self._visit_problem(end_desk, self._travel_height(end_desk, start_desk[2]), end_servo)
         if problem:
             return self._result(MoveStatus.REFUSED, f"it could not be set down there: {problem}")
-        result = self._grab(start, angle, servo, *retry)
+        result = self._grab(start, angle, servo, *retry, is_seal_wanted=bool(retry[0]))
         if not result:
             return result
         dropped = self._drop(end, facing, is_miss_carried=True)
@@ -405,8 +412,9 @@ class MaxArm:
     # --- the one way anything moves ---------------------------------------
 
     def _move(self, target: Position, move_type: MoveType,
-              servo: Optional[float] = None) -> MoveResult:
-        """Plan the whole path to a desk-space target, check it, and drive it leg by leg."""
+              servo: Optional[float] = None, speed_mm_s: Optional[float] = None) -> MoveResult:
+        """Plan the whole path to a desk-space target, check it, and drive it leg by leg: at `speed_mm_s`, or at
+        the move type's own."""
         self._require_connection()
         problem = nozzle.problem_with(servo)
         if problem:
@@ -417,7 +425,7 @@ class MaxArm:
         except Refused as reason:
             return self._result(MoveStatus.REFUSED, str(reason))
         turning_leg = _first_sideways(start, path) if servo is not None else None
-        speed = MOVE_FAST_MM_S if move_type is MoveType.FAST else MOVE_SLOW_MM_S
+        speed = speed_mm_s or (MOVE_FAST_MM_S if move_type is MoveType.FAST else MOVE_SLOW_MM_S)
         for index, point in enumerate(path):
             failed = self._drive(self._spaces.arm.from_desk(point), speed,
                                  servo if index == turning_leg else None)
@@ -478,7 +486,7 @@ class MaxArm:
         """The servos' mean over `reads`, each (when, pulses, supply); with the pump off, the supply and the cup's
         height over their last PRECISE_STEADY_HALF_S are kept as where the arm stands, to judge a seal against."""
         latest = [read for read in reads if read[0] >= reads[-1][0] - PRECISE_STEADY_HALF_S]
-        if not self._is_suction_on and latest[0][0] - self._suction_off_at >= seal.VENT_S:
+        if not self._is_suction_on and latest[0][0] >= self._vent_over_at:
             level = seal.level([supply for _, _, supply in latest])
             if level is not None:
                 self._supply_off, self._rest_z = level, _position_of(_mean(_pulses_of(latest)))[2]
@@ -531,9 +539,11 @@ class MaxArm:
         return None
 
     def _grab(self, point: Position, angle: Optional[float], servo: float,
-              retry_deeper_mm: float = 0.0, retry_step_mm: float = RETRY_STEP_MM) -> MoveResult:
+              retry_deeper_mm: float = 0.0, retry_step_mm: float = RETRY_STEP_MM,
+              is_seal_wanted: bool = True) -> MoveResult:
         """grab(), the cup turned to `servo` for the grip; landed again `retry_step_mm` deeper while it does not
-        seal, down to `retry_deeper_mm` under `point`."""
+        seal, down to `retry_deeper_mm` under `point`. Not `is_seal_wanted`: nobody asks how the grip sealed, so
+        the pump does not wait for the cup's height to stop creeping (`_settle_height()`), a second and a half."""
         if self._is_suction_on:
             stopped = self._switch_suction(False)
             if stopped is not None:
@@ -551,7 +561,8 @@ class MaxArm:
             if not result:
                 return replace(result, deeper_mm=deeper)
             landed = self._landed()                 # before the pump: the seal can pull the cup further off
-            self._settle_height()
+            if is_seal_wanted:
+                self._settle_height()
             stopped = self._switch_suction(True)
             if stopped is not None:
                 return replace(stopped, deeper_mm=deeper)
@@ -563,7 +574,7 @@ class MaxArm:
             if stopped is not None:
                 return replace(stopped, deeper_mm=deeper)
             if deeper >= retry_deeper_mm:
-                lifted = self._move((target[0], target[1], travel), MoveType.SLOW)
+                lifted = self._move((target[0], target[1], travel), MoveType.SLOW, speed_mm_s=MOVE_LIFT_MM_S)
                 if not lifted:
                     return replace(lifted, deeper_mm=deeper)
                 return replace(self._result(MoveStatus.NOT_GRIPPED,
@@ -573,7 +584,7 @@ class MaxArm:
                 trace_note(f"grip {state.value} at {deeper:g} mm deeper than asked; landing again deeper")
             deeper, tries = min(deeper + retry_step_mm, retry_deeper_mm), tries + 1
         self._held = self._hold(point, angle, landed)
-        result = self._move((target[0], target[1], travel), MoveType.SLOW)
+        result = self._move((target[0], target[1], travel), MoveType.SLOW, speed_mm_s=MOVE_LIFT_MM_S)
         if result and tries > 1:
             result = replace(result, detail=f"sealed {deeper:g} mm deeper than asked, on try {tries}: "
                                             f"{'; '.join(judged)}")
@@ -590,14 +601,26 @@ class MaxArm:
         result = self._visit(cup, travel, servo)
         if not result:
             return result
-        stopped = self._switch_suction(False)
-        if stopped is not None:
-            return stopped
-        self._held = None
-        return self._move((target[0], target[1], travel), MoveType.SLOW)
+        return self._let_go((target[0], target[1], travel))
+
+    def _let_go(self, lift: Position) -> MoveResult:
+        """Pump off, the release waited out, and up to `lift`. Where the board's vent can be held
+        (`has_vent`) it is open all the while, until the cup is up there, and not for the board's own second: with
+        the vent shut, a cup still sealed to a smooth piece draws it up after itself as its bellows stretch."""
+        is_vent_held = self._protocol.has_vent
+        try:
+            stopped = self._switch_suction(False, is_vent_held)
+            if stopped is not None:
+                return stopped
+            self._held = None
+            return self._move(lift, MoveType.SLOW, speed_mm_s=MOVE_LIFT_MM_S)
+        finally:
+            if is_vent_held:
+                self._protocol.shut_vent()
+                self._vent_over_at = time.monotonic() + seal.VENT_SHUT_S
 
     def _visit(self, target: Position, travel: float, servo: Optional[float]) -> MoveResult:
-        """Slowly up to `travel` if below it, then down onto `target` as `landing.py` comes down, and read there
+        """Up to `travel` if below it, then slowly down onto `target` as `landing.py` comes down, and read there
         as PRECISE is. The base is read until steady beside the target before its last turn -- the swing there
         spent -- and after it: one whose turn settled too far off to the side, with a nearer whole pulse to be had
         (`landing.is_worth_again()`), goes back beside the target and turns onto it again, once, from the same side
@@ -608,7 +631,7 @@ class MaxArm:
             return self._result(MoveStatus.REFUSED, problem)
         here = self._desk_position()
         if here[2] < travel:
-            result = self._move((here[0], here[1], travel), MoveType.SLOW)
+            result = self._move((here[0], here[1], travel), MoveType.SLOW, speed_mm_s=MOVE_LIFT_MM_S)
             if not result:
                 return result
         way = self._landings(target, travel)[0]
@@ -665,15 +688,19 @@ class MaxArm:
         self._travel_ended, self._settled = time.monotonic() + MOVE_MIN_MS / 1000.0, None
         return self._result(MoveStatus.STOPPED)
 
-    def _switch_suction(self, is_on: bool) -> Optional[MoveResult]:
-        """Pump on or off, waited out. A result only if stop() cut it short."""
+    def _switch_suction(self, is_on: bool, is_vent_held: bool = False) -> Optional[MoveResult]:
+        """Pump on or off, waited out. A result only if stop() cut it short. `is_vent_held`, with the pump going
+        off: the vent is opened to stay open, and is the caller's to shut (`_let_go()`)."""
         if self._abort.is_set():
             return self._result(MoveStatus.STOPPED)
         before = self._protocol.read_position() if IS_TRACED else None
         if is_on and self._supply_off is None and self._protocol.has_supply and not self._is_suction_on:
             self._read_steady()                     # nothing read since the arm last moved: the level, pump off
         was_on = self._is_suction_on
-        self._protocol.set_suction(is_on)
+        if is_vent_held:
+            self._protocol.open_vent()
+        else:
+            self._protocol.set_suction(is_on)
         self._is_suction_on = is_on
         if is_on:
             is_waited, supply, height = self._read_for(SUCTION_GRAB_MS, seal.PUMP_START_S)
@@ -682,8 +709,12 @@ class MaxArm:
                 self._seal = seal.judge(self._supply_off, supply, pulled)
                 if IS_TRACED:
                     trace_note(seal.describe(*self._seal))
+        elif is_vent_held:
+            # The open valve draws on the supply: nothing read until it is shut says where the supply stands.
+            self._seal, self._supply_off, self._rest_z, self._vent_over_at = None, None, None, math.inf
+            is_waited = self._wait(SUCTION_VENTED_MS)
         else:
-            self._seal, self._suction_off_at = None, time.monotonic()
+            self._seal, self._vent_over_at = None, time.monotonic() + seal.VENT_S
             settled_from = max(seal.VENT_S, SUCTION_RELEASE_MS / 1000.0 - PRECISE_STEADY_HALF_S)
             is_waited, self._supply_off, self._rest_z = self._read_for(SUCTION_RELEASE_MS, settled_from)
         if before is not None:

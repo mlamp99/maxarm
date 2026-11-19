@@ -2,7 +2,7 @@
 
     arm.use_coordinates(Space.DESK)
     arm.set_clearance(CLEARANCE_MM)
-    for step in plan_word("TEAM", tiles, letters, places, arm.can_reach, grip_mm=2.0, drop_mm=6.0, reader="left"):
+    for step in plan_word("TEAM", tiles, letters, places, arm.can_reach, grip_mm=2.0, drop_mm=2.0, reader="left"):
         arm.carry(step.start, step.end, angle=step.upright, facing=step.facing)
 
 The tiles on offer are those ready to pick up (`areas.Status.READY`) with their
@@ -26,11 +26,13 @@ from maxarm.geometry import Position
 
 from . import areas
 from .letters import Letter
-from .tiles import Tile
+from .tiles import TILE_HEIGHT_MM, Tile
 
-# Nothing travels sideways under this, desk mm, on the way: the tiles are 2 mm. The library keeps 5 mm over it,
-# and over the height of what the cup carries.
-CLEARANCE_MM = 5.0
+# Nothing travels sideways under this, desk mm, on the way: the tiles' tops and 8 mm. The library keeps 5 mm over it
+# and over the height of what the cup carries, which it takes the grip's height for: a tile gripped 2 mm under its
+# top hangs that much lower. And an arm not level with its desk is lower at one side than its heights say: at 5 mm
+# it knocked the tiles it passed over there (the user's desk, 1.5 mm higher in 250 mm, 18 Nov).
+CLEARANCE_MM = TILE_HEIGHT_MM + 8.0
 
 
 class WordRefused(ValueError):

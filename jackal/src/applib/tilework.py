@@ -43,14 +43,14 @@ from .camera.fit import CameraFit
 from .camera.locate import SAME_SHAPE
 from .letters import Letter, read_letters
 from .motion import Motion, Refused
-from .tiles import TILE_HEIGHT_MM, Tile, find_tiles
+from .tiles import Tile, find_tiles
 
 COUNTED = (areas.Status.READY, areas.Status.TOO_CLOSE, areas.Status.ELSEWHERE, areas.Status.OUT_OF_REACH)
 # A detection offers this many letters for a word, at random from those on tiles ready to pick up.
 OFFERED_LETTERS = 5
-# Where the cup lets a tile go, desk mm: 2 mm over its top, where it let go while the library still sent the cup 1 mm
-# under the 3 mm over asked (the owner's, PILOT-hyena), so the tile falls no further than it did.
-DROP_MM = TILE_HEIGHT_MM + 2.0
+# A tile is let go with the cup at the height it gripped it at: the tile stands on the desk again there. Let go
+# from over that it falls, as far as the cup's bellows were pressed in for the grip and more, and lies turned and
+# off its place.
 # A tile's grip is not retried: the library's seal verdict holds against the desk, not for a light tile lifted into
 # the cup, and a retry can shift the tile (STATUS-jackal §17). The camera tells the tiles that did not arrive.
 # What is kept of a tile a word carried off, to draw where it was and how its letter lay: until the next detection.
@@ -86,7 +86,7 @@ class TileWork:
                 raise Refused("tiles have been carried off since the snapshot: find them again first")
             tiles, places = [tile for tile, _ in self.tiles], [place for _, place in self.tiles]
             letters, stamp = self.letters, self.found["stamp"]
-        return word.plan_word(text, tiles, letters, places, self.reach(), grip_mm=grip_mm, drop_mm=DROP_MM,
+        return word.plan_word(text, tiles, letters, places, self.reach(), grip_mm=grip_mm, drop_mm=grip_mm,
                               reader=reader), stamp
 
     def place(self, motion: Motion, steps: List[word.Step], stamp: int, fit: CameraFit) -> Union[MoveResult, str]:

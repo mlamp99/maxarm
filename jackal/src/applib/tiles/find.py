@@ -5,7 +5,7 @@
         print(tile.x, tile.y, tile.turn)
 
 The work is done in desk millimetres, on the frame resampled onto the plane of
-the tiles' top faces, 2 mm up (`topdown`), where every tile is the same square:
+the tiles' top faces, 4 mm up (`topdown`), where every tile is the same square:
 
 1. `votes` -- every colour edge votes for the centre of a 25 mm square it could
    be a side of; the places most voted for are where tiles may be.
@@ -18,13 +18,24 @@ the tiles' top faces, 2 mm up (`topdown`), where every tile is the same square:
 Nothing assumes the tiles are lighter or darker than the desk, or any colour at
 all. Tiles may touch: the seam between two counts for both. The letters on them
 are not read here.
+
+The fits are most of the time taken: a cluttered view has a hundred places
+voted for, a handful of them tiles, and one core of the i.MX95 fits four a
+second. A fit owes nothing to the fit at another place, so the places are dealt
+out, a few at a time, to worker processes on the other cores and to this one
+(`crew`); the workers take the view's edges up from a folder in memory, where
+they are kept for them. The fits are the same to the last digit whoever makes
+them, and step 3 takes them in the votes' order.
 """
 
 from __future__ import annotations
 
 import math
+import os
+import tempfile
 from dataclasses import dataclass
-from typing import List, Tuple
+from pathlib import Path
+from typing import List, Optional, Sequence, Tuple
 
 import cv2
 import numpy as np
@@ -33,11 +44,13 @@ from maxarm import Camera
 from maxarm.geometry import BASE_FAN_DEG, bearing_degrees
 from maxarm.path import BASE_LIMIT_HALF_MM, REACH_MAX_MM
 
-from . import pose, topdown, votes
+from . import crew, pose, topdown, votes
 from .edges import EdgeField
 
 TILE_MM = 25.0
-TILE_HEIGHT_MM = 2.0
+# How thick a tile is: where its top face is seen, and what the heights the cup grips, lets go and visits at are
+# counted from. A tile taken for thinner is placed further from the camera than it lies.
+TILE_HEIGHT_MM = 4.0
 # The top face as the camera sees it: larger than the tile, the more so the closer to the camera (STATUS-hyena
 # §10.2). The outline given (`Tile.corners`) stays the tile's own 25 mm.
 FACE_MM = (TILE_MM, TILE_MM + 2.5)
@@ -53,11 +66,18 @@ SAME_TILE_MM = 8.0
 MAX_OVERLAP = 0.1
 # The most places fitted, best voted first.
 MAX_CANDIDATES = 150
+# The places a worker is handed at a time: few, so that whoever is free takes the next and none is left waiting.
+SHARE_PLACES = 3
+# Where the view's edges are kept for the workers: in memory, where there is such a place, else among the
+# temporary files.
+KEPT_IN = "/dev/shm" if os.path.isdir("/dev/shm") else None
+
+_taken_up: Optional[Tuple[str, EdgeField]] = None      # a worker's: the edges it took up last, and from where
 
 
 @dataclass(frozen=True)
 class Tile:
-    """A tile's top face, desk mm, 2 mm over the desk. `turn` is the sides' direction, degrees from desk +x."""
+    """A tile's top face, desk mm, 4 mm over the desk. `turn` is the sides' direction, degrees from desk +x."""
 
     x: float
     y: float
@@ -77,19 +97,39 @@ def find_tiles(frame: np.ndarray, camera: Camera) -> List[Tile]:
     camera.check_frame(frame)
     view = topdown.render(frame, camera, TILE_HEIGHT_MM, (-SEARCH_MM, SEARCH_MM, -SEARCH_MM, SEARCH_MM))
     field = EdgeField(view, camera.position())
+    places = [(candidate.x, candidate.y) for candidate in votes.candidates(field, TILE_MM / 2, MAX_CANDIDATES)]
+    places = [place for place in places if _is_searched(place)]
     fits: List[pose.Fit] = []
-    for candidate in votes.candidates(field, TILE_MM / 2, MAX_CANDIDATES):
-        place = (candidate.x, candidate.y)
-        if not _is_searched(place) or _is_on(fits, place):
-            continue
-        rough = pose.rough_fit(field, place, TILE_MM)
-        if not rough.is_seen:
-            continue
-        fit = pose.close_fit(field, rough, FACE_MM)
-        if fit.is_seen and fit.contrast >= MIN_CONTRAST:
+    for place, fit in zip(places, _fit_each(field, places)):
+        if fit is not None and not _is_on(fits, place) and fit.is_seen and fit.contrast >= MIN_CONTRAST:
             fits.append(fit)
     tiles = [_tile(fit, camera) for fit in _without_overlaps(fits)]
     return sorted(tiles, key=lambda tile: math.atan2(tile.x, -tile.y))
+
+
+def _fit_each(field: EdgeField, places: Sequence[Tuple[float, float]]) -> List[Optional[pose.Fit]]:
+    """The square fitted at each of `places`, in their order: None where the frame does not show all of one."""
+    if not crew.WORKERS:
+        return [_fit_at(field, place) for place in places]
+    shares = [places[first:first + SHARE_PLACES] for first in range(0, len(places), SHARE_PLACES)]
+    with tempfile.TemporaryDirectory(prefix="tiles-", dir=KEPT_IN) as folder:
+        field.keep(Path(folder))
+        fitted = crew.run(_fit_share, [(folder, share) for share in shares],
+                          here=lambda _, share: [_fit_at(field, place) for place in share])
+    return [fit for share in fitted for fit in share]
+
+
+def _fit_share(folder: str, places: Sequence[Tuple[float, float]]) -> List[Optional[pose.Fit]]:
+    """A worker's part of `_fit_each()`, with the view's edges as they were kept in `folder`."""
+    global _taken_up
+    if _taken_up is None or _taken_up[0] != folder:
+        _taken_up = (folder, EdgeField.kept(Path(folder)))
+    return [_fit_at(_taken_up[1], place) for place in places]
+
+
+def _fit_at(field: EdgeField, place: Tuple[float, float]) -> Optional[pose.Fit]:
+    rough = pose.rough_fit(field, place, TILE_MM)
+    return pose.close_fit(field, rough, FACE_MM) if rough.is_seen else None
 
 
 def _is_searched(place: Tuple[float, float]) -> bool:

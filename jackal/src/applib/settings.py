@@ -1,7 +1,7 @@
 """The app's own settings, which the calibration app's pages and the /IOTCONNECT app share: `config/appcfg.json`.
 
     settings = Settings(CONFIG_DIR)
-    settings.get("grip_mm")                 # 2.0 until someone sets it
+    settings.get("grip_mm")                 # 2.0, 2 mm under a tile's top, until someone sets it
     settings.set(reader="left")             # written at once
     settings.to_json()                      # every setting, its value and its default, for a page
 
@@ -20,14 +20,16 @@ from pathlib import Path
 from typing import Callable, Dict, Optional
 
 from . import areas
+from .tiles import TILE_HEIGHT_MM
 
 APPCFG_FILE = "appcfg.json"
 
-# Where the cup grips a tile, desk mm: on the 2 mm tile's top, a grip that does not seal tried again deeper
-# (`tilework.py`) (the owner's, 9 Nov). It goes down to the desk and up to a visit's height, 4 mm over the tile's top.
-GRIP_MM = 2.0
+# Where the cup grips a tile, and lets it go, desk mm: 2 mm under the tile's top, its bellows pressed in that far.
+# Sent to the top itself the cup stops half a millimetre over it and only just touches, and where the desk stands a
+# millimetre lower than the arm has it, not at all (the user's rig, 18 Nov).
+GRIP_MM = TILE_HEIGHT_MM - 2.0
 # What the tiles page offers: 1 mm over a tile's top down to the desk, in GRIP_STEP_MM.
-GRIP_RANGE_MM = (0.0, 3.0)
+GRIP_RANGE_MM = (0.0, TILE_HEIGHT_MM + 1.0)
 GRIP_STEP_MM = 0.5
 READER = "back"
 
@@ -59,7 +61,7 @@ def _reader(value: object) -> str:
 
 
 SETTINGS: Dict[str, Setting] = {
-    "grip_mm": Setting(GRIP_MM, _grip, "the desk height the cup grips a tile at, mm"),
+    "grip_mm": Setting(GRIP_MM, _grip, "the desk height the cup grips a tile at, and lets it go at, mm"),
     "reader": Setting(READER, _reader, "where the person reading the word stands, round the arm"),
 }
 
