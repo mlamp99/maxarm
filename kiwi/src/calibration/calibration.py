@@ -3,7 +3,7 @@
 and the tiles.
 
     ../.venv/bin/python src/calibration/calibration.py                  # then open http://localhost:8080
-    ../.venv/bin/python src/calibration/calibration.py --host 0.0.0.0   # on the board, for another machine's browser
+    ../.venv/bin/python src/calibration/calibration.py --host ::        # every address, for another machine's browser
 
 The arm is on MAXARM_DEVICE, /dev/ttyUSB0 by default. Connecting resets the
 board, which homes the arm: 4 s, sometimes 15. This process is the only thing
@@ -15,9 +15,13 @@ The pages' own files -- HTML, scripts, styles -- are in the pilot's `web/`.
 """
 
 import argparse
+import fcntl
+import ipaddress
+import socket
+import struct
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 HERE = Path(__file__).resolve().parent
 WEB = HERE.parents[1] / "web"
@@ -48,8 +52,10 @@ def run(host: str, port: int, config_dir: Path = CONFIG_DIR) -> None:
     TilesSession(worker, feed, config_dir).register(server)
     worker.start()
     feed.start()
-    print(f"calibration: http://{'localhost' if host in ('127.0.0.1', '0.0.0.0') else host}:{port}/"
-          f"  -- Ctrl-C to stop", flush=True)
+    print(f"calibration: http://localhost:{port}/  -- Ctrl-C to stop", flush=True)
+    if host in ("0.0.0.0", "::"):
+        for interface, address in local_addresses(is_ipv6_wanted=host == "::"):
+            print(f"  {interface:<8} http://{address}:{port}/", flush=True)
     try:
         server.serve(host, port)
     except KeyboardInterrupt:
@@ -59,10 +65,37 @@ def run(host: str, port: int, config_dir: Path = CONFIG_DIR) -> None:
         worker.shutdown()
 
 
+_SIOCGIFADDR = 0x8915                     # an interface's IPv4 address, in a struct ifreq
+
+
+def local_addresses(is_ipv6_wanted: bool) -> List[Tuple[str, str]]:
+    """Where another machine can reach this one, by interface: each one's IPv4 address, and its global IPv6 ones,
+    in brackets as a URL takes them. Loopback is left out, and so is link-local IPv6 (fe80::): a browser will not
+    take the interface such a URL needs."""
+    found = []
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as probe:
+        for _, interface in socket.if_nameindex():
+            try:
+                reply = fcntl.ioctl(probe.fileno(), _SIOCGIFADDR, struct.pack("256s", interface[:15].encode()))
+            except OSError:
+                continue                                    # no IPv4 address on it
+            address = socket.inet_ntoa(reply[20:24])
+            if not address.startswith("127."):
+                found.append((interface, address))
+    addresses_v6 = Path("/proc/net/if_inet6")
+    if is_ipv6_wanted and addresses_v6.exists():
+        # Each line: address in hex, interface index, prefix length, scope, flags, interface; scope 00 is global.
+        for line in addresses_v6.read_text().splitlines():
+            hex_address, _, _, scope, _, interface = line.split()
+            if scope == "00":
+                found.append((interface, f"[{ipaddress.IPv6Address(int(hex_address, 16))}]"))
+    return found
+
+
 def main(argv: List[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--host", default="127.0.0.1",
-                        help="the address to serve on: 0.0.0.0 to reach it from another machine")
+                        help="the address to serve on: :: (or 0.0.0.0, IPv4 only) to reach it from another machine")
     parser.add_argument("--port", type=int, default=8080)
     args = parser.parse_args(argv[1:])
     run(args.host, args.port)

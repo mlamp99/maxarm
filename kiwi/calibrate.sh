@@ -8,4 +8,4 @@ cd "$(dirname "$(readlink -f "$0")")"
 venv/bin/python -c "import numpy, cv2, tflite_runtime, gi"
 
 export PYTHONUNBUFFERED=1
-exec venv/bin/python src/calibration/calibration.py --host 0.0.0.0 "$@"
+exec venv/bin/python src/calibration/calibration.py --host :: "$@"

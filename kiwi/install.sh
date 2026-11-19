@@ -11,6 +11,7 @@ cd "$(dirname "$(readlink -f "$0")")"
 scripts/install-ch341.sh
 
 if [ ! -d venv ]; then
+  echo "Creating the Python Virtual environment in venv/. This may take some time..."
   # --system-site-packages: the image's numpy, cv2, tflite_runtime and gi, never pip's (src/requirements.txt).
   python3 -m venv --system-site-packages venv
 fi

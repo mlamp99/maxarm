@@ -11,7 +11,7 @@ arm can pick up, and sets a word of them down.
 
 ```
 ../.venv/bin/python src/calibration/calibration.py                  # then open http://localhost:8080
-../.venv/bin/python src/calibration/calibration.py --host 0.0.0.0   # on the board, for another machine's browser
+../.venv/bin/python src/calibration/calibration.py --host ::        # every address, for another machine's browser
 ../.venv/bin/python agenttools/serve-fake.py                        # the same pages on a fake arm and camera
 ```
 

@@ -17,6 +17,7 @@ directories (`home`, `common` and any other directory named in `pages`).
 import json
 import math
 import mimetypes
+import socket
 import sys
 import time
 import traceback
@@ -86,7 +87,8 @@ class Server:
 
     def serve(self, host: str, port: int) -> None:
         """Serve until Ctrl-C, which is raised to the caller."""
-        httpd = ThreadingHTTPServer((host, port), _RequestHandler)
+        server_class = _DualStackServer if host == "::" else ThreadingHTTPServer
+        httpd = server_class((host, port), _RequestHandler)
         httpd.daemon_threads = True
         httpd.app = self
         try:
@@ -150,6 +152,15 @@ class Server:
         if file.suffix not in WEB_SUFFIXES or directory not in file.parents or not file.is_file():
             return None
         return file
+
+
+class _DualStackServer(ThreadingHTTPServer):
+    """On "::", IPv4 as well as IPv6: one socket takes both."""
+    address_family = socket.AF_INET6
+
+    def server_bind(self) -> None:
+        self.socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
+        super().server_bind()
 
 
 class _RequestHandler(BaseHTTPRequestHandler):
