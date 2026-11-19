@@ -18,4 +18,9 @@ fi
 . venv/bin/activate
 scripts/install.sh
 
+echo
+echo "Use this certificate to register the device with /IOTCONNECT (config/device-cert.pem):"
+cat config/device-cert.pem
+echo "Then download the device's iotcDeviceConfig.json into config/."
+echo
 echo "Done. Calibrate: ./calibrate.sh; then the app: ./run.sh"

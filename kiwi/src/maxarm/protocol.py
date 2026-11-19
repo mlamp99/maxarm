@@ -55,6 +55,7 @@ ABSENT_SERVO_ID = 5
 # The servos run off the barrel jack; USB powers only the ESP32. Below this the
 # supply is off, and the servos still answer reads while being unable to move.
 SERVO_VOLTAGE_MIN_MV = 6000
+NO_POWER = "ERROR: Ensure power supply plugged in and switch in UP postion!"
 
 READ_PULSES = "[bus_servo.get_position(i) for i in (1, 2, 3)]"
 
@@ -126,10 +127,8 @@ class ReplProtocol:
             if reason is None:
                 self.has_supply = self._can_read_supply()
                 return
-            if not is_transient:
+            if not is_transient or attempt == BOARD_CHECK_ATTEMPTS:
                 raise BoardNotReadyError(reason)
-            if attempt == BOARD_CHECK_ATTEMPTS:
-                raise BoardNotReadyError(f"{reason} (unchanged over {attempt} reads)")
             time.sleep(BOARD_CHECK_RETRY_S)
 
     def _board_problem(self) -> Tuple[Optional[str], bool]:
@@ -142,14 +141,9 @@ class ReplProtocol:
         if absent is not False:
             return (f"servo id {ABSENT_SERVO_ID} is not fitted but answered {absent!r}: the bus "
                     "is echoing, so no readback can be trusted. Power-cycle the arm.", False)
-        if not position:
-            return ("the servo bus did not answer a position read. Check the arm's DC supply "
-                    "and the servo cabling.", True)
-        if not isinstance(voltage, int) or voltage < SERVO_VOLTAGE_MIN_MV:
-            reading = f"{voltage / 1000.0:.2f} V" if isinstance(voltage, int) else repr(voltage)
-            return (f"servo supply reads {reading}, below {SERVO_VOLTAGE_MIN_MV / 1000:.1f} V. "
-                    "USB powers the ESP32 but not the servos -- check the barrel jack and its "
-                    "switch.", True)
+        # No answer from the servos, or too low a supply: USB powers the ESP32 but not the servos.
+        if not position or not isinstance(voltage, int) or voltage < SERVO_VOLTAGE_MIN_MV:
+            return (NO_POWER, True)
         return (None, False)
 
     def _can_read_supply(self) -> bool:

@@ -17,8 +17,5 @@ mkdir -p config
 if [ ! -f config/device-pkey.pem ]; then
   openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -days 3650 \
     -keyout config/device-pkey.pem -out config/device-cert.pem -subj "/CN=maxarm"
-  echo "Made config/device-cert.pem: paste it as the device's certificate when you create the device in /IOTCONNECT."
-fi
-if [ ! -f config/iotcDeviceConfig.json ]; then
-  echo "Next: download iotcDeviceConfig.json from the device's page in /IOTCONNECT into config/."
+  echo "Made config/device-cert.pem: register the device with /IOTCONNECT with it."
 fi
