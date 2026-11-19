@@ -4,7 +4,8 @@ Spec: [`work/PILOT-jackal.md`](../work/PILOT-jackal.md).
 State of play: [`work/STATUS-jackal.md`](../work/STATUS-jackal.md).
 
 Two apps on one library. **The calibration app** (`src/calibration/`, its pages in `web/`) calibrates the desk and
-the camera and tries them: desk, camera, Fine Tune and Tiles pages, as impala left them. **The /IOTCONNECT app**
+the camera and tries them: desk, camera, Fine Tune and Tiles pages, as impala left them, and a GenAI page, where a
+language model on the Ara240 makes words of the tiles (`src/calibration/README.md`). **The /IOTCONNECT app**
 (`src/main.py`) takes commands from the dashboard or the console, sends what it found as telemetry, and streams the
 camera's picture with the tiles drawn over it over KVS WebRTC. Calibrate first; the two cannot run at once, as each
 holds the arm and the camera.
@@ -70,7 +71,8 @@ pages' live view as a layer.
 | `src/main.py`       | the /IOTCONNECT app: the composition root                                                |
 | `src/app/`          | what the app does, command by command (`app.py`)                                         |
 | `src/applib/`       | how, for both apps: the tiles, the letters, the camera, the arm's moves, the overlay,    |
-|                     | the settings; and the app's commands, telemetry, /IOTCONNECT, the stream and WebRTC      |
+|                     | the settings, the language model (`genai/`); and the app's commands, telemetry,          |
+|                     | /IOTCONNECT, the stream and WebRTC                                                       |
 | `src/maxarm/`       | the arm's library                                                                        |
 | `src/calibration/`  | the calibration app and its pages' requests; guide in its `README.md`                    |
 | `web/`              | the calibration app's pages: HTML, scripts, styles                                       |

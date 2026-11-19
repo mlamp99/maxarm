@@ -18,6 +18,7 @@ but this one belongs to one rig, so none of them is in git (`../.gitignore`).
 | `camera-view.json`          | QUALITY or FPS: the camera's mode for the live view     | `calibration/`, camera page |
 | `arm-true.json`             | the arm's raw-to-true correction the points make        | `calibration/`, both pages  |
 | `appcfg.json`               | the app's settings that differ from their defaults      | the Tiles page; the app     |
+| `words.json`                | the library of words the language model marked          | `calibration/`, GenAI page  |
 | `iotcDeviceConfig.json`     | the device, as /IOTCONNECT knows it                     | you: downloaded             |
 | `device-cert.pem`           | the device's certificate                                | you, or `scripts/install.sh`|
 | `device-pkey.pem`           | its private key                                         | you, or `scripts/install.sh`|
@@ -132,6 +133,14 @@ The app's own settings, which the calibration app's Tiles page and the /IOTCONNE
 Only what differs from the defaults is written; a setting set back to its default is taken out, and with none left
 the file goes. Either app writes it as soon as a setting changes -- the Tiles page's grip box and reader, the app's
 `reader-location` command -- and reads it again when it has changed.
+
+## words.json
+
+Written once by the calibration app, 40 s after the language model has first loaded onto the Ara240
+(`src/applib/genai/library.py`): each word of the model's vocabulary that may be an everyday English one, and how far
+the model scored it behind its first choice. The GenAI page lists those of them the tiles spell. It is not this rig's
+alone -- the same model, asked the same, marks the same words -- but it is made here, not shipped; `source` says by
+which model and questions, and with another of either the file is made again. Deleted, it is made again too.
 
 ## iotcDeviceConfig.json, device-cert.pem, device-pkey.pem
 

@@ -1,0 +1,61 @@
+/* The GenAI page's layout: the camera with LOCATE TILES, the buttons that build a word and the question under it, on
+   the left; the library of words the tiles spell down the right side. The camera's lines and the card shown without
+   a calibration are the Tiles page's (tiles.css). */
+
+main.genai {
+  display: grid; gap: 16px; padding: 16px 20px 28px; align-items: start;
+  grid-template-columns: minmax(520px, 1.5fr) minmax(340px, 1fr);
+  grid-template-areas: "live library" "build library" "ask library";
+}
+main.genai .live { grid-area: live; }
+main.genai .build { grid-area: build; }
+main.genai .ask { grid-area: ask; }
+main.genai .library { grid-area: library; align-self: stretch; }
+
+@media (max-width: 1080px) {
+  main.genai { grid-template-columns: 1fr; grid-template-areas: "live" "build" "ask" "library"; }
+}
+
+main.genai.is-blocked { grid-template-columns: 1fr; grid-template-areas: "blocked"; }
+main.genai.is-blocked .live, main.genai.is-blocked .build, main.genai.is-blocked .ask,
+main.genai.is-blocked .library { display: none; }
+
+/* --- a word built --------------------------------------------------------- */
+
+.picks { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn.pick { padding: 10px 18px; letter-spacing: 1.2px; display: grid; justify-items: center; line-height: 1.25; }
+.btn.pick small { font-size: 11px; font-weight: 500; letter-spacing: 0.3px; opacity: 0.75; }
+
+/* --- a question ----------------------------------------------------------- */
+
+.ask-row { display: flex; gap: 10px; }
+#question { flex: 1; min-width: 0; font: 15px var(--sans); color: var(--text); background: var(--bg);
+  border: 1px solid var(--line-strong); border-radius: 9px; padding: 9px 12px; }
+#question:focus { border-color: var(--green); }
+#question:disabled { opacity: 0.4; }
+#ask { padding: 9px 22px; letter-spacing: 1.2px; }
+.answer-line { margin: 12px 2px 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.answer-line:empty { display: none; }
+.answer-line .asked { color: var(--faint); }
+.answer-line b { font-family: var(--mono); font-weight: 700; letter-spacing: 1.5px; color: var(--text); }
+.answer-line b.spelled { color: var(--green-bright); font-size: 17px; }
+.answer-line .thinking { color: var(--yellow); }
+
+/* --- the library ---------------------------------------------------------- */
+
+.library .card-head .counts { color: var(--muted); font-size: 12.5px; }
+.library .pill { max-width: 300px; }
+.library-line { margin: 0 2px 10px; line-height: 1.5; }
+.words { display: grid; gap: 12px; max-height: calc(100vh - 210px); overflow: auto; padding-right: 4px; }
+.words h3 { margin: 0 0 6px; font-size: 11px; font-weight: 650; letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--faint); }
+.words h3 b { color: var(--muted); font-weight: 650; }
+.words .group { display: flex; flex-wrap: wrap; gap: 6px; }
+.words button.word { font: 600 13px var(--mono); letter-spacing: 1.2px; color: var(--text); cursor: pointer;
+  padding: 4px 9px; border-radius: 7px; background: var(--panel-raised); border: 1px solid var(--line-strong);
+  transition: border-color 0.12s, background 0.12s; }
+.words button.word:hover:not(:disabled) { border-color: var(--green); background: var(--green-wash);
+  color: var(--green-bright); }
+.words button.word:disabled { cursor: default; opacity: 0.6; }
+.words button.word.building { border-color: var(--green); background: var(--green); color: #06210f; opacity: 1; }
+.words .none { color: var(--faint); font-size: 13px; }

@@ -14,6 +14,7 @@ of, and what they share. Nothing here knows of either app's pages, nor of the cl
 | `motion`    | how the arm moves near the desk: carefully, in arm or desk space                     |
 | `overlay`   | what is drawn over the camera's picture: on the pages, and on the stream             |
 | `settings`  | the app's settings, `config/appcfg.json`: the grip height, the reader                |
+| `genai`     | the language model on the Ara240: the words the tiles spell, a question answered     |
 | `stream`    | the camera's picture with the overlay in it, frame after frame, for WebRTC           |
 | `commands`  | commands from any source, run off the other threads, each with its answer            |
 | `console`   | the console as a source of commands                                                  |

@@ -7,7 +7,8 @@ Specs: [`work/PILOT-falcon.md`](../../../work/PILOT-falcon.md), the desk page;
 [`work/PILOT-jackal.md`](../../../work/PILOT-jackal.md), what it shares with the /IOTCONNECT app.
 One web app with a page per calibration: the desk first, then the camera; then Fine Tune, which tries the camera's
 calibration and refines it; then Tiles, which finds the 25 mm letter tiles, reads their letters, says which the
-arm can pick up, and sets a word of them down.
+arm can pick up, and sets a word of them down; then GenAI, where a language model on the Ara240 lists the words
+the tiles can spell and answers a question in one of them.
 
 ```
 ../.venv/bin/python src/calibration/calibration.py                  # then open http://localhost:8080
@@ -392,6 +393,45 @@ one whose letter needs the least turning goes; an N, an S or an O is turned to w
 The library's `carry()` picks the tile up and sets it down, and knowing both ends, shares out a turn the cup cannot
 make from centre.
 
+## The GenAI page
+
+`genai/`. Words of the tiles from a language model on the board's Ara240: the words the tiles can spell listed down
+the side, one of them set down at a press, and a question answered in one. The tiles are the Tiles page's -- the same
+LOCATE TILES, the same PLACE, the grip height and the reader chosen there -- and the letters a word is made of are
+those on the tiles ready to pick up, their letters read.
+
+1. **LOCATE TILES**, here or on the Tiles page. The list shows the words of the model's library that the letters
+   spell, each tile once in a word, by length, the longest first.
+2. **LONGEST WORD, 3 LETTERS, 4 LETTERS, 5 LETTERS** set one of those down along the dropoff arc: of several of the
+   length one at random, and not the one built last. A click on a word in the list sets that word down.
+3. **ASK** puts the question typed to the model, which answers in one word, about 2 s. If the tiles spell it, the
+   arm sets it down. If they do not, the best few words of the list are put to the model as answers, and the first
+   it holds right too is set down instead: asked the colour of an apple with no D among the tiles, RED becomes
+   GREEN. What the model said, and why that was not set down, is shown under the question.
+4. Take the word off the arc and LOCATE TILES again before the next: a word goes where the last one lies.
+
+| needs                         | where                                                                        |
+| ----------------------------- | ---------------------------------------------------------------------------- |
+| the Ara240 and its runtime    | NXP's rt-sdk-ara2, its proxy running (`rt-sdk-ara2.service`): with the image |
+| a model compiled for it       | `/usr/share/llm/Qwen2.5-7B-Instruct`: with the image, or `fetch_models`      |
+| the model's tokenizer         | `tokenizers`, in `src/requirements.txt`                                      |
+
+**The model loads when the app starts, in the background: 4 minutes**, its 8 GB going into the Ara240's own memory.
+The pill over the list counts them. Until then ASK waits; the list and its buttons do not, once the library has been
+made. Without an Ara240 the pill says what is missing, and the other pages are as before.
+
+**The library** (`applib/genai/library.py`) is made by the model once, 40 s after its first load, and kept in
+`config/words.json`. A language model does not count letters -- asked for words of given tiles, this one names words
+the tiles do not hold -- but it knows which words are everyday English. So it is shown the start of a list of such
+words, and its score for each of the twenty thousand words in its own vocabulary as the next one is read: those that
+score near its first choice are kept, 1900 of them, 3 to 9 letters. Which of them the tiles spell is counted, not
+asked. The cut is set where no fragments, names and foreign words were found above it, so some everyday words are
+missing too (WOMAN, HEAT); an answer to a question need not be in the library, only on the tiles. Words a demo
+should not spell in front of people are left out (`UNSUITABLE`), for the list and for answers.
+
+**An answer** (`applib/genai/answer.py`) is the model's own: it is sometimes wrong, and writes sums in digits, which
+are put in letters here, up to TWENTY and the tens.
+
 From the pilot's root:
 
 | directory              | holds                                                                                   |
@@ -399,14 +439,16 @@ From the pilot's root:
 | `src/calibration/`     | the app (`calibration.py`) and each page's requests: `common/` the web server, the     |
 |                        | arm's one thread (`worker.py`) and its controls (`arm_api.py`); `desk/` the plane and  |
 |                        | its files; `camera/` CALIBRATE, the check image (`check.py`), the                       |
-|                        | refinement (`refine.py`); `tests/` Fine Tune; `tiles/` the Tiles page                   |
+|                        | refinement (`refine.py`); `tests/` Fine Tune; `tiles/` the Tiles page; `genai/` the     |
+|                        | GenAI page                                                                              |
 | `web/`                 | the pages: `common/` the look, the view from above with the height beside it (`grid.js`,|
 |                        | `view.css`, `height.js`), desk space to the picture and back (`shares.js`), the marks  |
 |                        | drawn over it (`marks.js`), a layer drawn in Python laid over it (`layer.js`), the      |
 |                        | picture full size (`fullview.js`); `desk/`, `camera/` (its GUIDE, `guide.md`),          |
-|                        | `tests/`, `tiles/`, each page's `index.html`, script, styles and grid                   |
+|                        | `tests/`, `tiles/`, `genai/`, each page's `index.html`, script, styles and grid         |
 | `src/applib/`          | what the /IOTCONNECT app shares with the pages: the camera (`camera/`: which camera,    |
 |                        | the live view, the fit and its files, the cubes, the red cube), the arm's moves         |
 |                        | (`motion.py`), the tiles' flow (`tilework.py`), the red cube's (`redcube.py`), what is  |
 |                        | drawn over the picture (`overlay/`), the settings (`settings.py`); and the tiles found, |
-|                        | read, placed and a word of them planned (`tiles/`, `letters/`, `areas.py`, `word.py`)   |
+|                        | read, placed and a word of them planned (`tiles/`, `letters/`, `areas.py`, `word.py`);  |
+|                        | and the language model on the Ara240, its library of words and its answers (`genai/`)   |
