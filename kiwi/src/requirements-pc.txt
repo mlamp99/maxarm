@@ -1,0 +1,7 @@
+# A PC's: the board's requirements, and what the board's image brings, at the image's versions (LF_v6.18.37-2.1.0).
+# Not GStreamer and gi: those come from the PC's system (../README.md).
+-r requirements.txt
+
+numpy==2.4.3
+opencv-python-headless==4.13.0.92
+ai-edge-litert==2.1.0       # the image has it beside tflite_runtime, which has no PC build
