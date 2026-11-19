@@ -1,33 +1,19 @@
 #!/usr/bin/env bash
-# Install what both apps need, here, from this source tree: a venv with src/requirements.txt in it, and the
-# device's certificate and key in config/ if it has none yet. Run it from anywhere, once:
+# The apps' Python packages, into the python3 on PATH -- an activated venv's, if there is one -- and the device's
+# certificate and key in config/ if it has none yet. On the board ../install.sh runs it in the app's venv; on a PC,
+# activate a venv first if you want one:
 #
-#   scripts/install.sh                      # the venv at .venv, beside src/
-#   VENV=../.venv scripts/install.sh        # another venv, made if it is not there
-#
-# The TFLite interpreter is not installed: on the i.MX95 it is the BSP's tflite_runtime, which the venv sees; on a
-# PC, `pip install ai-edge-litert` into the venv.
-set -euo pipefail
+#   scripts/install.sh
+set -e
 cd "$(dirname "$(readlink -f "$0")")/.."
 
-VENV="${VENV:-.venv}"
-if [ ! -x "$VENV/bin/python" ]; then
-  # --system-site-packages: the BSP's own numpy, cv2 and tflite_runtime stay visible on the board.
-  python3 -m venv --system-site-packages "$VENV"
-fi
-"$VENV/bin/pip" install -r src/requirements.txt
-
-if ! "$VENV/bin/python" -c "import gi; gi.require_version('Gst', '1.0'); gi.require_version('GstVideo', '1.0')" \
-    2>/dev/null; then
-  echo "NOTE: no GStreamer for Python, so no camera. It comes from the system: see README.md."
+if [ "$(uname -m)" = aarch64 ]; then
+  python3 -m pip install -r src/requirements.txt
+else
+  python3 -m pip install -r src/requirements-pc.txt
 fi
 
-if ! "$VENV/bin/python" -c "import tflite_runtime" 2>/dev/null \
-    && ! "$VENV/bin/python" -c "import ai_edge_litert" 2>/dev/null \
-    && ! "$VENV/bin/python" -c "import tensorflow" 2>/dev/null; then
-  echo "NOTE: no TFLite interpreter, so no letters can be read. On a PC: $VENV/bin/pip install ai-edge-litert"
-fi
-
+mkdir -p config
 if [ ! -f config/device-pkey.pem ]; then
   openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -days 3650 \
     -keyout config/device-pkey.pem -out config/device-cert.pem -subj "/CN=maxarm"
@@ -36,4 +22,3 @@ fi
 if [ ! -f config/iotcDeviceConfig.json ]; then
   echo "Next: download iotcDeviceConfig.json from the device's page in /IOTCONNECT into config/."
 fi
-echo "Done. Calibrate: $VENV/bin/python src/calibration/calibration.py; then run: $VENV/bin/python src/main.py"

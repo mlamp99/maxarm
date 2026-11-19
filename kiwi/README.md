@@ -16,12 +16,24 @@ Both read the camera through GStreamer, which comes from the system, not pip: it
 `python3-gi gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-good`. The venv sees them
 (`--system-site-packages`).
 
+On the board, as root:
+
 ```
-scripts/install.sh                                   # once: a venv, src/requirements.txt, a device key in config/
-../.venv/bin/python src/calibration/calibration.py   # calibrate, then try it: http://localhost:8080
-../.venv/bin/python src/main.py                      # the app: /IOTCONNECT, the stream, the console
-../.venv/bin/python src/main.py --no-iotc            # the app without the cloud: commands at the console
+mkdir -p ~/kiwi && cd ~/kiwi
+# TODO(owner): the package's download location
+wget -O tiles.tgz https://downloads.iotconnect.io/partners/nxp/packages/tiles.tgz
+tar zxf tiles.tgz
+./install.sh            # once, and again after unpacking a newer package: the arm's USB driver, venv/, packages
+./calibrate.sh          # calibrate, then try it: http://<board>:8080
+./run.sh                # the app: /IOTCONNECT, the stream, the console
+./run.sh --no-iotc      # the app without the cloud: commands at the console
 ```
+
+The package is made on a PC by `scripts/package.sh`. `config/` is not in it, so a newer one unpacked over the old
+keeps the calibration and the device's identity.
+
+On a PC, in a venv of your own if you like: `scripts/install.sh`, then `python src/calibration/calibration.py` and
+`python src/main.py`.
 
 ## /IOTCONNECT
 
@@ -77,9 +89,10 @@ pages' live view as a layer.
 | `src/calibration/`  | the calibration app and its pages' requests; guide in its `README.md`                    |
 | `web/`              | the calibration app's pages: HTML, scripts, styles                                       |
 | `config/`           | the calibration, the settings and the device's identity; per rig, not in git             |
-| `files/`            | the letter reader, `letters.tflite`, what it was built from, and the device template     |
+| `files/`            | the letter reader, `letters.tflite`, what it was built from, and the device template;    |
+|                     | `ch341/<uname -r>/ch341.ko`, the arm's USB serial driver for that i.MX95 image           |
 | `training/`         | `letters/`: the reader's recipe                                                          |
-| `scripts/`          | `install.sh`                                                                             |
+| `scripts/`          | `install.sh`, `install-ch341.sh`; `package.sh` makes `tiles.tgz`, `build-ch341.sh` the driver |
 | `agenttools/`       | the fake board and camera, the overlay drawn on the owner's stills, checks; not shipped  |
 
 The arm's library, its calls and limits: [`src/maxarm/README.md`](src/maxarm/README.md).

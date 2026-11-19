@@ -4,7 +4,6 @@ and the tiles.
 
     ../.venv/bin/python src/calibration/calibration.py                  # then open http://localhost:8080
     ../.venv/bin/python src/calibration/calibration.py --host 0.0.0.0   # on the board, for another machine's browser
-    ../.venv/bin/python src/calibration/calibration.py --camera /dev/video2   # not the camera it would pick
 
 The arm is on MAXARM_DEVICE, /dev/ttyUSB0 by default. Connecting resets the
 board, which homes the arm: 4 s, sometimes 15. This process is the only thing
@@ -18,7 +17,7 @@ The pages' own files -- HTML, scripts, styles -- are in the pilot's `web/`.
 import argparse
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 HERE = Path(__file__).resolve().parent
 WEB = HERE.parents[1] / "web"
@@ -38,9 +37,9 @@ from tests.api import TestsSession                           # noqa: E402
 from tiles.api import TilesSession                           # noqa: E402
 
 
-def run(host: str, port: int, config_dir: Path = CONFIG_DIR, camera: Optional[str] = None) -> None:
+def run(host: str, port: int, config_dir: Path = CONFIG_DIR) -> None:
     worker = Worker(Motion(MaxArm(config_dir=None), config_dir))
-    feed = Feed(camera, config_dir)
+    feed = Feed(config_dir)
     server = Server(WEB, home="desk", pages=["camera", "tests", "tiles"])
     arm_api.register(server, worker)
     DeskSession(worker, config_dir).register(server)
@@ -65,10 +64,8 @@ def main(argv: List[str]) -> int:
     parser.add_argument("--host", default="127.0.0.1",
                         help="the address to serve on: 0.0.0.0 to reach it from another machine")
     parser.add_argument("--port", type=int, default=8080)
-    parser.add_argument("--camera", help="the camera, /dev/videoN: by default the owner's if it is plugged in, "
-                                         "else the first that is not virtual")
     args = parser.parse_args(argv[1:])
-    run(args.host, args.port, camera=args.camera)
+    run(args.host, args.port)
     return 0
 
 

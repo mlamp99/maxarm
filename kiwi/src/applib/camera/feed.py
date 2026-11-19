@@ -186,8 +186,7 @@ def _raise_problem(pipeline, name: str) -> None:
 
 
 class Feed:
-    def __init__(self, device: Optional[str] = None, config_dir: Optional[Path] = None) -> None:
-        self.device = device                # None: found afresh each time the camera is opened
+    def __init__(self, config_dir: Optional[Path] = None) -> None:
         self.config_dir = config_dir        # where camera-view.json says the mode, and camera.json the focus
         self.stream: "Optional[Stream]" = None   # fed from the pipeline; with it, the camera is open the whole run
         self.condition = threading.Condition()
@@ -311,7 +310,7 @@ class Feed:
                     self.condition.wait_for(lambda: self.is_closed, timeout=RETRY_S)
 
     def _stream(self) -> None:
-        device = self.device or find_camera()
+        device = find_camera()                       # afresh each time: it can be plugged in elsewhere
         name = describe(device)
         node = query(device)
         card = node.card if node else name

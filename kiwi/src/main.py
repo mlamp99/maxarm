@@ -82,7 +82,7 @@ def main() -> int:
     if problem:
         raise SystemExit(f"{problem}. Calibrate first: {CALIBRATION_APP}, the desk and camera pages.")
     settings = Settings(CONFIG_DIR)
-    feed = Feed(None, CONFIG_DIR)
+    feed = Feed(CONFIG_DIR)
     work = TileWork(feed, CONFIG_DIR)
     cube = RedCube(feed)
     overlay = StreamOverlay(fit, stream_size(fit.frame_size), work.scene, lambda: cube.found)

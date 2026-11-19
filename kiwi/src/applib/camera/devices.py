@@ -1,8 +1,10 @@
-"""Which camera to use: the owner's if it is plugged in, else the first real one; and which of its modes.
+"""Which camera to use: the first USB one that captures video, asked at each start; and which of its modes.
 
-Every /dev/videoN is asked what it is (V4L2's QUERYCAP). Nodes that cannot
-capture video -- a USB camera's metadata node, say -- are skipped, and so are
-virtual cameras: OBS's v4l2loopback, or anything calling itself virtual.
+The /dev/videoN moves: the board's own blocks (JPEG and video codecs) take
+nodes before a USB camera gets one, and how many depends on the image. So every
+node is asked what it is (V4L2's QUERYCAP), and the bus is what decides: built-in
+blocks and virtual cameras are not on `usb-`, a webcam is. A USB camera's
+metadata node is on the same bus but cannot capture video, and is skipped.
 
 The camera is asked its formats and sizes (ENUM_FMT, ENUM_FRAMESIZES), and
 how fast it gives each (ENUM_FRAMEINTERVALS). Two of them can be the live view:
@@ -20,14 +22,10 @@ from dataclasses import dataclass
 from fractions import Fraction
 from typing import Dict, List, Optional, Tuple
 
-# The owner's document camera, by the USB port it hangs off (PILOT-gecko).
-PREFERRED_BUS = "usb-0000:0b:00.0-3.1"
-
 _VIDIOC_QUERYCAP = 0x80685600            # _IOR('V', 0, struct v4l2_capability), 104 bytes
 _CAPABILITY_SIZE = 104
 _CAP_VIDEO_CAPTURE = 0x00000001
 _CAP_DEVICE_CAPS = 0x80000000            # device_caps is filled in
-_VIRTUAL_DRIVERS = ("v4l2 loopback",)
 _VIDIOC_ENUM_FMT = 0xC0405602            # _IOWR('V', 2, struct v4l2_fmtdesc), 64 bytes
 _VIDIOC_ENUM_FRAMESIZES = 0xC02C564A     # _IOWR('V', 74, struct v4l2_frmsizeenum), 44 bytes
 _VIDIOC_ENUM_FRAMEINTERVALS = 0xC034564B  # _IOWR('V', 75, struct v4l2_frmivalenum), 52 bytes
@@ -44,11 +42,6 @@ class CameraNode:
     card: str             # what the camera calls itself
     bus: str              # where it is plugged in: usb-0000:0b:00.0-3.1, platform:...
     is_capture: bool      # gives video frames, as opposed to metadata or output
-
-    @property
-    def is_virtual(self) -> bool:
-        return (self.driver in _VIRTUAL_DRIVERS or "loopback" in self.bus
-                or "virtual" in self.card.lower())
 
     def describe(self) -> str:
         return f"{self.card} on {self.path}"
@@ -155,14 +148,13 @@ def _fourcc(code: int) -> str:
 
 
 def find_camera() -> str:
-    """The /dev/videoN to use. Raises, saying what is plugged in, if there is none."""
+    """The first USB camera's /dev/videoN. Raises, saying what is there, if none is plugged in."""
     nodes = list_nodes()
-    cameras = [node for node in nodes if node.is_capture and not node.is_virtual]
+    cameras = [node for node in nodes if node.is_capture and node.bus.startswith("usb-")]
     if not cameras:
         seen = ", ".join(f"{node.path} ({node.card})" for node in nodes) or "no /dev/video* at all"
-        raise RuntimeError(f"no camera found: {seen}")
-    return min(cameras, key=lambda node: (node.bus != PREFERRED_BUS, not node.bus.startswith("usb-"),
-                                          _number(node.path))).path
+        raise RuntimeError(f"no USB camera found: {seen}")
+    return cameras[0].path
 
 
 def describe(device: str) -> str:

@@ -6,8 +6,9 @@ config/*.png
 config/*.jpg
 config/*.pem
 
-# A venv made beside src/ by scripts/install.sh.
+# A venv: on the board install.sh makes venv/, on a PC the owner makes their own.
 .venv/
+venv/
 
 # A training run's best epoch, removed when it finishes (training/letters/train.py).
 training/letters/letters.keras

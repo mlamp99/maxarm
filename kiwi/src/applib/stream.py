@@ -1,7 +1,8 @@
 """The stream: the camera's live view with the overlay drawn in, H.264, for whoever watches over WebRTC.
 
     stream = Stream(overlay)
-    feed = Feed(None, CONFIG_DIR, stream=stream)   # the stream is a branch of the camera's pipeline
+    feed = Feed(CONFIG_DIR)
+    feed.add_stream(stream)                        # the stream is a branch of the camera's pipeline
     stream.connect_encoded(streamer.on_encoded)    # each H.264 access unit, on GStreamer's thread
     stream.set_watched(True)                       # a viewer came: frames flow, a keyframe first
     stream.request_keyframe()

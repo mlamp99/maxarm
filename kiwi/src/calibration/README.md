@@ -12,11 +12,10 @@ arm can pick up, and sets a word of them down.
 ```
 ../.venv/bin/python src/calibration/calibration.py                  # then open http://localhost:8080
 ../.venv/bin/python src/calibration/calibration.py --host 0.0.0.0   # on the board, for another machine's browser
-../.venv/bin/python src/calibration/calibration.py --camera /dev/video2   # a camera other than the one it picks
 ../.venv/bin/python agenttools/serve-fake.py                        # the same pages on a fake arm and camera
 ```
 
-It needs `src/requirements.txt` and a TFLite interpreter; the web server is Python's own.
+It needs `src/requirements.txt` (`src/requirements-pc.txt` on a PC); the web server is Python's own.
 The pages' own files are in the pilot's [`web/`](../../web/), a directory per page; their requests are answered here,
 and what the /IOTCONNECT app does the same way is in [`applib/`](../applib/): the tiles' flow, the red cube's, the
 camera, the arm's moves, and what is drawn over the camera's picture.
@@ -162,9 +161,8 @@ camera's own JPEGs go to the page as they come. The snapshot is five fresh frame
 pauses for it. The document camera's raw format, YUYV, shows the same picture, at 2 frames a second
 (`work/STATUS-impala.md` §1).
 
-**Which camera.** The owner's document camera, by the USB port it hangs off (`usb-0000:0b:00.0-3.1`), when it is
-plugged in; otherwise the first camera that is not virtual: OBS's virtual camera is never picked.
-`--camera /dev/videoN` picks another (`applib/camera/devices.py`).
+**Which camera.** The first USB camera that captures video, found at each start: the /dev/videoN moves with the
+image and with what else is plugged in (`applib/camera/devices.py`). Nothing else is picked, a virtual camera neither.
 
 **The guide** is `web/camera/guide.md`, plain text to edit as wanted. A line starting "- " is a bullet, and an indented
 line under it carries it on; `**two stars**` make bold and `*one*` italic; a blank line starts a new paragraph.

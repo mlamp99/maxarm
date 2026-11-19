@@ -22,8 +22,7 @@
 # eIQ payload: fetched by scripts/local-setup.sh, never committed
 /nxp-lib/
 
-# When making the eiq demo tarball:
-dm-eiq-genai-flow-demonstrator/
+# when making packages:
 *.tgz
 *.zip
 
