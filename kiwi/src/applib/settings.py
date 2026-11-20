@@ -1,7 +1,7 @@
 """The app's own settings, which the calibration app's pages and the /IOTCONNECT app share: `config/appcfg.json`.
 
     settings = Settings(CONFIG_DIR)
-    settings.get("grip_depth_mm")           # 1.0 until someone sets it
+    settings.get("tile_offset_mm")          # 1.0 until someone sets it
     settings.set(reader="left")             # written at once
     settings.to_json()                      # every setting, its value and its default, for a page
 
@@ -27,11 +27,12 @@ APPCFG_FILE = "appcfg.json"
 # How thick the tiles are (`tiles/find.py`), in TILE_HEIGHT_STEP_MM: what the tiles page offers.
 TILE_HEIGHT_RANGE_MM = (1.0, 8.0)
 TILE_HEIGHT_STEP_MM = 0.5
-# How far under a tile's top the cup grips it, its bellows pressed in that far: 1 mm (the owner's). What the tiles page
-# offers: 1 mm over the top to 3 mm in, in GRIP_STEP_MM; the cup never goes under the desk (`tilework.py`).
-GRIP_DEPTH_MM = 1.0
-GRIP_DEPTH_RANGE_MM = (-1.0, 3.0)
-GRIP_STEP_MM = 0.5
+# The tile offset: how far under a tile's top the cup grips it, its bellows pressed in that far: 1 mm (the owner's).
+# What the tiles page offers: 1 mm over the top to 3 mm in, in TILE_OFFSET_STEP_MM; the cup never goes under the desk
+# (`tilework.py`).
+TILE_OFFSET_MM = 1.0
+TILE_OFFSET_RANGE_MM = (-1.0, 3.0)
+TILE_OFFSET_STEP_MM = 0.5
 READER = "back"
 
 
@@ -66,8 +67,8 @@ def _reader(value: object) -> str:
 SETTINGS: Dict[str, Setting] = {
     "tile_height_mm": Setting(TILE_HEIGHT_MM, _millimetres("tile height", *TILE_HEIGHT_RANGE_MM, TILE_HEIGHT_STEP_MM),
                               "how thick the tiles are, mm"),
-    "grip_depth_mm": Setting(GRIP_DEPTH_MM, _millimetres("grip depth", *GRIP_DEPTH_RANGE_MM, GRIP_STEP_MM),
-                             "how far under a tile's top the cup grips it, mm"),
+    "tile_offset_mm": Setting(TILE_OFFSET_MM, _millimetres("tile offset", *TILE_OFFSET_RANGE_MM, TILE_OFFSET_STEP_MM),
+                              "how far under a tile's top the cup grips it, mm"),
     "reader": Setting(READER, _reader, "where the person reading the word stands, round the arm"),
 }
 

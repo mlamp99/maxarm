@@ -55,9 +55,12 @@ main.tiles.is-blocked .view, main.tiles.is-blocked .live, main.tiles.is-blocked 
 .locate-line b { font-family: var(--mono); font-weight: 650; color: var(--text); }
 .locate-line .note { color: var(--faint); }
 
-label.tile-height { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--muted); }
-#tile-height { width: 4.8em; padding: 6px 5px; }
-#tile-height:disabled { opacity: 0.4; }
+/* The settings' boxes: no fixed width, so the choice shown is not cut short of what the open list says. */
+label.tile-height, label.tile-offset, label.reader { display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12.5px; color: var(--muted); }
+#tile-height, #tile-offset, #reader { padding: 6px 5px; font: inherit; font-size: 12.5px; color: var(--text);
+  background: var(--bg); border: 1px solid var(--line-strong); border-radius: 8px; }
+#tile-height:disabled, #tile-offset:disabled, #reader:disabled { opacity: 0.4; }
 
 /* PLACE: the letters to set down, beside LOCATE TILES; how it is going, under the picture. */
 .word-tools { display: inline-flex; gap: 6px; }
@@ -66,15 +69,6 @@ label.tile-height { display: inline-flex; align-items: center; gap: 5px; font-si
 #word:focus { border-color: var(--green); }
 #word:disabled { opacity: 0.4; }
 #place { padding: 8px 14px; letter-spacing: 1.2px; }
-.word-tools label.grip { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px;
-  color: var(--muted); }
-#grip { width: 3.6em; padding: 6px 5px; }
-#grip:disabled { opacity: 0.4; }
-.word-tools label.reader { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px;
-  color: var(--muted); }
-#reader { padding: 6px 5px; font: inherit; font-size: 12.5px; color: var(--text); background: var(--bg);
-  border: 1px solid var(--line-strong); border-radius: 8px; }
-#reader:disabled { opacity: 0.4; }
 .word-line { margin: 4px 2px 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
 .word-line:empty { display: none; }
 .word-line b { font-family: var(--mono); font-weight: 650; color: var(--text); }

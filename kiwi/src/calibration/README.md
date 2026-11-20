@@ -304,7 +304,7 @@ them and the arm's centre line. Right the camera, LOCATE TILES in its heading. A
 
 1. **Set the tiles down**, letters up, where the camera sees them. A letter is a capital printed in black marker;
    on a letter that is another turned -- M and W -- a dot at its bottom right says which it is. Say how thick they
-   are in **tiles**, beside LOCATE TILES: 2 mm to start. The tiles are looked for that high, and the grip, the
+   are in **tile height**, beside LOCATE TILES: 2 mm to start. The tiles are looked for that high, and the grip, the
    release and the way across are counted from it.
 2. **LOCATE TILES.** The arm parks the way CALIBRATE parks it, out of the picture; the camera takes its snapshot at
    full size -- under 2 s -- and the tiles are found in it, about 2 s more. The live view shows them outlined on
@@ -331,18 +331,18 @@ them and the arm's centre line. Right the camera, LOCATE TILES in its heading. A
    from the tiles ready to pick up; type any others, as many as there are ready tiles for. Letters typed stay, LOCATE
    after LOCATE; emptied, the box is offered letters again. PLACE checks them -- letters on ready tiles, read,
    each tile once, nothing found lying where they go -- and refuses, saying why, before the arm moves. Then each
-   tile in turn: the cup over it, slowly down as far under the tile's top as the grip box beside PLACE says -- 1 mm
+   tile in turn: the cup over it, slowly down as far under the tile's top as **tile offset** beside PLACE says -- 1 mm
    to start -- read there, grip, up; across to its place with the cup at twice the tile's thickness and 4 mm, 8 mm for
    2 mm tiles, turning it on the way, slowly down to 2 mm over its top, let go -- the cup's vent held open -- up.
    The places are along the dotted arc 130 mm from the base axis, 25 mm in from the dropoff
    area's outer edge, 5 mm apart at their corners nearest the arm, centred on the arm's centre line, each letter
-   turned and the word ordered for where its **reader** stands, the choice beside the grip box:
+   turned and the word ordered for where its **reader** stands, the choice beside tile offset:
    - **back**, behind the arm: each letter's top away from the arm, the word from the arm's left to its right;
    - **front**, facing the arm: each letter's top towards it, the word from the arm's right to its left;
    - **left**, **right**, at that side of the arm: each letter turned a quarter, its top away from the reader, the
      word read top to bottom, from the far end of the arc to the near one.
 
-   The tile height, the grip and the reader are the app's settings, kept in `config/appcfg.json` as soon as they
+   The tile height, the tile offset and the reader are the app's settings, kept in `config/appcfg.json` as soon as they
    change, and used by the /IOTCONNECT app too; the file holds only what differs from the defaults. A turn the cup
    cannot make after the grip, past 90 degrees, it makes half before. Each place is drawn, dashed, and filled once
    its tile is there. At the end -- or a refusal or failure on the way, but not RESET -- the arm parks and the tiles
@@ -354,10 +354,10 @@ them and the arm's centre line. Right the camera, LOCATE TILES in its heading. A
 | control             | does                                                                                 |
 | ------------------- | ------------------------------------------------------------------------------------ |
 | LOCATE TILES        | park the arm, take the snapshot at full size, find the tiles, read and place them    |
-| tiles               | how thick the tiles are, mm: `appcfg.json`                                           |
-| PLACE               | the tiles with the letters typed to the dropoff arc, gripped as deep as the grip box |
+| tile height         | how thick the tiles are, mm: `appcfg.json`                                           |
+| PLACE               | the tiles with the letters typed to the dropoff arc, gripped as deep as tile offset  |
 |                     | says; then park, and find and read the tiles again                                   |
-| grip, reader        | how far under a tile's top the cup grips it; where the word's reader stands: both    |
+| tile offset, reader | how far under a tile's top the cup grips it; where the word's reader stands: both    |
 |                     | `appcfg.json`                                                                        |
 | Areas               | the work areas and the arm's reach drawn on the desk, or not                         |
 | FULL SIZE           | the picture as large as the window allows; the tile under the pointer is said        |
@@ -366,13 +366,13 @@ them and the arm's centre line. Right the camera, LOCATE TILES in its heading. A
 
 **How the tiles are found** (`applib/tiles/`). The snapshot is resampled onto the plane of the tiles' top faces,
 the tile height up, where every tile is the same 25 mm square, perspective gone. Every colour edge votes for the
-centre of a square it could be a side of, either side of it: a tile's four sides all vote for its centre, and the seam between
-two touching tiles for both of theirs. A square is fitted to the edges round each place most voted for -- its
-centre to a few hundredths of a millimetre, its turn to a tenth of a degree, its size from 25 to 27.5 mm, as a face
-looks larger close to the camera -- and kept as a tile if each of its sides stands out from what lies just beyond
+centre of a square it could be a side of, either side of it: a tile's four sides all vote for its centre, and the
+seam between two touching tiles for both of theirs. A square is fitted to the edges round each place most voted
+for -- its centre to a few hundredths of a millimetre, its turn to a tenth of a degree, its size from 25 to 27.5
+mm, as a face looks larger close to the camera -- and kept as a tile if each of its sides stands out from what lies just beyond
 it, beyond its side face where the camera sees one. Nothing is assumed of the tiles' or the desk's colour or
 brightness. A tile cut by the picture's edge, or behind the arm, is not looked for. The squares are fitted on the
-board's other cores too (`tiles/crew.py`).
+board's other cores too (`applib/crew.py`).
 
 **How a letter is read** (`applib/letters/`). The tile's face is resampled square-on from the snapshot, along its
 sides. Ink is what is darker than the face round it; a face with none is blank, and a small round blob of ink off a

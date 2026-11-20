@@ -14,7 +14,7 @@ Commands, from the device's Commands tab in /IOTCONNECT or typed at the console:
 
 Calibrate first: the calibration app (`src/calibration/calibration.py`) writes
 config/, and this app uses what it chose there -- the camera's mode and focus, the
-tile height, the grip, the reader. The two cannot run at once: each holds the arm and the
+tile height, the tile offset, the reader. The two cannot run at once: each holds the arm and the
 camera. The device's identity is in config/ too: `iotcDeviceConfig.json`, as
 downloaded from /IOTCONNECT, and `device-cert.pem` and `device-pkey.pem`.
 
@@ -98,12 +98,11 @@ def main() -> int:
     cloud = build_cloud(args, service, telemetry, overlay, streamer)
 
     signal.signal(signal.SIGTERM, _interrupt)           # stopped as Ctrl-C stops it: the arm held, the port closed
-    stopping = Event()
     try:
         if cloud is not None:
             cloud.connect()
         print("arm        : connecting, which resets the board and homes the arm (4 s, sometimes 15)", flush=True)
-        Thread(target=app.keep_arm_connected, args=(stopping,), name="arm", daemon=True).start()
+        Thread(target=app.keep_arm_connected, name="arm", daemon=True).start()
         feed.start()
         if cloud is not None:
             cloud.start()
@@ -118,7 +117,6 @@ def main() -> int:
     except KeyboardInterrupt:
         print("\nstopping", flush=True)
     finally:
-        stopping.set()
         shut_down(app, motion, feed, service, streamer, cloud)
     return 0
 

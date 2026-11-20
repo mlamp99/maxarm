@@ -13,7 +13,7 @@ because a small step is not always a step taken. Until that read is done,
 `is_reading` tells the page that what the arm says is out of date.
 
 While the arm is not connected -- not there when the app started, or lost on the
-way -- CONNECT is tried again every CONNECT_RETRY_S, as well as from the page.
+way -- CONNECT is tried again every `motion.RECONNECT_S`, as well as from the page.
 """
 
 import threading
@@ -24,13 +24,10 @@ from typing import Callable, Deque, Optional, Tuple, Union
 
 from maxarm import MoveResult, TransportError
 
-from applib.motion import Motion, Refused
+from applib.motion import RECONNECT_S, Motion, Refused
 
 Action = Callable[[Motion], Union[MoveResult, str, None]]
 __all__ = ["Refused", "Worker"]
-
-# Each try resets the board, which homes the arm once its supply is on: seldom, so as not to keep resetting it.
-CONNECT_RETRY_S = 30.0
 
 
 @dataclass
@@ -59,7 +56,7 @@ class Worker:
         # whether anything else has moved the arm since its own last command.
         self.count = 0
         self.connection = {"status": "connecting", "detail": ""}
-        self.failed_at = 0.0                        # time.monotonic() when the arm last failed to connect, or was lost
+        self._failed_at = 0.0                       # time.monotonic() when the arm last failed to connect, or was lost
         self.is_running = True
         self.thread = threading.Thread(target=self._run, name="arm", daemon=True)
 
@@ -174,20 +171,19 @@ class Worker:
         self.last = {"label": command.label, "status": status, "detail": detail}
         command.finish(status, detail)
 
-
     def _failed(self, detail: str) -> None:
-        self.connection = {"status": "failed", "detail": f"{detail} (tried again every {CONNECT_RETRY_S:.0f} s)"}
-        self.failed_at = time.monotonic()
+        self.connection = {"status": "failed", "detail": f"{detail} (tried again every {RECONNECT_S:.0f} s)"}
+        self._failed_at = time.monotonic()
 
     def _retry(self) -> None:
-        """CONNECT, CONNECT_RETRY_S after each failure, while the arm is not connected."""
+        """CONNECT, RECONNECT_S after each failure, while the arm is not connected."""
         while True:
             is_failed = self.connection["status"] == "failed"
-            wait = CONNECT_RETRY_S - (time.monotonic() - self.failed_at) if is_failed else CONNECT_RETRY_S
+            wait = RECONNECT_S - (time.monotonic() - self._failed_at) if is_failed else RECONNECT_S
             with self.condition:
                 if self.condition.wait_for(lambda: not self.is_running, timeout=max(wait, 0.0)):
                     return
-            if self.connection["status"] == "failed" and time.monotonic() - self.failed_at >= CONNECT_RETRY_S:
+            if self.connection["status"] == "failed" and time.monotonic() - self._failed_at >= RECONNECT_S:
                 self.connect()
 
 

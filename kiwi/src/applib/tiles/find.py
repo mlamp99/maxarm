@@ -22,7 +22,7 @@ are not read here.
 The fits are most of the time taken: a cluttered view has many places voted
 for, a handful of them tiles (STATUS-kiwi). A fit owes nothing to the fit at
 another place, so the places are dealt out, a few at a time, to worker
-processes on the other cores and to this one (`crew`); the workers take the
+processes on the other cores and to this one (`applib/crew.py`); the workers take the
 view's edges up from a folder in memory, where they are kept for them. The fits
 are the same to the last digit whoever makes them, and step 3 takes them in the
 votes' order.
@@ -44,7 +44,8 @@ from maxarm import Camera
 from maxarm.geometry import BASE_FAN_DEG, bearing_degrees
 from maxarm.path import BASE_LIMIT_HALF_MM, REACH_MAX_MM
 
-from . import crew, pose, topdown, votes
+from .. import crew
+from . import pose, topdown, votes
 from .edges import EdgeField
 
 TILE_MM = 25.0

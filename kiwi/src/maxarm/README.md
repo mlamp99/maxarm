@@ -172,7 +172,7 @@ Seven values answer to the environment, each one `MAXARM_` and the constant's na
 | ----------------------------- | -------------- | ----------------------------------------------- |
 | `MAXARM_DEVICE`               | first ttyUSB   | the serial port                                 |
 | `MAXARM_MOVE_FAST_MM_S`       | 200            | fast moves                                      |
-| `MAXARM_MOVE_SLOW_MM_S`       | 10             | slow moves, and grab's and drop's ways down     |
+| `MAXARM_MOVE_SLOW_MM_S`       | 10             | slow moves, and grab() and drop() coming down   |
 | `MAXARM_SUCTION_GRAB_MS`      | 1500           | the wait for a grip                             |
 | `MAXARM_SUCTION_RELEASE_MS`   | 3000           | the wait for a release, the vent not held       |
 | `MAXARM_BASE_LIMIT_HALF_MM`   | 70             | the arm-base limit's half-width                 |

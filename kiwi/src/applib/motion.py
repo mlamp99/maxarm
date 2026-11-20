@@ -51,6 +51,9 @@ GLIDE_STEP_MM = 10.0
 # How far a jump lowers its crossing height at a time, looking for one at which
 # the far end is in reach: near the reset pose, little is.
 TRAVEL_SEARCH_STEP_MM = 5.0
+# While the arm is not connected, both apps try again this often. Each try resets the board, which homes the arm
+# once its supply is on: seldom, so as not to keep resetting it.
+RECONNECT_S = 30.0
 
 Leg = Tuple[Position, MoveType]
 
@@ -79,10 +82,8 @@ class Motion:
 
     def connect(self) -> MoveResult:
         """Open the port -- the board resets and homes the arm -- and start from the reset pose."""
-        if self.is_connected:
-            self.is_connected = False
-            self.arm.disconnect()
-        self.arm.connect()
+        self.is_connected = False
+        self.arm.connect()                         # lets go of the port first, if it still holds it
         self.is_connected = True
         self.cup, self.is_suction_on = 0.0, False
         self.use(Space.ARM)

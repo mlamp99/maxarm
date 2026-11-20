@@ -44,7 +44,8 @@ from .tunable import tunable
 MOVE_FAST_MM_S = tunable("MOVE_FAST_MM_S", 200.0)
 # Slow enough not to yank a heavy piece; every move onto the desk in grab() and drop().
 MOVE_SLOW_MM_S = tunable("MOVE_SLOW_MM_S", 10.0)
-# Off the desk again in grab() and drop(), and up to the travel height before a landing: nothing is landed on.
+# Straight up: off the desk after a grip or a release, and to the travel height before a landing. Faster than
+# MOVE_SLOW_MM_S: going up, nothing is landed on.
 MOVE_LIFT_MM_S = 30.0
 # A few millimetres at travel speed would ask the servos for a jerk at full speed.
 MOVE_MIN_MS = 150
@@ -443,6 +444,9 @@ class MaxArm:
             return self._land(self._spaces.arm.from_desk(target))
         return self._result(MoveStatus.DONE)
 
+    def _lift(self, target: Position) -> MoveResult:
+        return self._move(target, MoveType.SLOW, speed_mm_s=MOVE_LIFT_MM_S)
+
     def _land(self, target: Position) -> MoveResult:
         """Read until the servos are steady (`_steady()`): the arm is then taken to be at `target`, and their mean
         is where it is (`get_position()`)."""
@@ -582,7 +586,7 @@ class MaxArm:
             if stopped is not None:
                 return replace(stopped, deeper_mm=deeper)
             if deeper >= retry_deeper_mm:
-                lifted = self._move((target[0], target[1], travel), MoveType.SLOW, speed_mm_s=MOVE_LIFT_MM_S)
+                lifted = self._lift((target[0], target[1], travel))
                 if not lifted:
                     return replace(lifted, deeper_mm=deeper)
                 return replace(self._result(MoveStatus.NOT_GRIPPED,
@@ -592,7 +596,7 @@ class MaxArm:
                 trace_note(f"grip {state.value} at {deeper:g} mm deeper than asked; landing again deeper")
             deeper, tries = min(deeper + retry_step_mm, retry_deeper_mm), tries + 1
         self._held = self._hold(point, angle, landed)
-        result = self._move((target[0], target[1], travel), MoveType.SLOW, speed_mm_s=MOVE_LIFT_MM_S)
+        result = self._lift((target[0], target[1], travel))
         if result and tries > 1:
             result = replace(result, detail=f"sealed {deeper:g} mm deeper than asked, on try {tries}: "
                                             f"{'; '.join(judged)}")
@@ -621,7 +625,7 @@ class MaxArm:
             if stopped is not None:
                 return stopped
             self._held = None
-            return self._move(lift, MoveType.SLOW, speed_mm_s=MOVE_LIFT_MM_S)
+            return self._lift(lift)
         finally:
             if is_vent_held:
                 self._protocol.shut_vent()
@@ -639,7 +643,7 @@ class MaxArm:
             return self._result(MoveStatus.REFUSED, problem)
         here = self._desk_position()
         if here[2] < travel:
-            result = self._move((here[0], here[1], travel), MoveType.SLOW, speed_mm_s=MOVE_LIFT_MM_S)
+            result = self._lift((here[0], here[1], travel))
             if not result:
                 return result
         way = self._landings(target, travel)[0]

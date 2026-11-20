@@ -9,11 +9,11 @@
 // to 4 mm over its top, to see whether it is centred.
 // Until letters are typed in the box beside PLACE, each LOCATE TILES -- not the one after PLACE -- puts five there at
 // random from the tiles ready to pick up; PLACE carries the tiles with the letters in the box, in order, to the
-// dropoff arc, each the right way up, the cup gripping each as far under its top as the grip box says. Where each
+// dropoff arc, each the right way up, the cup gripping each as far under its top as the tile offset says. Where each
 // goes is drawn, filled once the tile is there. Then the arm parks and the tiles are found again; where the tiles
 // carried were stays drawn, dotted, with their letters, until LOCATE TILES, so that they can be put back.
 // The tiles over the picture are drawn in Python (applib/overlay), as the app's stream draws them, and laid over it;
-// the tiles' thickness, the grip and where the word's reader stands are the app's settings too, kept in
+// the tile height, the tile offset and where the word's reader stands are the app's settings too, kept in
 // config/appcfg.json; the tiles are looked for at the thickness set, and drawn at the one they were found at.
 
 import { $, api, fmt, mountHeader, report, showHeader, startPolling } from '/common/page.js';
@@ -48,7 +48,7 @@ const ui = {
   picked: null,                 // the tile last sent to, its number
   offered: null,                // the stamp of the snapshot whose letters were put in the box
   isTyped: false,               // letters typed in the box: LOCATE TILES leaves them
-  isSettingsShown: false,       // the tile height, the grip box and the reader set from the app's settings, once
+  isSettingsShown: false,       // the tile height, the tile offset and the reader set from the app's settings, once
 };
 let state = null;
 let inFlight = 0;
@@ -108,7 +108,7 @@ function visit(n) {
 function place() {
   const letters = $('word').value.trim().toUpperCase();
   if (!letters || $('place').disabled) return;
-  command('tiles/place', { letters, grip: Number($('grip').value) }, `PLACE ${letters}`);
+  command('tiles/place', { letters, offset: Number($('tile-offset').value) }, `PLACE ${letters}`);
 }
 
 // A setting changed on the page: kept for the app at once, in config/appcfg.json. Refused, the box shows again what
@@ -180,18 +180,19 @@ function choices(low, high, step, label) {
   return values;
 }
 
-// The grip's choices, from over a tile's top to deepest into it.
-const gripChoices = () => choices(...TILES.word.grip_range, TILES.word.grip_step, (value) => (value === 0 ? '0 (top)'
-  : value > 0 ? `${value.toFixed(1)} mm in` : `${(-value).toFixed(1)} mm over`));
+// The tile offset's choices, from over a tile's top to deepest into it.
+const offsetLabel = (value) => (value === 0 ? '0 (top)'
+  : value > 0 ? `${value.toFixed(1)} mm in` : `${(-value).toFixed(1)} mm over`);
+const offsetChoices = () => choices(...TILES.word.offset_range, TILES.word.offset_step, offsetLabel);
 const tileHeightChoices = () => choices(...TILES.height_range, TILES.height_step, (value) => `${value.toFixed(1)} mm`);
 
-// The grip box and the reader as the app's settings have them, the first time they come; after that, the page's.
+// The settings' boxes as the app's settings have them, the first time they come; after that, the page's.
 function renderSettings() {
   const { settings } = state;
   if (!settings || ui.isSettingsShown) return;
   ui.isSettingsShown = true;
   $('tile-height').value = settings.tile_height_mm.value;
-  $('grip').value = settings.grip_depth_mm.value;
+  $('tile-offset').value = settings.tile_offset_mm.value;
   $('reader').value = settings.reader.value;
 }
 
@@ -219,10 +220,10 @@ function renderPage() {
   }
   $('word').disabled = Boolean(problem) || !result;
   $('tile-height').disabled = Boolean(problem) || isBusy();   // settings: not tied to a detection
-  $('grip').disabled = Boolean(problem) || isBusy();
+  $('tile-offset').disabled = Boolean(problem) || isBusy();
   $('reader').disabled = Boolean(problem) || isBusy();
   $('place').disabled = Boolean(problem) || isBusy() || !result || !$('word').value.trim() || moved().size > 0
-    || $('grip').value === '' || Number.isNaN(Number($('grip').value));
+    || $('tile-offset').value === '' || Number.isNaN(Number($('tile-offset').value));
   $('word-line').innerHTML = wordLine(result, placing());
 }
 
@@ -237,8 +238,8 @@ function wordLine(result, word) {
     return before + (result.on_offer ? `On the tiles ready to pick up: <b class="letters">${result.on_offer}</b> <span `
       + `class="note">· PLACE carries the letters typed, in order, to the arc ${fmt(TILES.word.arc, 0)} mm out, `
       + `${fmt(TILES.word.gap, 0)} mm apart, each letter turned for a reader ${READER_WORDS[$('reader').value]}; `
-      + `the cup grips each tile as far in as grip says and lets it go ${fmt(TILES.word.drop_over, 0)} mm over its `
-      + 'top</span>'
+      + `the cup grips each tile as far in as tile offset says and lets it go ${fmt(TILES.word.drop_over, 0)} mm `
+      + 'over its top</span>'
       : '<span class="note">No letters on tiles ready to pick up: nothing for PLACE to carry.</span>');
   }
   if (word.status === 'placing') {
@@ -403,10 +404,12 @@ $('reader').addEventListener('change', () => keep('reader', $('reader').value));
 $('tile-height').innerHTML = tileHeightChoices().map(([value, label]) => `<option value="${value}">${label}</option>`)
   .join('');
 $('tile-height').addEventListener('change', () => keep('tile_height_mm', Number($('tile-height').value)));
-$('grip').innerHTML = gripChoices().map(([value, label]) => `<option value="${value}">${label}</option>`).join('');
-$('grip').addEventListener('input', render);
-$('grip').addEventListener('change', () => {
-  if ($('grip').value !== '' && !Number.isNaN(Number($('grip').value))) keep('grip_depth_mm', Number($('grip').value));
+$('tile-offset').innerHTML = offsetChoices().map(([value, label]) => `<option value="${value}">${label}</option>`)
+  .join('');
+$('tile-offset').addEventListener('input', render);
+$('tile-offset').addEventListener('change', () => {
+  const offset = $('tile-offset').value;
+  if (offset !== '' && !Number.isNaN(Number(offset))) keep('tile_offset_mm', Number(offset));
 });
 $('word').addEventListener('input', () => {
   ui.isTyped = $('word').value.trim() !== '';

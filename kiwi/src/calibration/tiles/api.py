@@ -10,10 +10,10 @@ lays over the picture: the stream's overlay, the same code.
 | `POST /api/tiles/locate`      |               | park the arm, take the snapshot, find the tiles -- as thick as  |
 |                               |               | the settings say -- read and place                              |
 | `POST /api/tiles/visit`       | n             | the cup over tile n's centre, down to 4 mm over its top face    |
-| `POST /api/tiles/place`       | letters, grip | the tiles that spell them carried to the dropoff arc, in order, |
-|                               |               | each gripped `grip` mm under its top, now kept                  |
+| `POST /api/tiles/place`       | letters,      | the tiles that spell them carried to the dropoff arc, in order, |
+|                               | offset        | each gripped `offset` mm under its top, now kept                |
 | `POST /api/settings`          | name: value   | the app's settings, `config/appcfg.json`: `tile_height_mm`,     |
-|                               |               | `grip_depth_mm`, `reader`                                       |
+|                               |               | `tile_offset_mm`, `reader`                                      |
 | `GET /api/tiles/scene.png`    | w, s, areas   | the tiles drawn for a picture `w` px wide at pixel ratio `s`;   |
 |                               |               | the work areas unless `areas` is 0                              |
 
@@ -32,7 +32,7 @@ from applib.camera.feed import Feed
 from applib.camera.fit import CameraFit
 from applib.motion import Motion
 from applib.overlay import draw_tiles, inks, picture_layer
-from applib.settings import (GRIP_DEPTH_RANGE_MM, GRIP_STEP_MM, TILE_HEIGHT_RANGE_MM, TILE_HEIGHT_STEP_MM,
+from applib.settings import (TILE_HEIGHT_RANGE_MM, TILE_HEIGHT_STEP_MM, TILE_OFFSET_RANGE_MM, TILE_OFFSET_STEP_MM,
                               Settings)
 from applib.tiles import TILE_MM, Tile
 from applib.tilework import DROP_OVER_MM, TileWork
@@ -61,7 +61,7 @@ class TilesSession:
             "areas": [area.to_json() for area in (areas.PICKUP, areas.DROPOFF)],
             "word": {"arc": areas.WORD_ARC_MM, "gap": areas.WORD_GAP_MM, "most": areas.WORD_MAX_LETTERS,
                      "readers": list(areas.READERS), "drop_over": DROP_OVER_MM,
-                     "grip_range": list(GRIP_DEPTH_RANGE_MM), "grip_step": GRIP_STEP_MM},
+                     "offset_range": list(TILE_OFFSET_RANGE_MM), "offset_step": TILE_OFFSET_STEP_MM},
             "ink": inks.to_json()}})
         server.post("/api/tiles/locate", self.locate)
         server.post("/api/tiles/visit", self.visit)
@@ -102,18 +102,18 @@ class TilesSession:
 
     def place(self, body: dict) -> dict:
         try:
-            self.settings.set(grip_depth_mm=number(body, "grip"))
+            self.settings.set(tile_offset_mm=number(body, "offset"))
         except ValueError as reason:
             raise BadRequest(str(reason)) from None
-        grip, reader = self.settings.get("grip_depth_mm"), self.settings.get("reader")
+        offset, reader = self.settings.get("tile_offset_mm"), self.settings.get("reader")
         try:
             fit = self._usable()
-            steps, stamp = self.work.plan(str(body.get("letters", "")), grip, reader)
+            steps, stamp = self.work.plan(str(body.get("letters", "")), offset, reader)
         except (Refused, word.WordRefused) as reason:
             return {"status": "refused", "detail": str(reason)}
         spelled = "".join(step.letter for step in steps)
         return self.worker.run("tiles-place", f"PLACE {spelled}: each tile to the dropoff arc in turn, gripped "
-                               f"{grip:g} mm in, for a reader at the {reader}",
+                               f"{offset:g} mm in, for a reader at the {reader}",
                                lambda motion: self.work.place(motion, steps, stamp, fit))
 
     def set_settings(self, body: dict) -> dict:

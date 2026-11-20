@@ -74,8 +74,8 @@ PyAV at its fastest, encoded once for every viewer (`src/applib/stream.py`).
 ## What the two apps share
 
 The calibration's choices carry over: the camera's mode and focus (`config/camera-view.json`, `camera.json`), and the
-app's settings, the grip height and the reader (`config/appcfg.json`, only what differs from the defaults, which are
-in `src/applib/settings.py`). So does the code: the Tiles page's LOCATE TILES and PLACE are the app's `detect` and
+app's settings, the tiles' height, the grip and the reader (`config/appcfg.json`, only what differs from the
+defaults, which are in `src/applib/settings.py`). So does the code: the Tiles page's LOCATE TILES and PLACE are the app's `detect` and
 `place` (`src/applib/tilework.py`), Fine Tune's FIND RED CUBE its `find-cube` (`src/applib/redcube.py`), and what both
 pages draw over the camera's picture is drawn in Python (`src/applib/overlay/`), the stream's overlay, laid over the
 pages' live view as a layer.

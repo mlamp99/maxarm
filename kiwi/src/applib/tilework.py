@@ -3,7 +3,7 @@
 
     work = TileWork(feed, CONFIG_DIR)
     work.detect(motion, fit, tile_height_mm=2.0)   # park the arm, take the snapshot, find, read and place the tiles
-    steps, stamp = work.plan("TEAM", grip_depth_mm=1.0, reader="back")   # raises word.WordRefused, saying why
+    steps, stamp = work.plan("TEAM", tile_offset_mm=1.0, reader="back")  # raises word.WordRefused, saying why
     work.place(motion, steps, stamp, fit)           # each tile carried to the dropoff arc; then found again
     work.scene()                                    # what the overlay draws: overlay.draw_tiles()
     work.summary()                                  # the letters, and which tiles are in trouble
@@ -77,9 +77,9 @@ class TileWork:
             return parked
         return self._find(fit, tile_height_mm)
 
-    def plan(self, text: str, grip_depth_mm: float, reader: str) -> Tuple[List[word.Step], int]:
+    def plan(self, text: str, tile_offset_mm: float, reader: str) -> Tuple[List[word.Step], int]:
         """How the word goes down, from the last detection, and that detection's stamp; raises `word.WordRefused`
-        or `Refused`, saying why. Each tile is gripped `grip_depth_mm` under its top, never under the desk, and let
+        or `Refused`, saying why. Each tile is gripped `tile_offset_mm` under its top, never under the desk, and let
         go DROP_OVER_MM over it."""
         with self.lock:
             if not self.found:
@@ -88,7 +88,7 @@ class TileWork:
                 raise Refused("tiles have been carried off since the snapshot: find them again first")
             tiles, places = [tile for tile, _ in self.tiles], [place for _, place in self.tiles]
             letters, stamp, height = self.letters, self.found["stamp"], self.found["height"]
-        return word.plan_word(text, tiles, letters, places, self.reach(), grip_mm=max(0.0, height - grip_depth_mm),
+        return word.plan_word(text, tiles, letters, places, self.reach(), grip_mm=max(0.0, height - tile_offset_mm),
                               drop_mm=height + DROP_OVER_MM, reader=reader), stamp
 
     def place(self, motion: Motion, steps: List[word.Step], stamp: int, fit: CameraFit) -> Union[MoveResult, str]:
@@ -108,7 +108,8 @@ class TileWork:
                     self._end("stopped", "RESET")
                     return MoveResult(MoveStatus.STOPPED, motion.position(Space.DESK), "RESET")
                 self._mark(index, "carrying")
-                result = motion.carry(step.start, step.end, step.upright, step.facing, word.clearance_mm(height))
+                # The clearance is the tiles' tops: the library keeps the carried tile's bottom 5 mm over them.
+                result = motion.carry(step.start, step.end, step.upright, step.facing, height)
                 self._mark(index, "placed" if result else result.status.value, result.detail)
                 if not result:
                     detail = (f"letter {index + 1} of {len(steps)}, {step.letter} from tile {step.index + 1}: "

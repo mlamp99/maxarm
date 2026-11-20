@@ -83,7 +83,7 @@ def _give_up(problem: Exception) -> None:
         workers, _workers = _workers, None
     if workers is not None:
         workers.shutdown(wait=False, cancel_futures=True)
-    print(f"tiles: the worker processes failed, so this process does their work: {type(problem).__name__}: {problem}",
+    print(f"crew: the worker processes failed, so this process does their work: {type(problem).__name__}: {problem}",
           file=sys.stderr, flush=True)
 
 

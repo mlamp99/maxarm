@@ -12,17 +12,17 @@ so the handlers below, read top to bottom, are the whole behaviour of the app:
   tiles are out of reach or too close to another.
 - `place LETTERS`: detect first, as a precaution -- tiles may have been moved by
   hand -- then set the letters down along the dropoff arc for where the reader
-  stands, each tile gripped at the grip depth, and detect again.
+  stands, each tile gripped the tile offset under its top, and detect again.
 - `find-cube [red]`: park the arm, find the red cube in the live view and bring
   the cup over it; the stream shows the cube until the next detect or place.
 - `reader-location [back|front|left|right]`: where the person reading the word
   stands, kept in `config/appcfg.json`; without one, where they stand now.
 
 The arm is connected on a thread of its own (`keep_arm_connected()`): at the
-start, and again ARM_RETRY_S after it fails or is lost, so the app runs on
+start, and again RECONNECT_S after it fails or is lost, so the app runs on
 without it and a command meanwhile is refused, saying why.
 
-The tile height, the grip and the reader are the calibration app's Tiles page's too: one
+The tile height, the tile offset and the reader are the calibration app's Tiles page's too: one
 `appcfg.json`. What the dashboard is told is written into `TelemetryState`, and
 `iotc.py` sends it: the cloud is not called from here. One command moves the arm
 at a time, under a lock, so a command that comes while another runs waits for it;
@@ -31,7 +31,7 @@ at a time, under a lock, so a command that comes while another runs waits for it
 
 from __future__ import annotations
 
-from threading import Event, Lock
+from threading import Lock
 from typing import Union
 
 from maxarm import MoveResult, TransportError
@@ -40,7 +40,7 @@ from applib import commands
 from applib.camera.fit import CameraFit
 from applib.camera.store import CameraFile
 from applib.commands import Command, CommandError
-from applib.motion import Motion, Refused
+from applib.motion import RECONNECT_S, Motion, Refused
 from applib.overlay.stream import StreamOverlay
 from applib.redcube import RedCube
 from applib.settings import Settings
@@ -48,8 +48,6 @@ from applib.telemetry import TelemetryState
 from applib.tilework import TileWork
 from applib.word import WordRefused
 
-# Each try resets the board, which homes the arm once its supply is on: seldom, so as not to keep resetting it.
-ARM_RETRY_S = 30.0
 READER_WORDS = {"back": "behind the arm", "front": "in front of the arm", "left": "at the arm's left",
                 "right": "at the arm's right"}
 
@@ -60,7 +58,7 @@ class TilesApp:
         self.motion = motion
         self.work = work                # the tiles: found, read, placed, and a word of them set down
         self.cube = cube                # the red cube found, and the cup brought over it
-        self.settings = settings        # the tile height, the grip and the reader, config/appcfg.json
+        self.settings = settings        # the tile height, the tile offset and the reader, config/appcfg.json
         self.camera_file = camera_file  # config/camera.json, the calibration
         self.overlay = overlay          # what the stream shows over the picture
         self.telemetry = telemetry      # written here, sent by iotc.py
@@ -86,7 +84,7 @@ class TilesApp:
                 raise CommandError("The app is stopping.")
             if not self.motion.is_connected:
                 raise CommandError(_sentence(f"the arm is not connected, {self.arm_problem}; it is tried again "
-                                             f"every {ARM_RETRY_S:.0f} s"))
+                                             f"every {RECONNECT_S:.0f} s"))
             try:
                 return handler(command)
             except (Refused, WordRefused) as reason:
@@ -96,15 +94,15 @@ class TilesApp:
                 self.motion.arm.disconnect()            # the port let go at once: plugged in again, the arm takes it
                 self.arm_problem = f"it stopped answering: {error}"
                 raise CommandError(_sentence(f"the arm stopped answering: {error}; it is tried again every "
-                                             f"{ARM_RETRY_S:.0f} s")) from None
+                                             f"{RECONNECT_S:.0f} s")) from None
             finally:
                 self.overlay.set_doing("")
                 self._rest()
 
-    def keep_arm_connected(self, stopping: Event) -> None:
-        """Connect the arm, and again ARM_RETRY_S after each failure or loss, until `stopping`. Its own thread."""
+    def keep_arm_connected(self) -> None:
+        """Connect the arm, and again RECONNECT_S after each failure or loss, until the app stops. Its own thread."""
         said = None
-        while not stopping.is_set():
+        while not self.motion.stopping.is_set():
             if not self.motion.is_connected:
                 with self._lock:
                     try:
@@ -113,10 +111,12 @@ class TilesApp:
                     except Exception as error:
                         self.arm_problem = str(error) or repr(error)
                 if self.arm_problem != said:
-                    print(f"arm        : {self.arm_problem or 'connected and homed'}"
-                          f"{f'; tried again every {ARM_RETRY_S:.0f} s' if self.arm_problem else ''}", flush=True)
                     said = self.arm_problem
-            stopping.wait(ARM_RETRY_S)
+                    if said:
+                        print(f"arm        : {said}; tried again every {RECONNECT_S:.0f} s", flush=True)
+                    else:
+                        print("arm        : connected and homed", flush=True)
+            self.motion.stopping.wait(RECONNECT_S)
 
     def wait_idle(self, timeout_s: float) -> bool:
         """Until no command moves the arm, at most `timeout_s`; whether none does."""
@@ -147,7 +147,7 @@ class TilesApp:
             _answer(self.work.detect(self.motion, fit, self.settings.get("tile_height_mm")))
         finally:
             self._report()
-        steps, stamp = self.work.plan(letters, self.settings.get("grip_depth_mm"), self.settings.get("reader"))
+        steps, stamp = self.work.plan(letters, self.settings.get("tile_offset_mm"), self.settings.get("reader"))
         self.overlay.set_doing(f"Placing {letters}")
         try:
             return _answer(self.work.place(self.motion, steps, stamp, fit))
@@ -197,9 +197,9 @@ class TilesApp:
         found = self.work.found
         tiles = (f"{len(found['tiles'])} tiles: {self.work.summary()['tiles'].upper()}" if found and found["tiles"]
                  else "no tiles found" if found else "waiting for a command")
-        self.overlay.set_resting(f"{tiles}   reader {self.settings.get('reader')}   tiles "
-                                 f"{self.settings.get('tile_height_mm'):g} mm, gripped "
-                                 f"{self.settings.get('grip_depth_mm'):g} mm in")
+        self.overlay.set_resting(f"{tiles}   reader {self.settings.get('reader')}   tile height "
+                                 f"{self.settings.get('tile_height_mm'):g} mm, offset "
+                                 f"{self.settings.get('tile_offset_mm'):g} mm in")
 
 
 def _answer(result: Union[MoveResult, str]) -> str:

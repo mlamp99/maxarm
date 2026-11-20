@@ -1,7 +1,7 @@
 """A word set down in the dropoff area: which tile for each letter, where it goes, and how it turns.
 
     arm.use_coordinates(Space.DESK)
-    arm.set_clearance(clearance_mm(2.0))
+    arm.set_clearance(2.0)                  # the tiles' tops: nothing crosses under them
     for step in plan_word("TEAM", tiles, letters, places, arm.can_reach, grip_mm=1.0, drop_mm=4.0, reader="left"):
         arm.carry(step.start, step.end, angle=step.upright, facing=step.facing)
 
@@ -27,13 +27,6 @@ from maxarm.geometry import Position
 from . import areas
 from .letters import Letter
 from .tiles import Tile
-
-
-def clearance_mm(tile_height_mm: float) -> float:
-    """The height nothing travels sideways under, desk mm, on the way: the tiles' tops. The library keeps the carried
-    tile, as high as the cup gripped it at, and 5 mm over that: at a grip 1 mm into the tile the cup crosses at twice
-    the tile's height and 4 mm, the carried tile's bottom 5 mm over the tiles lying on the desk."""
-    return tile_height_mm
 
 
 class WordRefused(ValueError):
