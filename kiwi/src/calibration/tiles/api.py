@@ -7,11 +7,13 @@ lays over the picture: the stream's overlay, the same code.
 
 | request                       | body          | does                                                            |
 | ----------------------------- | ------------- | --------------------------------------------------------------- |
-| `POST /api/tiles/locate`      |               | park the arm, take the snapshot, find the tiles, read and place |
+| `POST /api/tiles/locate`      |               | park the arm, take the snapshot, find the tiles -- as thick as  |
+|                               |               | the settings say -- read and place                              |
 | `POST /api/tiles/visit`       | n             | the cup over tile n's centre, down to 4 mm over its top face    |
 | `POST /api/tiles/place`       | letters, grip | the tiles that spell them carried to the dropoff arc, in order, |
-|                               |               | each gripped with the cup at desk height `grip`, mm, now kept   |
-| `POST /api/settings`          | name: value   | the app's settings, `config/appcfg.json`: `grip_mm`, `reader`   |
+|                               |               | each gripped `grip` mm under its top, now kept                  |
+| `POST /api/settings`          | name: value   | the app's settings, `config/appcfg.json`: `tile_height_mm`,     |
+|                               |               | `grip_depth_mm`, `reader`                                       |
 | `GET /api/tiles/scene.png`    | w, s, areas   | the tiles drawn for a picture `w` px wide at pixel ratio `s`;   |
 |                               |               | the work areas unless `areas` is 0                              |
 
@@ -30,15 +32,16 @@ from applib.camera.feed import Feed
 from applib.camera.fit import CameraFit
 from applib.motion import Motion
 from applib.overlay import draw_tiles, inks, picture_layer
-from applib.settings import GRIP_RANGE_MM, GRIP_STEP_MM, Settings
-from applib.tiles import TILE_HEIGHT_MM, TILE_MM, Tile
-from applib.tilework import DROP_MM, TileWork
+from applib.settings import (GRIP_DEPTH_RANGE_MM, GRIP_STEP_MM, TILE_HEIGHT_RANGE_MM, TILE_HEIGHT_STEP_MM,
+                              Settings)
+from applib.tiles import TILE_MM, Tile
+from applib.tilework import DROP_OVER_MM, TileWork
 from common.server import BadRequest, Server, number
 from common.worker import Refused, Worker
 
-# A visit comes over the tile at the height the areas allow for, then down to 4 mm over its top face.
+# A visit comes over the tile at the height the areas allow for, then down to this far over its top face.
 VISIT_OVER_MM = areas.OVER_TILE_MM
-VISIT_MM = TILE_HEIGHT_MM + 4.0
+VISIT_ABOVE_MM = 4.0
 
 
 class TilesSession:
@@ -52,11 +55,13 @@ class TilesSession:
     def register(self, server: Server) -> None:
         server.add_state(self.state)
         server.add_limits(lambda: {"tiles": {
-            "tile": TILE_MM, "height": TILE_HEIGHT_MM, "visit": {"over": VISIT_OVER_MM, "down": VISIT_MM},
+            "tile": TILE_MM, "height_range": list(TILE_HEIGHT_RANGE_MM), "height_step": TILE_HEIGHT_STEP_MM,
+            "visit": {"over": VISIT_OVER_MM, "above": VISIT_ABOVE_MM},
             "gap": areas.MIN_GAP_MM, "margin": areas.REACH_MARGIN_MM,
             "areas": [area.to_json() for area in (areas.PICKUP, areas.DROPOFF)],
             "word": {"arc": areas.WORD_ARC_MM, "gap": areas.WORD_GAP_MM, "most": areas.WORD_MAX_LETTERS,
-                     "readers": list(areas.READERS), "drop": DROP_MM, "grip_range": list(GRIP_RANGE_MM), "grip_step": GRIP_STEP_MM},
+                     "readers": list(areas.READERS), "drop_over": DROP_OVER_MM,
+                     "grip_range": list(GRIP_DEPTH_RANGE_MM), "grip_step": GRIP_STEP_MM},
             "ink": inks.to_json()}})
         server.post("/api/tiles/locate", self.locate)
         server.post("/api/tiles/visit", self.visit)
@@ -67,8 +72,9 @@ class TilesSession:
     # --- the requests -----------------------------------------------------
 
     def locate(self, body: dict) -> dict:
+        height = self.settings.get("tile_height_mm")
         return self.worker.run("tiles-locate", "LOCATE TILES: parking the arm, the snapshot, finding the tiles",
-                               lambda motion: self.work.detect(motion, self._usable()))
+                               lambda motion: self.work.detect(motion, self._usable(), height))
 
     def visit(self, body: dict) -> dict:
         n = int(number(body, "n", 1))
@@ -82,31 +88,32 @@ class TilesSession:
         if place.status is areas.Status.OUT_OF_REACH:
             return {"status": "refused", "detail": f"tile {n} is out of the arm's reach: {place.detail}"}
         return self.worker.run(
-            "tiles-visit", f"over tile {n}, desk ({tile.x:.1f}, {tile.y:.1f}), down to {VISIT_MM:.0f} mm",
-            lambda motion: self._visit(motion, tile), latest_only=True)
+            "tiles-visit", f"over tile {n}, desk ({tile.x:.1f}, {tile.y:.1f}), down to "
+                           f"{tile.height + VISIT_ABOVE_MM:g} mm", lambda motion: self._visit(motion, tile),
+            latest_only=True)
 
     @staticmethod
     def _visit(motion: Motion, tile: Tile) -> MoveResult:
-        result = motion.down_to(Space.DESK, (tile.x, tile.y, VISIT_MM), hover=VISIT_OVER_MM)
+        result = motion.down_to(Space.DESK, (tile.x, tile.y, tile.height + VISIT_ABOVE_MM), hover=VISIT_OVER_MM)
         if not result:
             return result
         return MoveResult(result.status, result.position,
-                          f"the cup is {VISIT_MM - TILE_HEIGHT_MM:.0f} mm over the tile's centre, as the camera has it")
+                          f"the cup is {VISIT_ABOVE_MM:.0f} mm over the tile's centre, as the camera has it")
 
     def place(self, body: dict) -> dict:
         try:
-            self.settings.set(grip_mm=number(body, "grip"))
+            self.settings.set(grip_depth_mm=number(body, "grip"))
         except ValueError as reason:
             raise BadRequest(str(reason)) from None
-        grip, reader = self.settings.get("grip_mm"), self.settings.get("reader")
+        grip, reader = self.settings.get("grip_depth_mm"), self.settings.get("reader")
         try:
             fit = self._usable()
             steps, stamp = self.work.plan(str(body.get("letters", "")), grip, reader)
         except (Refused, word.WordRefused) as reason:
             return {"status": "refused", "detail": str(reason)}
         spelled = "".join(step.letter for step in steps)
-        return self.worker.run("tiles-place", f"PLACE {spelled}: each tile to the dropoff arc in turn, gripped at "
-                               f"{grip:g} mm, for a reader at the {reader}",
+        return self.worker.run("tiles-place", f"PLACE {spelled}: each tile to the dropoff arc in turn, gripped "
+                               f"{grip:g} mm in, for a reader at the {reader}",
                                lambda motion: self.work.place(motion, steps, stamp, fit))
 
     def set_settings(self, body: dict) -> dict:

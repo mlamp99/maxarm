@@ -124,14 +124,16 @@ app reads it, its own points numbered on after them.
 
 The app's own settings, which the calibration app's Tiles page and the /IOTCONNECT app share (`src/applib/settings.py`):
 
-| setting   | default | what it is                                                                           |
-| --------- | ------- | ------------------------------------------------------------------------------------ |
-| `grip_mm` | 1.0     | the desk height the cup grips a tile at, mm: 0 to 6                                   |
-| `reader`  | `back`  | where the person reading a word stands, round the arm: `back`, `front`, `left`, `right` |
+| setting          | default | what it is                                                                     |
+| ---------------- | ------- | ------------------------------------------------------------------------------ |
+| `tile_height_mm` | 2.0     | how thick the tiles are, mm: 1 to 8                                            |
+| `grip_depth_mm`  | 1.0     | how far under a tile's top the cup grips it, mm: 1 over the top to 3 in        |
+| `reader`         | `back`  | where the person reading a word stands, round the arm: `back`, `front`, `left`, `right` |
 
 Only what differs from the defaults is written; a setting set back to its default is taken out, and with none left
-the file goes. Either app writes it as soon as a setting changes -- the Tiles page's grip box and reader, the app's
-`reader-location` command -- and reads it again when it has changed.
+the file goes. Either app writes it as soon as a setting changes -- the Tiles page's tiles, grip and reader boxes, the
+app's `reader-location` command -- and reads it again when it has changed. A setting the file holds that is no longer
+one, like `grip_mm`, the desk height of the grip before `grip_depth_mm`, is ignored, and gone at the next write.
 
 ## iotcDeviceConfig.json, device-cert.pem, device-pkey.pem
 

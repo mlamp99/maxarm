@@ -21,7 +21,10 @@ with a bar on each.
 
 A fit is a tile when each of its sides stands out from what lies just beyond it,
 measured the same way: the gradient across lines parallel to the side, a few
-millimetres out, the quietest of them. A side of a tile is where one material
+millimetres out, the quietest of them. On a side that faces the camera they are
+counted from the band's outer edge: the side face is the tile's own, and a 4 mm
+tile's is as wide in the view as the lines are far out, the shadow at its foot
+wider. A side of a tile is where one material
 meets another; the desk's grain has as much beside it as on it, and a side a fit
 made up has nothing there at all. The quietest, as a grain line running along
 the side, or a neighbour's corner, can fill one line but seldom all of them.
@@ -32,6 +35,7 @@ its far sides faintly, but on smooth paper.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Tuple
 
 import numpy as np
@@ -58,8 +62,8 @@ FINE_TURN_REACH_DEG = 3.0
 FINE_TURN_DEG = 1.0
 # The side faces' bottom edges count for this much of a top face's side: next to another tile there is no band.
 BAND_WEIGHT = 0.5
-# What lies beyond a side is measured on lines this far outside it, mm: past the tile's side face, which the
-# camera sees beyond the sides facing it.
+# What lies beyond a side is measured on lines this far outside it, mm; outside the foot of its side face, where
+# the camera sees one beyond it.
 BEYOND_MM = (6.0, 7.5, 9.0)
 
 
@@ -100,16 +104,30 @@ def outline(centre, turn_rad: float, size_mm: float, step_mm: float):
     return np.array(points), np.array(normals)
 
 
+@lru_cache(maxsize=4096)
+def _outline_round_origin(turn_rad: float, size_mm: float, step_mm: float):
+    """`outline()` round (0, 0), kept: the searches ask for the same turns and sizes at every place, and a step
+    that moves a pose's centre alone asks again for the one it had. Not to be written to."""
+    points, normals = outline((0.0, 0.0), turn_rad, size_mm, step_mm)
+    points.flags.writeable = normals.flags.writeable = False
+    return points, normals
+
+
 def _edges(field: EdgeField, centre, turn_rad: float, size_mm: float, step_mm: float):
     """What a pose is scored on, round (0, 0): the top face's four sides, then the bottom edges of the side faces,
     seen beyond the sides that face the camera. Points and normals (8, n, 2), and each edge's weight (8,)."""
-    points, normals = outline((0.0, 0.0), turn_rad, size_mm, step_mm)
-    camera = field.camera_xyz
-    # Where the desk under the top face's edge is seen in the view, from that edge: towards the camera's foot.
-    band = (camera[:2] - np.asarray(centre)) * field.view.height_mm / camera[2]
+    points, normals = _outline_round_origin(turn_rad, size_mm, step_mm)
+    band = _band(field, centre)
     facing = np.clip(normals[:, 0] @ band / max(float(np.linalg.norm(band)), 1e-9), 0.0, 1.0)
     return (np.concatenate((points, points + band)), np.concatenate((normals, normals)),
             np.concatenate((np.ones(4), BAND_WEIGHT * facing)))
+
+
+def _band(field: EdgeField, centre) -> np.ndarray:
+    """Where the desk under a top face's edge is seen in the view, from that edge: towards the camera's foot, as far
+    as the tile is thick and the camera low."""
+    camera = field.camera_xyz
+    return (camera[:2] - np.asarray(centre)) * field.view.height_mm / camera[2]
 
 
 def rough_fit(field: EdgeField, near: Tuple[float, float], size_mm: float) -> Fit:
@@ -139,7 +157,8 @@ def measure(field: EdgeField, centre, turn_rad: float, size_mm: float) -> Fit:
     """How a square there lies on the view: each side, and the same just beyond it."""
     points, normals = outline(centre, turn_rad, size_mm, SAMPLE_MM)
     sides = _side(field.across(points, normals))
-    beyond = np.min([np.median(field.across(points + normals * distance, normals), axis=1)
+    side_face = np.clip(normals[:, 0] @ _band(field, centre), 0.0, None)[:, None, None]
+    beyond = np.min([np.median(field.across(points + normals * (side_face + distance), normals), axis=1)
                      for distance in BEYOND_MM], axis=0)
     seen = field.is_seen(points.reshape(-1, 2))
     return Fit((float(centre[0]), float(centre[1])), _turn_deg(turn_rad), float(size_mm),
@@ -156,7 +175,7 @@ def _search(field: EdgeField, centre: np.ndarray, turns: np.ndarray, reach_mm: f
     normals = np.array([shape[1] for shape in shapes])
     weights = np.array([shape[2] for shape in shapes])           # turns, 8
     shifted = points[:, None] + grid[None, :, None, None, :]     # turns, grid, 8, n, 2
-    strength = field.across(shifted, np.broadcast_to(normals[:, None], shifted.shape), is_exact)
+    strength = field.across(shifted, normals[:, None], is_exact)          # the normals: a turn's, at every centre
     scores = _score(_side(strength), weights[:, None])           # turns, grid
     turn_index, grid_index = np.unravel_index(int(np.argmax(scores)), scores.shape)
     return grid[grid_index], float(turns[turn_index])
@@ -195,8 +214,17 @@ def _polish(field: EdgeField, centre: np.ndarray, turn: float, size_mm: float, s
 
 
 def _side(strength: np.ndarray) -> np.ndarray:
-    """Each side's strength from its samples, the last axis."""
-    return np.percentile(strength, SIDE_PERCENTILE, axis=-1)
+    """Each side's strength from its samples, the last axis: their SIDE_PERCENTILE, to the last digit what
+    `np.percentile()` gives -- straight between the two samples either side of it, summed its way -- without its
+    preparation, which every pose tried would pay."""
+    last = strength.shape[-1] - 1
+    at = last * (SIDE_PERCENTILE / 100.0)
+    below = int(at)
+    above = min(below + 1, last)
+    share = at - below
+    ordered = np.partition(strength, (below, above), axis=-1)
+    low, high = ordered[..., below], ordered[..., above]
+    return low + (high - low) * share if share < 0.5 else high - (high - low) * (1 - share)
 
 
 def _score(edges: np.ndarray, weights: np.ndarray) -> np.ndarray:

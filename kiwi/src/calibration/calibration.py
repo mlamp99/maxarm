@@ -5,7 +5,7 @@ and the tiles.
     ../.venv/bin/python src/calibration/calibration.py                  # then open http://localhost:8080
     ../.venv/bin/python src/calibration/calibration.py --host ::        # every address, for another machine's browser
 
-The arm is on MAXARM_DEVICE, /dev/ttyUSB0 by default. Connecting resets the
+The arm is on MAXARM_DEVICE, the first /dev/ttyUSB* by default. Connecting resets the
 board, which homes the arm: 4 s, sometimes 15. This process is the only thing
 that talks to the arm, and the only one using the camera; the pages ask it. So
 the /IOTCONNECT app (`src/main.py`) cannot run beside it. Ctrl-C holds the arm

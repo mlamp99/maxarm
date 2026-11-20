@@ -75,6 +75,10 @@ class Mesh:
                               for place, value in zip(places, values)]).reshape(-1, 2)
         self.triangles = _delaunay(plane)
         self.edges = _edges(plane, self.triangles)
+        # What `_left_at()` asks of every triangle and edge, worked out once: a position converted asks it of each
+        # of them, and a landing converts some dozens of positions (STATUS-kiwi).
+        self._shares = [_shares_of(plane[list(corners)]) for corners in self.triangles]
+        self._sides = [_side_of(plane[start], plane[end]) for start, end in self.edges]
 
     @classmethod
     def from_json(cls, stored: dict) -> "Mesh":
@@ -126,16 +130,17 @@ class Mesh:
 
     def _left_at(self, bearing_deg: float, reach_mm: float) -> np.ndarray:
         """What the pattern leaves: straight across the triangles; beyond them the nearest edge's, fading out."""
-        here = np.array([math.radians(bearing_deg) * REACH_SCALE_MM, reach_mm])
-        for corners in self.triangles:
-            shares = _barycentric(self.plane[list(corners)], here)
-            if shares.min() >= -1e-9:
-                return shares @ self.left[list(corners)]
-        best = (float(np.linalg.norm(self.plane[0] - here)), self.left[0])     # one point: its own
-        for start, end in self.edges:
-            a, b = self.plane[start], self.plane[end]
-            share = float(np.clip((here - a) @ (b - a) / max((b - a) @ (b - a), 1e-12), 0.0, 1.0))
-            gap = float(np.linalg.norm(a + share * (b - a) - here))
+        across, out = math.radians(bearing_deg) * REACH_SCALE_MM, reach_mm
+        for corners, (ax, ay, sx, sy, tx, ty) in zip(self.triangles, self._shares):
+            s = sx * (across - ax) + sy * (out - ay)
+            t = tx * (across - ax) + ty * (out - ay)
+            if min(1 - s - t, s, t) >= -1e-9:
+                return np.array([1 - s - t, s, t]) @ self.left[list(corners)]
+        first = self.plane[0]
+        best = (math.hypot(first[0] - across, first[1] - out), self.left[0])    # one point: its own
+        for (start, end), (ax, ay, dx, dy, length2) in zip(self.edges, self._sides):
+            share = min(max(((across - ax) * dx + (out - ay) * dy) / length2, 0.0), 1.0)
+            gap = math.hypot(ax + share * dx - across, ay + share * dy - out)
             if gap < best[0]:
                 best = (gap, (1 - share) * self.left[start] + share * self.left[end])
         return max(0.0, 1.0 - best[0] / FADE_MM) * best[1]
@@ -223,8 +228,15 @@ def _edges(plane: np.ndarray, triangles: List[Tuple[int, int, int]]) -> List[Tup
     return list(zip(order[:-1].tolist(), order[1:].tolist()))
 
 
-def _barycentric(corners: np.ndarray, here: np.ndarray) -> np.ndarray:
+def _shares_of(corners: np.ndarray) -> Tuple[float, ...]:
+    """A triangle's first corner, and the two rows that turn a place's offset from it into its shares of the
+    second and third corners: the first's is what they leave of 1."""
     a, b, c = corners
-    matrix = np.column_stack((b - a, c - a))
-    s, t = np.linalg.solve(matrix, here - a)
-    return np.array([1 - s - t, s, t])
+    rows = np.linalg.inv(np.column_stack((b - a, c - a)))
+    return (float(a[0]), float(a[1]), *(float(value) for value in rows.ravel()))
+
+
+def _side_of(start: np.ndarray, end: np.ndarray) -> Tuple[float, ...]:
+    """An edge's start, its run to its end, and that run's length squared."""
+    dx, dy = float(end[0] - start[0]), float(end[1] - start[1])
+    return (float(start[0]), float(start[1]), dx, dy, max(dx * dx + dy * dy, 1e-12))

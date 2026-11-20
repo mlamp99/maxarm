@@ -37,7 +37,7 @@ import numpy as np
 from maxarm.geometry import BASE_FAN_DEG, bearing_degrees
 from maxarm.path import REACH_MAX_MM, REACH_MIN_MM
 
-from .tiles import TILE_HEIGHT_MM, TILE_MM, Tile
+from .tiles import TILE_MM, Tile
 from .tiles.pose import square_corners
 
 # A tile's centre stays this far inside both reach arcs: at the arcs themselves the arm is at its limit.
@@ -150,7 +150,7 @@ def place_tiles(tiles: Sequence[Tile], can_reach: Callable[[float, float, float]
         nearest, gap = _nearest(tiles, index)
         area = next((area.name for area in (PICKUP, DROPOFF) if area.contains(tile.x, tile.y)), "")
         reach = math.hypot(tile.x, tile.y)
-        problem = reach_problem(tile.x, tile.y, can_reach)
+        problem = reach_problem(tile.x, tile.y, tile.height, can_reach)
         if problem:
             status, detail = Status.OUT_OF_REACH, problem
         elif area != PICKUP.name:
@@ -163,14 +163,15 @@ def place_tiles(tiles: Sequence[Tile], can_reach: Callable[[float, float, float]
     return places
 
 
-def reach_problem(x: float, y: float, can_reach: Callable[[float, float, float], bool]) -> str:
-    """Why the arm cannot take a tile from, or set one down at, a tile centre (x, y), desk mm; "" if it can."""
+def reach_problem(x: float, y: float, height_mm: float, can_reach: Callable[[float, float, float], bool]) -> str:
+    """Why the arm cannot take a tile `height_mm` thick from, or set one down at, a tile centre (x, y), desk mm; ""
+    if it can."""
     reach = math.hypot(x, y)
     if reach < TILE_REACH_MM[0] or reach > TILE_REACH_MM[1]:
         return (f"{reach:.0f} mm from the base axis; tiles go {TILE_REACH_MM[0]:.0f} to {TILE_REACH_MM[1]:.0f}")
     if abs(bearing_degrees(x, y)) > BASE_FAN_DEG:
         return "behind the arm, where it cannot turn"
-    if not all(can_reach(x, y, z) for z in (TILE_HEIGHT_MM, TILE_HEIGHT_MM + OVER_TILE_MM)):
+    if not all(can_reach(x, y, z) for z in (height_mm, height_mm + OVER_TILE_MM)):
         return "a pose the arm cannot hold"
     return ""
 

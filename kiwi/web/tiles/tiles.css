@@ -55,6 +55,10 @@ main.tiles.is-blocked .view, main.tiles.is-blocked .live, main.tiles.is-blocked 
 .locate-line b { font-family: var(--mono); font-weight: 650; color: var(--text); }
 .locate-line .note { color: var(--faint); }
 
+label.tile-height { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--muted); }
+#tile-height { width: 4.8em; padding: 6px 5px; }
+#tile-height:disabled { opacity: 0.4; }
+
 /* PLACE: the letters to set down, beside LOCATE TILES; how it is going, under the picture. */
 .word-tools { display: inline-flex; gap: 6px; }
 #word { width: 9.5em; font: 600 14px var(--mono); letter-spacing: 2px; text-transform: uppercase; color: var(--text);

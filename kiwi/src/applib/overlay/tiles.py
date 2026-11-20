@@ -27,7 +27,6 @@ from maxarm.geometry import BASE_FAN_DEG
 from maxarm.path import REACH_MAX_MM, REACH_MIN_MM
 
 from applib import areas
-from applib.tiles import TILE_HEIGHT_MM
 
 from . import inks
 from .canvas import Canvas, Point, View, ink
@@ -109,14 +108,14 @@ def is_unread(tile: dict) -> bool:
 
 
 def _draw_tile(canvas: Canvas, view: View, tile: dict) -> None:
-    face = view.path(tile["corners"], TILE_HEIGHT_MM)
+    face = view.path(tile["corners"], tile["height"])
     if any(corner is None for corner in face):
         return
     colour = ink(inks.UNREAD if is_unread(tile) else inks.STATUS[tile["status"]])
     canvas.lines(face, colour, 1.0, 0.6, closed=True)
     text, corner, is_ringed = letter_badge(tile)
     if corner is not None:
-        at = view.at(corner[0], corner[1], TILE_HEIGHT_MM)
+        at = view.at(corner[0], corner[1], tile["height"])
     else:
         top = min(face, key=lambda point: point[1])
         at = (top[0], top[1] - BADGE_OVER * canvas.scale)
@@ -125,20 +124,20 @@ def _draw_tile(canvas: Canvas, view: View, tile: dict) -> None:
 
 def _draw_carried(canvas: Canvas, view: View, tile: dict) -> None:
     """Where a tile a word took was, and how its letter lay."""
-    face = view.path(tile["corners"], TILE_HEIGHT_MM)
+    face = view.path(tile["corners"], tile["height"])
     if any(corner is None for corner in face):
         return
     grey = inks.BGR["carried"]
     canvas.lines(face, grey, 1.2, 0.75, dash=(2, 3), closed=True)
-    canvas.lines(view.path(chevron_up(tile), TILE_HEIGHT_MM), grey, 1.5, 0.75)
+    canvas.lines(view.path(chevron_up(tile), tile["height"]), grey, 1.5, 0.75)
     text, corner, is_ringed = letter_badge(tile)
     x, y = corner if corner is not None else (tile["x"], tile["y"])
-    _badge(canvas, text, view.at(x, y, TILE_HEIGHT_MM), grey, is_ringed, is_faint=True)
+    _badge(canvas, text, view.at(x, y, tile["height"]), grey, is_ringed, is_faint=True)
 
 
 def _draw_word(canvas: Canvas, view: View, word: dict) -> None:
     for step in word["steps"]:
-        face = view.path(step["corners"], TILE_HEIGHT_MM)
+        face = view.path(step["corners"], step["height"])
         if any(corner is None for corner in face):
             continue
         colour = ink(inks.word_ink(step["status"]))
@@ -146,7 +145,7 @@ def _draw_word(canvas: Canvas, view: View, word: dict) -> None:
             canvas.fill(face, colour, 0.3)
         canvas.lines(face, colour, 1.5, 0.9, closed=True, dash=None if step["status"] == "placed" else (5, 4))
         _, corner, _ = letter_badge({**step, "is_read": True, "upright": step["facing"]})
-        _badge(canvas, step["letter"], view.at(corner[0], corner[1], TILE_HEIGHT_MM), colour, False)
+        _badge(canvas, step["letter"], view.at(corner[0], corner[1], step["height"]), colour, False)
 
 
 def _badge(canvas: Canvas, text: str, at: Point, colour, is_ringed: bool, is_faint: bool = False) -> None:

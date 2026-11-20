@@ -1,7 +1,7 @@
 """The app's own settings, which the calibration app's pages and the /IOTCONNECT app share: `config/appcfg.json`.
 
     settings = Settings(CONFIG_DIR)
-    settings.get("grip_mm")                 # 2.0 until someone sets it
+    settings.get("grip_depth_mm")           # 1.0 until someone sets it
     settings.set(reader="left")             # written at once
     settings.to_json()                      # every setting, its value and its default, for a page
 
@@ -20,14 +20,17 @@ from pathlib import Path
 from typing import Callable, Dict, Optional
 
 from . import areas
+from .tiles import TILE_HEIGHT_MM
 
 APPCFG_FILE = "appcfg.json"
 
-# Where the cup grips a tile, desk mm: on the 2 mm tile's top, a grip that does not seal tried again deeper
-# (`tilework.py`) (the owner's, 9 Nov). It goes down to the desk and up to a visit's height, 4 mm over the tile's top.
-GRIP_MM = 2.0
-# What the tiles page offers: 1 mm over a tile's top down to the desk, in GRIP_STEP_MM.
-GRIP_RANGE_MM = (0.0, 3.0)
+# How thick the tiles are (`tiles/find.py`), in TILE_HEIGHT_STEP_MM: what the tiles page offers.
+TILE_HEIGHT_RANGE_MM = (1.0, 8.0)
+TILE_HEIGHT_STEP_MM = 0.5
+# How far under a tile's top the cup grips it, its bellows pressed in that far: 1 mm (the owner's). What the tiles page
+# offers: 1 mm over the top to 3 mm in, in GRIP_STEP_MM; the cup never goes under the desk (`tilework.py`).
+GRIP_DEPTH_MM = 1.0
+GRIP_DEPTH_RANGE_MM = (-1.0, 3.0)
 GRIP_STEP_MM = 0.5
 READER = "back"
 
@@ -39,16 +42,18 @@ class Setting:
     about: str
 
 
-def _grip(value: object) -> float:
-    try:
-        grip = round(float(value), 1)
-    except (TypeError, ValueError):
-        raise ValueError(f"the grip height is a number of mm, not {value!r}") from None
-    if not GRIP_RANGE_MM[0] <= grip <= GRIP_RANGE_MM[1]:
-        raise ValueError(f"the grip height goes from {GRIP_RANGE_MM[0]:g} to {GRIP_RANGE_MM[1]:g} mm, not {grip:g}")
-    if abs(grip / GRIP_STEP_MM - round(grip / GRIP_STEP_MM)) > 1e-6:
-        raise ValueError(f"the grip height goes in steps of {GRIP_STEP_MM:g} mm, not {grip:g}")
-    return grip
+def _millimetres(what: str, low: float, high: float, step: float) -> Callable[[object], float]:
+    def accept(value: object) -> float:
+        try:
+            mm = round(float(value), 1)
+        except (TypeError, ValueError):
+            raise ValueError(f"the {what} is a number of mm, not {value!r}") from None
+        if not low <= mm <= high:
+            raise ValueError(f"the {what} goes from {low:g} to {high:g} mm, not {mm:g}")
+        if abs(mm / step - round(mm / step)) > 1e-6:
+            raise ValueError(f"the {what} goes in steps of {step:g} mm, not {mm:g}")
+        return mm
+    return accept
 
 
 def _reader(value: object) -> str:
@@ -59,7 +64,10 @@ def _reader(value: object) -> str:
 
 
 SETTINGS: Dict[str, Setting] = {
-    "grip_mm": Setting(GRIP_MM, _grip, "the desk height the cup grips a tile at, mm"),
+    "tile_height_mm": Setting(TILE_HEIGHT_MM, _millimetres("tile height", *TILE_HEIGHT_RANGE_MM, TILE_HEIGHT_STEP_MM),
+                              "how thick the tiles are, mm"),
+    "grip_depth_mm": Setting(GRIP_DEPTH_MM, _millimetres("grip depth", *GRIP_DEPTH_RANGE_MM, GRIP_STEP_MM),
+                             "how far under a tile's top the cup grips it, mm"),
     "reader": Setting(READER, _reader, "where the person reading the word stands, round the arm"),
 }
 

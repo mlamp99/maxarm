@@ -16,12 +16,12 @@ import os
 import time
 from typing import Callable, Optional
 
-DEVICE = os.environ.get("MAXARM_DEVICE", "/dev/ttyUSB0")
-BAUD = 115200
-
-# The bridge is a CH340-class part, so a MaxArm is always `ttyUSB`. Only used to
-# say what *is* plugged in when the asked-for port is not there.
+# The bridge is a CH340-class part, so a MaxArm is always `ttyUSB`, and on the board it is the only one. Unless
+# MAXARM_DEVICE names a port, each open takes the first there is: plugged in again while the port was held, the arm
+# comes back under the next number.
+DEVICE = os.environ.get("MAXARM_DEVICE", "")
 PORT_PATTERNS = ("/dev/ttyUSB*",)
+BAUD = 115200
 
 
 class TransportError(RuntimeError):
@@ -37,7 +37,7 @@ class SerialTransport:
 
     def __init__(self, device: str = DEVICE, read_timeout_s: float = 1.0,
                  port_factory: Optional[Callable[[], object]] = None) -> None:
-        self.device = device
+        self.device = device            # "": the first `PORT_PATTERNS` port at each open
         self.read_timeout_s = read_timeout_s
         self._port_factory = port_factory
         self._port = None
@@ -46,7 +46,8 @@ class SerialTransport:
         if self._port is not None:
             return
         port = (self._port_factory or _load_pyserial())()
-        port.port = self.device
+        device = self.device or _first_port()
+        port.port = device
         port.baudrate = BAUD
         port.timeout = self.read_timeout_s
         # Both sides of open(): it does not stop the reset, but asserting them
@@ -56,7 +57,7 @@ class SerialTransport:
         try:
             port.open()
         except Exception as error:
-            raise TransportError(_why_it_would_not_open(self.device, error)) from error
+            raise TransportError(_why_it_would_not_open(device, error)) from error
         port.dtr = False
         port.rts = False
         self._port = port
@@ -122,8 +123,21 @@ def _why_it_would_not_open(device: str, error: Exception) -> str:
     return f"cannot open {device}: {error}"
 
 
+def _first_port() -> str:
+    found = _ports()
+    if not found:
+        raise TransportError(f"no arm: nothing matches {' or '.join(PORT_PATTERNS)} -- its USB cable is unplugged, "
+                             f"or the board has no CH340 driver (scripts/install-ch341.sh)")
+    return found[0]
+
+
+def _ports() -> list:
+    """The ports there are, by number: ttyUSB2 before ttyUSB10."""
+    return sorted((path for pattern in PORT_PATTERNS for path in glob.glob(pattern)), key=lambda path: (len(path), path))
+
+
 def _ports_that_do_exist() -> str:
-    found = sorted(path for pattern in PORT_PATTERNS for path in glob.glob(pattern))
+    found = _ports()
     if not found:
         return f" Nothing matches {' or '.join(PORT_PATTERNS)} either."
     return f" What is there: {', '.join(found)} -- point $MAXARM_DEVICE at the right one."

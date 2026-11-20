@@ -21,7 +21,10 @@ Python keeps each frame as the camera gave it -- the camera's own JPEG, or YUYV
 wanted. A frame the camera's driver marks as damaged (a JPEG cut short) is
 dropped as it comes.
 
-Zoom, pan and tilt are put to the widest, straight view (`controls.py`). The
+Zoom, pan and tilt are put to the widest, straight view (`controls.py`), and
+the camera's backlight compensation is put off: over a dark desk it lightens
+the picture until what is light on the desk is washed out, a tile's white
+letter with its face. The
 focus is held still: a camera focusing moves its picture, the C920's by up to
 4%, desk points up to 17 mm (STATUS-impala §11). It is the focus `camera.json`
 was calibrated at, for the same camera; with none, the camera focuses itself
@@ -44,7 +47,7 @@ gi.require_version("Gst", "1.0")
 from gi.repository import Gst  # noqa: E402  (gi wants the version first)
 
 from . import store  # noqa: E402
-from .controls import FOCUS, FOCUS_AUTO, PAN, TILT, ZOOM, Controls  # noqa: E402
+from .controls import BACKLIGHT, FOCUS, FOCUS_AUTO, PAN, TILT, ZOOM, Controls  # noqa: E402
 from .devices import QUALITY, Mode, describe, find_camera, query, view_modes  # noqa: E402
 
 if TYPE_CHECKING:
@@ -104,13 +107,14 @@ def describe_pipeline(source: str, stream_branch: Optional[str]) -> str:
 
 
 def point_camera(controls: Controls, focus: Optional[int]) -> None:
-    """Zoom at its least, the widest view; pan and tilt straight; the focus held at `focus` or, None, the camera
-    focusing itself. A control the camera does not have is left alone."""
+    """Zoom at its least, the widest view; pan and tilt straight; backlight compensation off; the focus held at
+    `focus` or, None, the camera focusing itself. A control the camera does not have is left alone."""
     zoom = controls.least(ZOOM)
     if zoom is not None:
         controls.set(ZOOM, zoom)
     controls.set(PAN, 0)
     controls.set(TILT, 0)
+    controls.set(BACKLIGHT, 0)
     controls.set(FOCUS_AUTO, 1 if focus is None else 0)
     if focus is not None:
         controls.set(FOCUS, focus)

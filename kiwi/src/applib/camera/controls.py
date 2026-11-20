@@ -1,4 +1,5 @@
-"""The camera's own controls -- focus, zoom, pan, tilt -- read and set on its /dev/videoN while GStreamer streams.
+"""The camera's own controls -- focus, zoom, pan, tilt, backlight -- read and set on its /dev/videoN while GStreamer
+streams.
 
     controls = Controls("/dev/video1")
     controls.set(FOCUS_AUTO, 0)
@@ -18,8 +19,10 @@ from typing import Optional
 _VIDIOC_G_CTRL = 0xC008561B             # _IOWR('V', 27, struct v4l2_control), 8 bytes
 _VIDIOC_S_CTRL = 0xC008561C             # _IOWR('V', 28, struct v4l2_control)
 _VIDIOC_QUERYCTRL = 0xC0445624          # _IOWR('V', 36, struct v4l2_queryctrl), 68 bytes
+_USER_CLASS = 0x00980900
 _CAMERA_CLASS = 0x009A0900
 
+BACKLIGHT = _USER_CLASS + 28            # backlight compensation
 PAN = _CAMERA_CLASS + 8
 TILT = _CAMERA_CLASS + 9
 FOCUS = _CAMERA_CLASS + 10

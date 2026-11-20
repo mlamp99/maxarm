@@ -1,6 +1,6 @@
 """A tile's top face as a flat, square-on image, sampled straight from the camera frame.
 
-The camera maps the plane of the tiles' top faces to pixels by a homography, so
+The camera maps the plane of the tiles' top faces, `Tile.height` up, to pixels by a homography, so
 a window laid out in desk millimetres on that plane -- centred on the tile,
 turned to its sides -- is one resampling of the original frame. Quarter turn
 `quarter` lays the window out along the tile's sides turned by `quarter` x 90
@@ -27,7 +27,7 @@ import numpy as np
 
 from maxarm import Camera
 
-from ..tiles import TILE_HEIGHT_MM, Tile
+from ..tiles import Tile
 
 # Sampled this much finer than asked, then averaged down: the frame has 2.5 to 5 px a millimetre.
 SUPERSAMPLE = 4
@@ -57,7 +57,7 @@ def window(frame: np.ndarray, camera: Camera, tile: Tile, quarter: int, window_m
     down = np.array([-math.sin(side), math.cos(side)]) * mm_per_px
     corner = np.array([tile.x, tile.y]) - (right + down) * (fine - 1) / 2
     window_to_desk = np.array([[right[0], down[0], corner[0]], [right[1], down[1], corner[1]], [0.0, 0.0, 1.0]])
-    window_to_frame = camera.plane_to_pixel(TILE_HEIGHT_MM) @ window_to_desk
+    window_to_frame = camera.plane_to_pixel(tile.height) @ window_to_desk
     image = cv2.warpPerspective(frame, window_to_frame, (fine, fine), flags=cv2.INTER_LINEAR | cv2.WARP_INVERSE_MAP,
                                 borderMode=cv2.BORDER_REPLICATE)
     if grey and image.ndim == 3:

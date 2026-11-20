@@ -27,6 +27,7 @@ tar zxf tiles.tgz
 ./calibrate.sh          # calibrate, then try it: http://<board>:8080
 ./run.sh                # the app: /IOTCONNECT, the stream, the console
 ./run.sh --no-iotc      # the app without the cloud: commands at the console
+scripts/install-service.sh calibration   # or `app`: that one started at every boot; `none`: neither
 ```
 
 The package is made on a PC by `scripts/package.sh`. `config/` is not in it, so a newer one unpacked over the old
@@ -93,6 +94,7 @@ pages' live view as a layer.
 |                     | `ch341/<uname -r>/ch341.ko`, the arm's USB serial driver for that i.MX95 image           |
 | `training/`         | `letters/`: the reader's recipe                                                          |
 | `scripts/`          | `install.sh`, `install-ch341.sh`; `package.sh` makes `tiles.tgz`, `build-ch341.sh` the driver |
+|                     | `install-service.sh` starts an app at boot (`systemd/`)                                    |
 | `agenttools/`       | the fake board and camera, the overlay drawn on the owner's stills, checks; not shipped  |
 
 The arm's library, its calls and limits: [`src/maxarm/README.md`](src/maxarm/README.md).

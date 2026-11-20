@@ -58,12 +58,16 @@
         <label class="switch" title="The work areas and the reach, drawn on the desk">
           <input type="checkbox" id="guides" checked><span class="track"></span>Areas</label>
         <button class="btn" id="expand" title="The picture as large as the window allows">⛶ FULL SIZE</button>
+        <label class="tile-height" title="How thick the tiles are: LOCATE TILES looks for their top faces that high,
+          and the grip, the release and the way across are counted from it. Kept for the app, config/appcfg.json"
+          >tiles <select id="tile-height"></select></label>
         <button class="btn primary" id="locate"
           title="Park the arm, take the snapshot at full size, and find the tiles in it">◎ LOCATE TILES</button>
         <div class="word-tools">
           <input id="word" type="text" spellcheck="false" autocomplete="off" placeholder="letters"
             title="The letters to set down, in order, from the tiles ready to pick up">
-          <label class="grip" title="How high over the desk the cup grips each tile">grip <select id="grip"></select></label>
+          <label class="grip" title="How far under each tile's top the cup presses in to grip it. Kept for the app,
+            config/appcfg.json">grip <select id="grip"></select></label>
           <label class="reader" title="Where the person reading the word stands, round the arm: each letter is turned
             and the word ordered for them. Kept for the app, config/appcfg.json">reader <select id="reader"></select>
           </label>

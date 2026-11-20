@@ -1,8 +1,8 @@
 """A word set down in the dropoff area: which tile for each letter, where it goes, and how it turns.
 
     arm.use_coordinates(Space.DESK)
-    arm.set_clearance(CLEARANCE_MM)
-    for step in plan_word("TEAM", tiles, letters, places, arm.can_reach, grip_mm=2.0, drop_mm=6.0, reader="left"):
+    arm.set_clearance(clearance_mm(2.0))
+    for step in plan_word("TEAM", tiles, letters, places, arm.can_reach, grip_mm=1.0, drop_mm=4.0, reader="left"):
         arm.carry(step.start, step.end, angle=step.upright, facing=step.facing)
 
 The tiles on offer are those ready to pick up (`areas.Status.READY`) with their
@@ -28,9 +28,12 @@ from . import areas
 from .letters import Letter
 from .tiles import Tile
 
-# Nothing travels sideways under this, desk mm, on the way: the tiles are 2 mm. The library keeps 5 mm over it,
-# and over the height of what the cup carries.
-CLEARANCE_MM = 5.0
+
+def clearance_mm(tile_height_mm: float) -> float:
+    """The height nothing travels sideways under, desk mm, on the way: the tiles' tops. The library keeps the carried
+    tile, as high as the cup gripped it at, and 5 mm over that: at a grip 1 mm into the tile the cup crosses at twice
+    the tile's height and 4 mm, the carried tile's bottom 5 mm over the tiles lying on the desk."""
+    return tile_height_mm
 
 
 class WordRefused(ValueError):
@@ -107,7 +110,7 @@ def _short(wanted: str, offered: List[str]) -> str:
 def _check_slots(slots: Sequence[areas.Slot], tiles: Sequence[Tile],
                  can_reach: Callable[[float, float, float], bool]) -> None:
     for number, slot in enumerate(slots, 1):
-        problem = areas.reach_problem(slot.x, slot.y, can_reach)
+        problem = areas.reach_problem(slot.x, slot.y, tiles[0].height, can_reach)
         if problem:
             raise WordRefused(f"letter {number} would go where the arm cannot set it down: {problem}")
     in_the_way = sorted({index + 1 for index, tile in enumerate(tiles) for slot in slots

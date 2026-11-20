@@ -7,7 +7,7 @@ sent. Both apps drive the arm through it (`applib/motion.py`). Carried from impa
 ## The calls
 
 ```python
-MaxArm(device="/dev/ttyUSB0", config_dir=Path("config"))   # both optional
+MaxArm(device="/dev/ttyUSB0", config_dir=Path("config"))   # both optional: the first ttyUSB, at each connect
 arm.connect(); arm.disconnect()                           # or: with MaxArm() as arm:
 
 arm.use_coordinates(Space.DESK)        # ARM (the default), DESK, CUSTOM, CAMERA
@@ -40,6 +40,9 @@ It is falsy unless it is `DONE`. From `grab()` and `carry()` its `deeper_mm` say
 went for the grip.
 `move()`, `down_to()`, `grab()`, `drop()`, `carry()` and `home()` all go through one internal move, which plans the whole path
 and checks every limit before anything is sent.
+
+`connect()` lets go of a port still open from before, and of the port again when it fails: the arm plugged in again
+then takes the first ttyUSB, and `connect()` once more finds it. Trying again is the caller's; both apps do it.
 
 ## Coordinate spaces
 
@@ -121,7 +124,7 @@ the base's play is then taken up the same way every time. It stays down, suction
 It is a move only: the suction, and how deep a grip should go, are not its business.
 
 **grab()** lets go of anything held, then: `down_to()` the height given, exactly, while the cup centres itself, suction on and
-waited for (1.5 s), slowly back up. The travel height is `clearance + height + 5 mm`, so the piece clears the clearance by 5 mm. Its
+waited for (1.5 s), back up at three times the speed it came down at. The travel height is `clearance + height + 5 mm`, so the piece clears the clearance by 5 mm. Its
 `angle` says which way the piece faces.
 
 `retry_deeper_mm` (`grab()` and `carry()`, 0 to 2 mm, more is a ValueError; 0 by default, the grip not checked): a
@@ -131,7 +134,10 @@ The seal it goes by is told right only against what does not move -- the desk, a
 whether a light piece came along (see the seal, below).
 
 **drop()** is the same in reverse, `down_to()` the place: the piece is turned to `angle` on the way across, and the release is waited out
-(3 s, longer than a grip: the board vents the cup for a second and then shuts the valve) before the slow lift. The
+before the lift. The vent valve is held open through both, until the cup is up: left to the board, it shuts after a
+second, the cup's bellows still springing back, and the suction they draw takes a light piece up with the cup.
+Held open, there is nothing to wait out but the bellows letting the piece down, half a second. Firmware whose nozzle
+is built otherwise keeps the board's second, and waits 3 s. The
 travel height allows for the piece hanging under the cup. `angle=None` leaves the cup alone, so the piece turns with
 the arm. The cup turns 90 degrees either way from where `grab()` centred it; more is refused, the piece still held.
 
@@ -164,11 +170,11 @@ Seven values answer to the environment, each one `MAXARM_` and the constant's na
 
 | variable                      | default        | what it changes                                 |
 | ----------------------------- | -------------- | ----------------------------------------------- |
-| `MAXARM_DEVICE`               | `/dev/ttyUSB0` | the serial port                                 |
+| `MAXARM_DEVICE`               | first ttyUSB   | the serial port                                 |
 | `MAXARM_MOVE_FAST_MM_S`       | 200            | fast moves                                      |
-| `MAXARM_MOVE_SLOW_MM_S`       | 10             | slow moves, and grab's and drop's ups and downs |
+| `MAXARM_MOVE_SLOW_MM_S`       | 10             | slow moves, and grab's and drop's ways down     |
 | `MAXARM_SUCTION_GRAB_MS`      | 1500           | the wait for a grip                             |
-| `MAXARM_SUCTION_RELEASE_MS`   | 3000           | the wait for a release                          |
+| `MAXARM_SUCTION_RELEASE_MS`   | 3000           | the wait for a release, the vent not held       |
 | `MAXARM_BASE_LIMIT_HALF_MM`   | 70             | the arm-base limit's half-width                 |
 | `MAXARM_BASE_LIMIT_HEIGHT_MM` | 200            | its height                                      |
 

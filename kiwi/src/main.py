@@ -14,7 +14,7 @@ Commands, from the device's Commands tab in /IOTCONNECT or typed at the console:
 
 Calibrate first: the calibration app (`src/calibration/calibration.py`) writes
 config/, and this app uses what it chose there -- the camera's mode and focus, the
-grip height, the reader. The two cannot run at once: each holds the arm and the
+tile height, the grip, the reader. The two cannot run at once: each holds the arm and the
 camera. The device's identity is in config/ too: `iotcDeviceConfig.json`, as
 downloaded from /IOTCONNECT, and `device-cert.pem` and `device-pkey.pem`.
 
@@ -33,6 +33,7 @@ The threads:
     webrtc     asyncio: the signalling channel, every viewer                      applib/webrtc.py
     iotc       the telemetry publisher, and paho's own MQTT thread          applib/iotc.py
     command    two: one moves the arm at a time (app/app.py)               applib/commands.py
+    arm        connects the arm, and again after it fails or is lost        app/app.py
     main       the console, or a wait for Ctrl-C
 
 /IOTCONNECT is connected first, before the arm and the camera: the cloud is
@@ -44,7 +45,7 @@ import argparse
 import signal
 import sys
 from pathlib import Path
-from threading import Event
+from threading import Event, Thread
 
 from maxarm import MaxArm
 from maxarm.spaces import CONFIG_DIR
@@ -97,11 +98,12 @@ def main() -> int:
     cloud = build_cloud(args, service, telemetry, overlay, streamer)
 
     signal.signal(signal.SIGTERM, _interrupt)           # stopped as Ctrl-C stops it: the arm held, the port closed
+    stopping = Event()
     try:
         if cloud is not None:
             cloud.connect()
         print("arm        : connecting, which resets the board and homes the arm (4 s, sometimes 15)", flush=True)
-        connect_arm(motion)
+        Thread(target=app.keep_arm_connected, args=(stopping,), name="arm", daemon=True).start()
         feed.start()
         if cloud is not None:
             cloud.start()
@@ -116,6 +118,7 @@ def main() -> int:
     except KeyboardInterrupt:
         print("\nstopping", flush=True)
     finally:
+        stopping.set()
         shut_down(app, motion, feed, service, streamer, cloud)
     return 0
 
@@ -147,14 +150,6 @@ def build_cloud(args, service: CommandService, telemetry: TelemetryState, overla
     print(f"/IOTCONNECT: {DEVICE_CONFIG}, certificate {DEVICE_CERT.name}", flush=True)
     return iotc.IotcClient(DEVICE_CONFIG, DEVICE_CERT, DEVICE_KEY, service, telemetry, VERSION, streaming=streamer,
                            on_status=overlay.set_cloud_status, on_stream_status=overlay.set_stream_status)
-
-
-def connect_arm(motion: Motion) -> None:
-    """The arm connected and homed, or the app stopped, saying why."""
-    try:
-        motion.connect()
-    except Exception as error:
-        raise SystemExit(f"the arm did not connect: {error}") from None
 
 
 def shut_down(app: TilesApp, motion: Motion, feed: Feed, service: CommandService, streamer, cloud) -> None:

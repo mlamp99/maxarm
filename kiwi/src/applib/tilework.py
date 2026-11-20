@@ -2,8 +2,8 @@
 /IOTCONNECT app both do, the same way.
 
     work = TileWork(feed, CONFIG_DIR)
-    work.detect(motion, fit)                       # park the arm, take the snapshot, find, read and place the tiles
-    steps, stamp = work.plan("TEAM", grip_mm=1.0, reader="back")   # raises word.WordRefused, saying why
+    work.detect(motion, fit, tile_height_mm=2.0)   # park the arm, take the snapshot, find, read and place the tiles
+    steps, stamp = work.plan("TEAM", grip_depth_mm=1.0, reader="back")   # raises word.WordRefused, saying why
     work.place(motion, steps, stamp, fit)           # each tile carried to the dropoff arc; then found again
     work.scene()                                    # what the overlay draws: overlay.draw_tiles()
     work.summary()                                  # the letters, and which tiles are in trouble
@@ -43,18 +43,18 @@ from .camera.fit import CameraFit
 from .camera.locate import SAME_SHAPE
 from .letters import Letter, read_letters
 from .motion import Motion, Refused
-from .tiles import TILE_HEIGHT_MM, Tile, find_tiles
+from .tiles import Tile, find_tiles
 
 COUNTED = (areas.Status.READY, areas.Status.TOO_CLOSE, areas.Status.ELSEWHERE, areas.Status.OUT_OF_REACH)
 # A detection offers this many letters for a word, at random from those on tiles ready to pick up.
 OFFERED_LETTERS = 5
-# Where the cup lets a tile go, desk mm: 2 mm over its top, where it let go while the library still sent the cup 1 mm
-# under the 3 mm over asked (the owner's, PILOT-hyena), so the tile falls no further than it did.
-DROP_MM = TILE_HEIGHT_MM + 2.0
+# Where the cup lets a tile go: this far over its top, desk mm, where it let go while the library still sent the cup
+# 1 mm under the 3 mm over asked (the owner's, PILOT-hyena), so the tile falls no further than it did.
+DROP_OVER_MM = 2.0
 # A tile's grip is not retried: the library's seal verdict holds against the desk, not for a light tile lifted into
 # the cup, and a retry can shift the tile (STATUS-jackal §17). The camera tells the tiles that did not arrive.
 # What is kept of a tile a word carried off, to draw where it was and how its letter lay: until the next detection.
-CARRIED_KEYS = ("n", "x", "y", "corners", "letter", "is_read", "upright")
+CARRIED_KEYS = ("n", "x", "y", "corners", "letter", "is_read", "upright", "height")
 
 
 class TileWork:
@@ -69,25 +69,27 @@ class TileWork:
 
     # --- what the arm does --------------------------------------------------------------------------------------
 
-    def detect(self, motion: Motion, fit: CameraFit) -> Union[MoveResult, str]:
-        """Park the arm out of the picture, take the snapshot, and find, read and place the tiles in it."""
+    def detect(self, motion: Motion, fit: CameraFit, tile_height_mm: float) -> Union[MoveResult, str]:
+        """Park the arm out of the picture, take the snapshot, and find, read and place the tiles in it: tiles
+        `tile_height_mm` thick."""
         parked = motion.reset()
         if not parked:
             return parked
-        return self._find(fit)
+        return self._find(fit, tile_height_mm)
 
-    def plan(self, text: str, grip_mm: float, reader: str) -> Tuple[List[word.Step], int]:
+    def plan(self, text: str, grip_depth_mm: float, reader: str) -> Tuple[List[word.Step], int]:
         """How the word goes down, from the last detection, and that detection's stamp; raises `word.WordRefused`
-        or `Refused`, saying why."""
+        or `Refused`, saying why. Each tile is gripped `grip_depth_mm` under its top, never under the desk, and let
+        go DROP_OVER_MM over it."""
         with self.lock:
             if not self.found:
                 raise Refused("no tiles found yet: find them first, a word is made of them")
             if self.moved():
                 raise Refused("tiles have been carried off since the snapshot: find them again first")
             tiles, places = [tile for tile, _ in self.tiles], [place for _, place in self.tiles]
-            letters, stamp = self.letters, self.found["stamp"]
-        return word.plan_word(text, tiles, letters, places, self.reach(), grip_mm=grip_mm, drop_mm=DROP_MM,
-                              reader=reader), stamp
+            letters, stamp, height = self.letters, self.found["stamp"], self.found["height"]
+        return word.plan_word(text, tiles, letters, places, self.reach(), grip_mm=max(0.0, height - grip_depth_mm),
+                              drop_mm=height + DROP_OVER_MM, reader=reader), stamp
 
     def place(self, motion: Motion, steps: List[word.Step], stamp: int, fit: CameraFit) -> Union[MoveResult, str]:
         """Each tile carried to its place in turn; then the arm parked and the tiles found again. `stamp`: the
@@ -96,16 +98,17 @@ class TileWork:
         with self.lock:
             if not self.found or self.found["stamp"] != stamp:
                 raise Refused("the tiles have been found again since the word was planned on them: place it again")
+            height = self.found["height"]
             self.word = {"letters": spelled, "status": "placing", "detail": "",
                          "steps": [{"n": step.index + 1, "letter": step.letter, **step.slot.to_json(),
-                                    "status": "waiting", "detail": ""} for step in steps]}
+                                    "height": height, "status": "waiting", "detail": ""} for step in steps]}
         try:
             for index, step in enumerate(steps):
                 if motion.stopping.is_set():
                     self._end("stopped", "RESET")
                     return MoveResult(MoveStatus.STOPPED, motion.position(Space.DESK), "RESET")
                 self._mark(index, "carrying")
-                result = motion.carry(step.start, step.end, step.upright, step.facing, word.CLEARANCE_MM)
+                result = motion.carry(step.start, step.end, step.upright, step.facing, word.clearance_mm(height))
                 self._mark(index, "placed" if result else result.status.value, result.detail)
                 if not result:
                     detail = (f"letter {index + 1} of {len(steps)}, {step.letter} from tile {step.index + 1}: "
@@ -164,9 +167,9 @@ class TileWork:
 
     # --- inside -------------------------------------------------------------------------------------------------
 
-    def _find(self, fit: CameraFit, carried: Optional[List[dict]] = None, placed: str = "") -> str:
-        """The snapshot, the tiles in it found, read and placed; the arm out of the picture. `carried`: where the
-        tiles a word carried were, and `placed`, how it went."""
+    def _find(self, fit: CameraFit, height: float, carried: Optional[List[dict]] = None, placed: str = "") -> str:
+        """The snapshot, the tiles `height` thick in it found, read and placed; the arm out of the picture.
+        `carried`: where the tiles a word carried were, and `placed`, how it went."""
         try:
             frame, described = self.feed.snapshot()
         except RuntimeError as reason:
@@ -177,7 +180,7 @@ class TileWork:
         except ValueError as reason:
             raise Refused(f"{reason}: the calibration holds for its own frame size only") from None
         started = time.monotonic()
-        tiles = find_tiles(frame, camera)
+        tiles = find_tiles(frame, camera, height)
         seconds = time.monotonic() - started
         started = time.monotonic()
         letters = read_letters(frame, camera, tiles)
@@ -193,7 +196,7 @@ class TileWork:
                 "tiles": [{"n": index + 1, **tile.to_json(), **place.to_json(), **letter.to_json(),
                            "nearest": None if place.nearest is None else place.nearest + 1}
                           for index, ((tile, place), letter) in enumerate(zip(self.tiles, letters))],
-                "counts": counts, "taken": time.strftime("%H:%M:%S"), "stamp": time.time_ns(),
+                "counts": counts, "height": height, "taken": time.strftime("%H:%M:%S"), "stamp": time.time_ns(),
                 "frame": [frame.shape[1], frame.shape[0]], "seconds": round(seconds, 2),
                 "reading": round(reading, 2), "described": described,
                 "on_offer": "".join(sorted(on_offer)),
@@ -207,10 +210,11 @@ class TileWork:
         with self.lock:
             carried = self.found["carried"] + [{key: tile[key] for key in CARRIED_KEYS}
                                                for tile in self.found["tiles"] if tile["n"] in self.moved()]
+            height = self.found["height"]
         parked = motion.reset()                         # out of the picture
         if not parked:
             return f"{placed}; the arm did not park, so the tiles are not found again: {parked.detail}"
-        return f"{placed}; found again: {self._find(fit, carried, placed)}"
+        return f"{placed}; found again: {self._find(fit, height, carried, placed)}"
 
     def _mark(self, index: int, status: str, detail: str = "") -> None:
         with self.lock:

@@ -19,7 +19,8 @@ It needs `src/requirements.txt` (`src/requirements-pc.txt` on a PC); the web ser
 The pages' own files are in the pilot's [`web/`](../../web/), a directory per page; their requests are answered here,
 and what the /IOTCONNECT app does the same way is in [`applib/`](../applib/): the tiles' flow, the red cube's, the
 camera, the arm's moves, and what is drawn over the camera's picture.
-Connecting resets the board, which homes the arm: 4 s, sometimes 15.
+Connecting resets the board, which homes the arm: 4 s, sometimes 15. While the arm is not connected -- not there
+at the start, or lost on the way -- it is tried again every 30 s, and CONNECT tries at once.
 This process is the only thing that talks to the arm, and the only one using the camera: the /IOTCONNECT app cannot
 run beside it. Ctrl-C holds the arm where it is and closes the port.
 
@@ -155,7 +156,8 @@ MJPG, its own JPEGs passed on, faster. The choice is there only when the YUYV is
 a warning, sets the calibration and everything in its pixels aside, as `*-previous`: CALIBRATE again. Its focus is
 held still, since focusing moves the picture (the C920's by up to 4%): at the focus `camera.json` was calibrated
 at (`lens`), for the same camera; with none, the camera focuses itself once, until its picture keeps still, and
-CALIBRATE keeps where it stopped. Zoom is at its least, the widest view; pan and tilt at 0.
+CALIBRATE keeps where it stopped. Zoom is at its least, the widest view; pan and tilt at 0; backlight compensation
+off, so that a dark desk does not wash out what is light on it.
 The camera is read through GStreamer (`applib/camera/feed.py`): a frame its driver marks damaged is dropped, and the
 camera's own JPEGs go to the page as they come. The snapshot is five fresh frames of the view averaged: nothing
 pauses for it. The document camera's raw format, YUYV, shows the same picture, at 2 frames a second
@@ -301,7 +303,9 @@ Left the view from above, with the work areas: **pickup**, green, the outer two 
 them and the arm's centre line. Right the camera, LOCATE TILES in its heading. Across the bottom the tiles' table.
 
 1. **Set the tiles down**, letters up, where the camera sees them. A letter is a capital printed in black marker;
-   on a letter that is another turned -- M and W -- a dot at its bottom right says which it is.
+   on a letter that is another turned -- M and W -- a dot at its bottom right says which it is. Say how thick they
+   are in **tiles**, beside LOCATE TILES: 2 mm to start. The tiles are looked for that high, and the grip, the
+   release and the way across are counted from it.
 2. **LOCATE TILES.** The arm parks the way CALIBRATE parks it, out of the picture; the camera takes its snapshot at
    full size -- under 2 s -- and the tiles are found in it, about 2 s more. The live view shows them outlined on
    it. Each tile is
@@ -321,15 +325,16 @@ them and the arm's centre line. Right the camera, LOCATE TILES in its heading. A
    points, degrees from desk +x, starred when it reads the same turned (N, S, Z upside down; O, X any way). The
    letters, left to right, are said under the picture.
 3. **Try a tile's centre.** A tile clicked, on the grid, over the picture full size, or its row's *go*: the cup
-   comes over its centre at 14 mm over the desk, then slowly down to 6, 4 mm over the tile's top. It should be
+   comes over its centre at 14 mm over the desk, then slowly down to 4 mm over the tile's top. It should be
    centred on it. A tile out of reach is refused, nothing moved.
 4. **Set a word down.** Until letters are typed in the box beside PLACE, LOCATE TILES puts five there at random
    from the tiles ready to pick up; type any others, as many as there are ready tiles for. Letters typed stay, LOCATE
    after LOCATE; emptied, the box is offered letters again. PLACE checks them -- letters on ready tiles, read,
    each tile once, nothing found lying where they go -- and refuses, saying why, before the arm moves. Then each
-   tile in turn: the cup over it, slowly down to the height in the grip box beside PLACE -- 1 mm to start, under the
-   tile's top -- read there, grip, up; across to its place at 15 mm, turning it on the way, slowly down to 5 mm, 3 mm
-   over its top, let go, up. The places are along the dotted arc 130 mm from the base axis, 25 mm in from the dropoff
+   tile in turn: the cup over it, slowly down as far under the tile's top as the grip box beside PLACE says -- 1 mm
+   to start -- read there, grip, up; across to its place with the cup at twice the tile's thickness and 4 mm, 8 mm for
+   2 mm tiles, turning it on the way, slowly down to 2 mm over its top, let go -- the cup's vent held open -- up.
+   The places are along the dotted arc 130 mm from the base axis, 25 mm in from the dropoff
    area's outer edge, 5 mm apart at their corners nearest the arm, centred on the arm's centre line, each letter
    turned and the word ordered for where its **reader** stands, the choice beside the grip box:
    - **back**, behind the arm: each letter's top away from the arm, the word from the arm's left to its right;
@@ -337,9 +342,9 @@ them and the arm's centre line. Right the camera, LOCATE TILES in its heading. A
    - **left**, **right**, at that side of the arm: each letter turned a quarter, its top away from the reader, the
      word read top to bottom, from the far end of the arc to the near one.
 
-   The grip height and the reader are the app's settings, kept in `config/appcfg.json` as soon as they change, and
-   used by the /IOTCONNECT app too; the file holds only what differs from the defaults. A turn the cup cannot make
-   after the grip, past 90 degrees, it makes half before. Each place is drawn, dashed, and filled once
+   The tile height, the grip and the reader are the app's settings, kept in `config/appcfg.json` as soon as they
+   change, and used by the /IOTCONNECT app too; the file holds only what differs from the defaults. A turn the cup
+   cannot make after the grip, past 90 degrees, it makes half before. Each place is drawn, dashed, and filled once
    its tile is there. At the end -- or a refusal or failure on the way, but not RESET -- the arm parks and the tiles
    are found and read again in a new snapshot, as LOCATE TILES finds them. Where the tiles carried were stays
    drawn, dotted grey, the letter faint at its corner and a chevron to where its top pointed -- to put the tiles
@@ -349,22 +354,25 @@ them and the arm's centre line. Right the camera, LOCATE TILES in its heading. A
 | control             | does                                                                                 |
 | ------------------- | ------------------------------------------------------------------------------------ |
 | LOCATE TILES        | park the arm, take the snapshot at full size, find the tiles, read and place them    |
-| PLACE               | the tiles with the letters typed to the dropoff arc, gripped at the grip box's z;   |
-|                     | then park, and find and read the tiles again                                         |
-| grip, reader        | where the cup grips a tile, desk mm; where the word's reader stands: `appcfg.json`   |
+| tiles               | how thick the tiles are, mm: `appcfg.json`                                           |
+| PLACE               | the tiles with the letters typed to the dropoff arc, gripped as deep as the grip box |
+|                     | says; then park, and find and read the tiles again                                   |
+| grip, reader        | how far under a tile's top the cup grips it; where the word's reader stands: both    |
+|                     | `appcfg.json`                                                                        |
 | Areas               | the work areas and the arm's reach drawn on the desk, or not                         |
 | FULL SIZE           | the picture as large as the window allows; the tile under the pointer is said        |
 | a tile, *go*        | the cup over the tile's centre, down to 4 mm over its top                            |
 | RESET               | stop, let go, lift clear of the desk and of what is on it, and home                  |
 
 **How the tiles are found** (`applib/tiles/`). The snapshot is resampled onto the plane of the tiles' top faces,
-2 mm up, where every tile is the same 25 mm square, perspective gone. Every colour edge votes for the centre of a
-square it could be a side of, either side of it: a tile's four sides all vote for its centre, and the seam between
+the tile height up, where every tile is the same 25 mm square, perspective gone. Every colour edge votes for the
+centre of a square it could be a side of, either side of it: a tile's four sides all vote for its centre, and the seam between
 two touching tiles for both of theirs. A square is fitted to the edges round each place most voted for -- its
 centre to a few hundredths of a millimetre, its turn to a tenth of a degree, its size from 25 to 27.5 mm, as a face
 looks larger close to the camera -- and kept as a tile if each of its sides stands out from what lies just beyond
-it. Nothing is assumed of the tiles' or the desk's colour or
-brightness. A tile cut by the picture's edge, or behind the arm, is not looked for.
+it, beyond its side face where the camera sees one. Nothing is assumed of the tiles' or the desk's colour or
+brightness. A tile cut by the picture's edge, or behind the arm, is not looked for. The squares are fitted on the
+board's other cores too (`tiles/crew.py`).
 
 **How a letter is read** (`applib/letters/`). The tile's face is resampled square-on from the snapshot, along its
 sides. Ink is what is darker than the face round it; a face with none is blank, and a small round blob of ink off a
@@ -374,7 +382,7 @@ quarter turns and says which capital it is if that turn is upright, or that it i
 turn if there is one.
 
 **How a tile is placed** (`applib/areas.py`). By its centre, in desk mm round the arm's base axis; the areas and the
-2 mm are the app's own, for now, and the reach the library's: `can_reach()` at the tile's top and over it.
+2 mm gap are the app's own, for now, and the reach the library's: `can_reach()` at the tile's top and over it.
 
 **How a word is set down** (`applib/word.py`, the library's `carry()`). Of several ready tiles with a letter, the
 one whose letter needs the least turning goes; an N, an S or an O is turned to whichever of its ways up is nearest.

@@ -9,11 +9,12 @@
 // to 4 mm over its top, to see whether it is centred.
 // Until letters are typed in the box beside PLACE, each LOCATE TILES -- not the one after PLACE -- puts five there at
 // random from the tiles ready to pick up; PLACE carries the tiles with the letters in the box, in order, to the
-// dropoff arc, each the right way up, the cup gripping each at the desk height in the grip box. Where each goes is
-// drawn, filled once the tile is there. Then the arm parks and the tiles are found again; where the tiles carried were
-// stays drawn, dotted, with their letters, until LOCATE TILES, so that they can be put back.
+// dropoff arc, each the right way up, the cup gripping each as far under its top as the grip box says. Where each
+// goes is drawn, filled once the tile is there. Then the arm parks and the tiles are found again; where the tiles
+// carried were stays drawn, dotted, with their letters, until LOCATE TILES, so that they can be put back.
 // The tiles over the picture are drawn in Python (applib/overlay), as the app's stream draws them, and laid over it;
-// the grip height and where the word's reader stands are the app's settings too, kept in config/appcfg.json.
+// the tiles' thickness, the grip and where the word's reader stands are the app's settings too, kept in
+// config/appcfg.json; the tiles are looked for at the thickness set, and drawn at the one they were found at.
 
 import { $, api, fmt, mountHeader, report, showHeader, startPolling } from '/common/page.js';
 import { openFullView } from '/common/fullview.js';
@@ -47,7 +48,7 @@ const ui = {
   picked: null,                 // the tile last sent to, its number
   offered: null,                // the stamp of the snapshot whose letters were put in the box
   isTyped: false,               // letters typed in the box: LOCATE TILES leaves them
-  isSettingsShown: false,       // the grip box and the reader set from the app's settings, once
+  isSettingsShown: false,       // the tile height, the grip box and the reader set from the app's settings, once
 };
 let state = null;
 let inFlight = 0;
@@ -61,6 +62,8 @@ const sceneAddress = (width, scale) => `/api/tiles/scene.png?w=${width}&s=${scal
 const scene = new PictureLayer($('scene'), sceneAddress);
 const tiles = () => (state ? state.tiles : null);
 const found = () => (tiles() ? tiles().found : null);
+// How thick the tiles are: as the last LOCATE TILES looked for them, before one as the settings have it.
+const tileHeight = () => (found() ? found().height : state.settings.tile_height_mm.value);
 const placing = () => (tiles() ? tiles().word : null);
 const isBusy = () => inFlight > 0 || !state || Boolean(state.doing) || state.queued > 0;
 // The tiles PLACE has started on, by number: no longer, or perhaps not, where the snapshot has them.
@@ -167,28 +170,28 @@ function renderView() {
     + `${fmt(TILES.gap, 0)} mm apart.`;
 }
 
-// The grip's choices, highest first: desk heights over the desk, the plus written out; the tile's top and the desk
-// named.
-function gripChoices() {
-  const [low, high] = TILES.word.grip_range;
-  const step = TILES.word.grip_step;
-  const choices = [];
-  for (let count = Math.round((high - low) / step); count >= 0; count -= 1) {
+// A setting's choices, from `low` to `high` in `step`, each [value, label].
+function choices(low, high, step, label) {
+  const values = [];
+  for (let count = 0; count <= Math.round((high - low) / step); count += 1) {
     const value = Math.round((low + count * step) * 10) / 10;
-    const over = Math.round((value - TILES.height) * 10) / 10;
-    const label = value === 0 ? '0 (desk)'
-      : `+${value.toFixed(1)} mm${over === 0 ? ' (tile top)' : over > 0 ? ` (${over.toFixed(1)} mm over the tile)` : ''}`;
-    choices.push([String(value), label]);
+    values.push([String(value), label(value)]);
   }
-  return choices;
+  return values;
 }
+
+// The grip's choices, from over a tile's top to deepest into it.
+const gripChoices = () => choices(...TILES.word.grip_range, TILES.word.grip_step, (value) => (value === 0 ? '0 (top)'
+  : value > 0 ? `${value.toFixed(1)} mm in` : `${(-value).toFixed(1)} mm over`));
+const tileHeightChoices = () => choices(...TILES.height_range, TILES.height_step, (value) => `${value.toFixed(1)} mm`);
 
 // The grip box and the reader as the app's settings have them, the first time they come; after that, the page's.
 function renderSettings() {
   const { settings } = state;
   if (!settings || ui.isSettingsShown) return;
   ui.isSettingsShown = true;
-  $('grip').value = settings.grip_mm.value;
+  $('tile-height').value = settings.tile_height_mm.value;
+  $('grip').value = settings.grip_depth_mm.value;
   $('reader').value = settings.reader.value;
 }
 
@@ -209,13 +212,14 @@ function renderPage() {
       ${result.counts[status]} ${words}</span>`).join('') : '';
   $('visit-hint').textContent = result && result.tiles.length
     ? `go, or a click on a tile in the grid or the picture: the cup over its centre at ${fmt(TILES.visit.over, 0)} mm, `
-      + `down to ${fmt(TILES.visit.down, 0)}` : '';
+      + `down to ${fmt(TILES.visit.above, 0)} mm over its top` : '';
   if (result && ui.offered !== result.stamp) {
     if (!ui.isTyped && !result.placed) $('word').value = result.offer;     // not after PLACE, nor over letters typed
     ui.offered = result.stamp;
   }
   $('word').disabled = Boolean(problem) || !result;
-  $('grip').disabled = Boolean(problem) || isBusy();          // a setting: not tied to a detection
+  $('tile-height').disabled = Boolean(problem) || isBusy();   // settings: not tied to a detection
+  $('grip').disabled = Boolean(problem) || isBusy();
   $('reader').disabled = Boolean(problem) || isBusy();
   $('place').disabled = Boolean(problem) || isBusy() || !result || !$('word').value.trim() || moved().size > 0
     || $('grip').value === '' || Number.isNaN(Number($('grip').value));
@@ -233,7 +237,8 @@ function wordLine(result, word) {
     return before + (result.on_offer ? `On the tiles ready to pick up: <b class="letters">${result.on_offer}</b> <span `
       + `class="note">· PLACE carries the letters typed, in order, to the arc ${fmt(TILES.word.arc, 0)} mm out, `
       + `${fmt(TILES.word.gap, 0)} mm apart, each letter turned for a reader ${READER_WORDS[$('reader').value]}; `
-      + `the cup grips at the height chosen in grip and lets go at ${fmt(TILES.word.drop, 0)} mm</span>`
+      + `the cup grips each tile as far in as grip says and lets it go ${fmt(TILES.word.drop_over, 0)} mm over its `
+      + 'top</span>'
       : '<span class="note">No letters on tiles ready to pick up: nothing for PLACE to carry.</span>');
   }
   if (word.status === 'placing') {
@@ -313,7 +318,7 @@ function renderTable() {
         ${tile.detail && tile.status !== 'elsewhere' ? `<small>${tile.detail}</small>` : ''}${wordNote(word, tile)}</td>
       <td class="actions"><button class="btn small" data-n="${tile.n}"
         ${tile.status === 'out of reach' || isBusy() || carried.has(tile.n) ? 'disabled' : ''}
-        title="The cup over this tile's centre, down to ${fmt(TILES.visit.down, 0)} mm">go</button></td>
+        title="The cup over this tile's centre, down to ${fmt(TILES.visit.above, 0)} mm over its top">go</button></td>
     </tr>`) : [];
   const empty = result && !result.tiles.length ? '<tr class="empty"><td colspan="12">No tiles found.</td></tr>'
     : !result ? '<tr class="empty"><td colspan="12">LOCATE TILES to find them.</td></tr>' : '';
@@ -333,7 +338,7 @@ function wordNote(word, tile) {
 function pointedTile() {
   const result = found();
   const hover = full && full.marks.marks.hover;
-  const desk = hover && tiles() && toDesk(tiles().desk_to_view, hover, TILES.height);
+  const desk = hover && tiles() && toDesk(tiles().desk_to_view, hover, tileHeight());
   const tile = desk && result ? tileAt(result.tiles, desk) : null;
   if (!tile) return { label: 'tile', value: '', note: desk ? `desk ${desk[0].toFixed(1)}, ${desk[1].toFixed(1)}` : '' };
   return { label: `tile ${tileName(tile)}`, value: `${tile.x.toFixed(1)}, ${tile.y.toFixed(1)}`,
@@ -356,10 +361,9 @@ function openFull() {
     overlay: sceneAddress,
     aspect: size[0] / size[1],
     title: 'THE LIVE VIEW',
-    hint: 'Click a tile: the cup comes over its centre and down to '
-      + `${fmt(TILES.visit.down, 0)} mm, ${fmt(TILES.visit.down - TILES.height, 0)} over its top.`,
+    hint: `Click a tile: the cup comes over its centre and down to ${fmt(TILES.visit.above, 0)} mm over its top.`,
     onPick: (u, v) => {
-      const desk = toDesk(tiles().desk_to_view, [u, v], TILES.height);
+      const desk = toDesk(tiles().desk_to_view, [u, v], tileHeight());
       const tile = desk && found() ? tileAt(found().tiles, desk) : null;
       if (tile) visit(tile.n);
     },
@@ -396,10 +400,13 @@ $('locate').addEventListener('click', locate);
 $('word').maxLength = TILES.word.most;
 $('reader').innerHTML = TILES.word.readers.map((reader) => `<option value="${reader}">${reader}</option>`).join('');
 $('reader').addEventListener('change', () => keep('reader', $('reader').value));
+$('tile-height').innerHTML = tileHeightChoices().map(([value, label]) => `<option value="${value}">${label}</option>`)
+  .join('');
+$('tile-height').addEventListener('change', () => keep('tile_height_mm', Number($('tile-height').value)));
 $('grip').innerHTML = gripChoices().map(([value, label]) => `<option value="${value}">${label}</option>`).join('');
 $('grip').addEventListener('input', render);
 $('grip').addEventListener('change', () => {
-  if ($('grip').value !== '' && !Number.isNaN(Number($('grip').value))) keep('grip_mm', Number($('grip').value));
+  if ($('grip').value !== '' && !Number.isNaN(Number($('grip').value))) keep('grip_depth_mm', Number($('grip').value));
 });
 $('word').addEventListener('input', () => {
   ui.isTyped = $('word').value.trim() !== '';

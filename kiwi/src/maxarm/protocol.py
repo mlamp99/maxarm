@@ -55,7 +55,7 @@ ABSENT_SERVO_ID = 5
 # The servos run off the barrel jack; USB powers only the ESP32. Below this the
 # supply is off, and the servos still answer reads while being unable to move.
 SERVO_VOLTAGE_MIN_MV = 6000
-NO_POWER = "ERROR: Ensure power supply plugged in and switch in UP postion!"
+NO_POWER = "Arm has no power: plug it in, switch up."
 
 READ_PULSES = "[bus_servo.get_position(i) for i in (1, 2, 3)]"
 
@@ -67,6 +67,17 @@ SUPPLY_SAMPLES = 100
 READ_SUPPLY = ("(lambda adc: (adc.atten(ADC.ATTN_11DB), adc.width(ADC.WIDTH_12BIT),"
                f" sum([adc.read() for _ in range({SUPPLY_SAMPLES})]))[2])(ADC(Pin(39)))")
 READ_PULSES_AND_SUPPLY = f"({READ_PULSES}, {READ_SUPPLY})"
+
+# The vent valve held open for longer than `nozzle.off()` holds it, a second: by the nozzle's own parts -- the
+# pump's two PWM pins and the valve's, their full duty `hz`, and `nozzle_st`, which says the pump runs and which
+# `off()` clears so that `on()` starts it again. Firmware whose nozzle has them all can hold the vent (`has_vent`,
+# found at check_board()). Throwaway expressions like the rest: nothing is bound, and `nozzle_st` is set as `off()`
+# sets it. `on()` shuts the valve too, so a vent left open does not outlast the next grip.
+VENT_PARTS = ("pump_f", "pump_b", "valve_f", "valve_b", "hz", "nozzle_st")
+HAS_VENT = f"all([hasattr(nozzle, part) for part in {VENT_PARTS!r}])"
+OPEN_VENT = ("(nozzle.valve_f.duty(nozzle.hz), nozzle.valve_b.duty(0), nozzle.pump_f.duty(0), nozzle.pump_b.duty(0),"
+             " setattr(nozzle, 'nozzle_st', False))")
+SHUT_VENT = "(nozzle.valve_f.duty(0), nozzle.valve_b.duty(0))"
 
 BOARD_CHECK = (
     "([n in globals() for n in ('arm', 'bus_servo', 'nozzle', 'time', 'gc')],"
@@ -108,6 +119,7 @@ class ReplProtocol:
     def __init__(self, transport: SerialTransport) -> None:
         self.transport = transport
         self.has_supply = False         # whether this board reads its supply (`READ_SUPPLY`): found at check_board()
+        self.has_vent = False           # whether its vent can be held open (`OPEN_VENT`): found there too
 
     # --- session ----------------------------------------------------------
 
@@ -126,6 +138,7 @@ class ReplProtocol:
             reason, is_transient = self._board_problem()
             if reason is None:
                 self.has_supply = self._can_read_supply()
+                self.has_vent = self._can_hold_vent()
                 return
             if not is_transient or attempt == BOARD_CHECK_ATTEMPTS:
                 raise BoardNotReadyError(reason)
@@ -153,12 +166,19 @@ class ReplProtocol:
         except ProtocolError:
             return False
 
+    def _can_hold_vent(self) -> bool:
+        """Firmware whose nozzle is built otherwise still lets go, with `nozzle.off()` and its second of vent."""
+        try:
+            return self.evaluate(HAS_VENT) is True
+        except ProtocolError:
+            return False
+
     def disconnect(self) -> None:
         if not self.transport.is_open:
             return
         try:
             self.transport.write(CTRL_B)    # leave a friendly REPL for the next user
-        except TransportError:
+        except (TransportError, OSError):   # OSError: pyserial's, the board unplugged
             pass
         finally:
             self.transport.close()
@@ -282,6 +302,13 @@ class ReplProtocol:
     def set_suction(self, is_on: bool) -> None:
         """Pump on; or pump off with the vent valve held open for a second, on a board thread."""
         self.run("nozzle.on()" if is_on else "nozzle.off()")
+
+    def open_vent(self) -> None:
+        """Pump off and the vent valve open, to stay open until `shut_vent()`. Only where `has_vent`."""
+        self.run(OPEN_VENT)
+
+    def shut_vent(self) -> None:
+        self.run(SHUT_VENT)
 
     def read_pulses(self) -> Optional[Tuple[int, int, int]]:
         """The three servos' own positions, in pulses. None if the bus dropped one."""

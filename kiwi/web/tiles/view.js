@@ -44,13 +44,13 @@ export class TilesMarks extends ViewMarks {
   }
 
   drawPicked() {
-    const { found, limits, picked, moved } = this.marks;
+    const { found, picked, moved } = this.marks;
     if (!found) return;
     const hovered = this.hovered();
     for (const tile of found.tiles) {
       const isPicked = tile.n === picked || (hovered && tile.n === hovered.n);
       if (!isPicked || (moved && moved.has(tile.n))) continue;
-      const face = tile.corners.map(([x, y]) => this.at([x, y, limits.tiles.height]));
+      const face = tile.corners.map(([x, y]) => this.at([x, y, tile.height]));
       if (face.some((corner) => !corner)) continue;
       this.fill(face, tileInk(tile), 0.12);
       this.polyline([...face, face[0]], tileInk(tile), 1.5, 0.9);
@@ -59,9 +59,9 @@ export class TilesMarks extends ViewMarks {
 
   // The tile under the pointer, in the full-size view: its top face holds the point seen there.
   hovered() {
-    const { hover, found, matrix, limits } = this.marks;
+    const { hover, found, matrix } = this.marks;
     if (!hover || !found) return null;
-    const desk = toDesk(matrix, hover, limits.tiles.height);
+    const desk = toDesk(matrix, hover, found.height);
     return desk ? tileAt(found.tiles, desk) : null;
   }
 }
