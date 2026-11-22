@@ -150,6 +150,20 @@ class TileWork:
         return {"tiles": letters(), "err_no_reach": letters(areas.Status.OUT_OF_REACH.value),
                 "err_too_close": letters(areas.Status.TOO_CLOSE.value)}
 
+    def letters_seen(self) -> Optional[dict]:
+        """The last detection's letters by where their tiles lie, upper case, as `summary()` shows them: those a word
+        can take, sorted; those in the dropoff area, left to right from behind the arm -- a word set down, likely;
+        the rest; and when. None before the first detection."""
+        with self.lock:
+            found = self.found
+        if not found:
+            return None
+        dropoff = [tile for tile in found["tiles"] if tile["area"] == areas.DROPOFF.name]
+        return {"taken": found["taken"], "on_offer": found["on_offer"],
+                "dropoff": "".join(_shown(tile) for tile in dropoff),
+                "unusable": "".join(_shown(tile) for tile in found["tiles"] if tile not in dropoff
+                                    and not (tile["status"] == areas.Status.READY.value and tile["is_read"]))}
+
     def view_problem(self, fit: CameraFit) -> Optional[str]:
         """Why the live view cannot show the tiles in place, if it cannot: it must be the calibration's picture."""
         size = self.feed.state()["size"]

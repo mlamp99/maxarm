@@ -17,3 +17,8 @@ iotconnect-sdk-lite[aws-s3]==1.3.0
 # no hardware encoder; websockets for the signalling channel.
 aiortc==1.16.0
 websockets==17.4
+
+# The language model on the Ara240 (`agent`, app/agent.py): the model, torch and the rest are the connector's, its own
+# venv and process (connector/install.sh); here only what talks to it.
+strands-agents==1.50.2
+openai==2.52.0

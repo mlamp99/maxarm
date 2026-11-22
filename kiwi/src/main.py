@@ -11,6 +11,8 @@ Commands, from the device's Commands tab in /IOTCONNECT or typed at the console:
     place TEAM              detect, then set those letters down along the dropoff arc for the reader
     find-cube               find the red cube and bring the cup over it
     reader-location left    where the person reading the words stands: back, front, left or right
+    agent SENTENCE          the sentence to the language model on the Ara240, which may run the commands above;
+                            the console's only, so far. Needs connector/ running (connector/install.sh, run.sh)
 
 Calibrate first: the calibration app (`src/calibration/calibration.py`) writes
 config/, and this app uses what it chose there -- the camera's mode and focus, the
@@ -33,6 +35,7 @@ The threads:
     webrtc     asyncio: the signalling channel, every viewer                      applib/webrtc.py
     iotc       the telemetry publisher, and paho's own MQTT thread          applib/iotc.py
     command    two: one moves the arm at a time (app/app.py)               applib/commands.py
+    agent      asks the language model a throwaway question until it answers   app/agent.py
     arm        connects the arm, and again after it fails or is lost        app/app.py
     main       the console, or a wait for Ctrl-C
 
@@ -50,6 +53,7 @@ from threading import Event, Thread
 from maxarm import MaxArm
 from maxarm.spaces import CONFIG_DIR
 
+from app import agent
 from app.app import TilesApp
 from applib import iotc, webrtc
 from applib.camera.feed import Feed
@@ -92,6 +96,7 @@ def main() -> int:
     telemetry = TelemetryState()
     motion = Motion(MaxArm(config_dir=None), CONFIG_DIR)
     app = TilesApp(motion, work, cube, settings, camera_file, overlay, telemetry)
+    app.set_agent(build_agent(app))
     service = CommandService(app.on_command, on_result=lambda result: overlay.show_answer(result.message,
                                                                                          result.is_ok))
     streamer = build_streamer(args, overlay, stream)
@@ -135,6 +140,15 @@ def build_streamer(args, overlay: StreamOverlay, stream: Stream):
                                      on_keyframe_wanted=stream.request_keyframe)
     stream.connect_encoded(streamer.on_encoded)
     return streamer
+
+
+def build_agent(app: TilesApp):
+    """The language model on the Ara240, or None without strands-agents. Nothing is connected here: the connector is
+    optional and loads its model for minutes, so the agent's own thread finds out when it answers."""
+    if not agent.IS_STRANDS_AVAILABLE:
+        print("agent      : off, strands-agents is not installed (src/requirements.txt)", flush=True)
+        return None
+    return agent.AgentService(app.on_command, app.describe_letters, app.check_word)
 
 
 def build_cloud(args, service: CommandService, telemetry: TelemetryState, overlay: StreamOverlay, streamer):

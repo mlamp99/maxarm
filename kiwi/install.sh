@@ -24,3 +24,5 @@ cat config/device-cert.pem
 echo "Then download the device's iotcDeviceConfig.json into config/."
 echo
 echo "Done. Calibrate: ./calibrate.sh; then the app: ./run.sh"
+echo "With an Ara240, for the app's agent command: connector/install.sh once, then connector/install-service.sh"
+echo "to start it at every boot, or connector/run.sh after each."

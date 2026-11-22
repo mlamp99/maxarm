@@ -28,6 +28,8 @@ tar zxf tiles.tgz
 ./run.sh                # the app: /IOTCONNECT, the stream, the console
 ./run.sh --no-iotc      # the app without the cloud: commands at the console
 scripts/install-service.sh calibration   # or `app`: that one started at every boot; `none`: neither
+connector/install.sh    # optional, with an Ara240, once: the language model for `agent` (11 GB, many minutes)
+connector/install-service.sh  # then at every boot (or connector/run.sh after each): the model ready minutes later
 ```
 
 The package is made on a PC by `scripts/package.sh`. `config/` is not in it, so a newer one unpacked over the old
@@ -54,7 +56,20 @@ On a PC, in a venv of your own if you like: `scripts/install.sh`, then `python s
 |                             | they stand now                                                                      |
 
 Each is answered by its acknowledgement, the answer the console prints. The console takes the same commands as text:
-`place TEAM`, `find cube`, `reader left`.
+`place TEAM`, `find cube`, `reader left`. The console alone, so far, takes `agent` *SENTENCE*: the sentence to
+Qwen2.5-7B-Instruct on the Ara240, whose tools are the letters as last seen, `detect`, a word checked against the
+tiles, and `place` (`src/app/agent.py`).
+
+## The Ara240
+
+Optional: without it the app runs as before and `agent` says the model is not answering. The image brings the
+Ara240's runtime and the wheels of NXP's eIQ AAF Connector, which holds the model on the Ara240 behind an
+OpenAI-style endpoint, port 3000, on the board only. `connector/install.sh` installs the connector into its own
+`connector/venv/`, patched (`apply-patch.sh`), and fetches the model into `/usr/share/llm/`, where the image's
+`ara2-fetch-models` puts it. `connector/install-service.sh` starts it at every boot, as the systemd service
+`iotc-aaf-connector` (`--remove` takes it out); without the service, `connector/run.sh` starts it in the
+background, its log `connector/server.log`. With or without, `run.sh` restarts it and `run.sh --stop` stops it.
+`connector/config/server_config.json` is its configuration.
 
 | telemetry       | is                                                                                          |
 | --------------- | ------------------------------------------------------------------------------------------- |
@@ -95,6 +110,7 @@ pages' live view as a layer.
 | `training/`         | `letters/`: the reader's recipe                                                          |
 | `scripts/`          | `install.sh`, `install-ch341.sh`; `package.sh` makes `tiles.tgz`, `build-ch341.sh` the driver |
 |                     | `install-service.sh` starts an app at boot (`systemd/`)                                    |
+| `connector/`        | the Ara240's language model for `agent`: NXP's connector, installed and run by its scripts |
 | `agenttools/`       | the fake board and camera, the overlay drawn on the owner's stills, checks; not shipped  |
 
 The arm's library, its calls and limits: [`src/maxarm/README.md`](src/maxarm/README.md).

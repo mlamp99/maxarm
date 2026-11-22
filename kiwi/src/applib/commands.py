@@ -2,10 +2,13 @@
 `work/refs/iotc-eiq-imx95-property-alarm`).
 
 Every source funnels through `CommandService`: /IOTCONNECT C2D (`iotc.py`), the
-console (`console.py`), and whatever comes next -- speech, an agent. A source that
+console (`console.py`), and whatever comes next -- speech. A source that
 already has the verb and its argument, as C2D does, builds a `Command` and calls
 `submit_command()`; one that has a line of text calls `submit()` and has it
-parsed. Both end in the same handler and the same `CommandResult`.
+parsed. Both end in the same handler and the same `CommandResult`. One command
+comes back the other way: `agent` hands a sentence to the language model on the
+Ara240, whose tools run commands of their own straight through the app's handler
+(`app/agent.py`), not through here.
 
 A handler returns the sentence to answer with, or raises `CommandError` with the
 reason; both come back as a `CommandResult`, `is_ok` and that text. The console
@@ -31,7 +34,8 @@ DETECT = "detect"
 PLACE = "place"
 FIND_CUBE = "find-cube"
 READER_LOCATION = "reader-location"
-VERBS = (DETECT, PLACE, FIND_CUBE, READER_LOCATION)
+AGENT = "agent"             # a sentence for the language model on the Ara240; the console's only, so far
+VERBS = (DETECT, PLACE, FIND_CUBE, READER_LOCATION, AGENT)
 
 NOT_UNDERSTOOD = f"Not a command: the commands are {', '.join(VERBS)}."
 

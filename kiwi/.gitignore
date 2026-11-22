@@ -6,9 +6,12 @@ config/*.png
 config/*.jpg
 config/*.pem
 
-# A venv: on the board install.sh makes venv/, on a PC the owner makes their own.
+# A venv: on the board install.sh makes venv/, on a PC the owner makes their own; connector/install.sh its own.
 .venv/
 venv/
+
+# The connector's log (connector/run.sh).
+connector/server.log
 
 # A training run's best epoch, removed when it finishes (training/letters/train.py).
 training/letters/letters.keras

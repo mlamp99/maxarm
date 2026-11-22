@@ -17,6 +17,11 @@ so the handlers below, read top to bottom, are the whole behaviour of the app:
   the cup over it; the stream shows the cube until the next detect or place.
 - `reader-location [back|front|left|right]`: where the person reading the word
   stands, kept in `config/appcfg.json`; without one, where they stand now.
+- `agent SENTENCE`: the sentence to the language model on the Ara240
+  (`agent.py`), whose tools are these handlers -- `detect`, `place` -- and two
+  that move nothing: the letters as last seen, and whether a word can be set
+  down from them. Held outside the lock, as its tools come back in through
+  `on_command()`; the model takes one sentence at a time.
 
 The arm is connected on a thread of its own (`keep_arm_connected()`): at the
 start, and again RECONNECT_S after it fails or is lost, so the app runs on
@@ -32,7 +37,7 @@ at a time, under a lock, so a command that comes while another runs waits for it
 from __future__ import annotations
 
 from threading import Lock
-from typing import Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from maxarm import MoveResult, TransportError
 
@@ -48,6 +53,9 @@ from applib.telemetry import TelemetryState
 from applib.tilework import TileWork
 from applib.word import WordRefused
 
+if TYPE_CHECKING:                       # for the type only: agent.py needs strands-agents, which may not be there
+    from app.agent import AgentService
+
 READER_WORDS = {"back": "behind the arm", "front": "in front of the arm", "left": "at the arm's left",
                 "right": "at the arm's right"}
 
@@ -62,6 +70,7 @@ class TilesApp:
         self.camera_file = camera_file  # config/camera.json, the calibration
         self.overlay = overlay          # what the stream shows over the picture
         self.telemetry = telemetry      # written here, sent by iotc.py
+        self.agent: Optional["AgentService"] = None     # the language model on the Ara240, set_agent()
         self.arm_problem = "connecting"  # why the arm is not connected; "" once it is
         self._lock = Lock()
         self._handlers = {
@@ -69,6 +78,7 @@ class TilesApp:
             commands.PLACE: self._place,
             commands.FIND_CUBE: self._find_cube,
             commands.READER_LOCATION: self._reader_location,
+            commands.AGENT: self._agent,
         }
         self._rest()
 
@@ -77,7 +87,7 @@ class TilesApp:
         handler = self._handlers.get(command.verb)
         if handler is None:
             raise CommandError(f"There is no command {command.verb}.")
-        if command.verb == commands.READER_LOCATION:
+        if command.verb in (commands.READER_LOCATION, commands.AGENT):
             return handler(command)
         with self._lock:
             if self.motion.stopping.is_set():
@@ -117,6 +127,27 @@ class TilesApp:
                     else:
                         print("arm        : connected and homed", flush=True)
             self.motion.stopping.wait(RECONNECT_S)
+
+    def set_agent(self, agent: Optional["AgentService"]) -> None:
+        """The language model, once built: its tools are this app's handlers, so it is built after the app."""
+        self.agent = agent
+
+    def describe_letters(self) -> str:
+        """The letters as last seen, for the language model: what a word can take, what is set down already."""
+        seen = self.work.letters_seen()
+        if seen is None:
+            return "No tiles found yet: detect them first."
+        return (f"The tiles as found at {seen['taken']}. Ready to pick up: {seen['on_offer'] or 'none'}. Already in "
+                f"the dropoff area, left to right: {seen['dropoff'] or 'none'}. Not usable: "
+                f"{seen['unusable'] or 'none'} ('?' not read, '-' blank).")
+
+    def check_word(self, text: str) -> str:
+        """Whether `text` can be set down from the tiles as last found, and if not, why; planned, nothing moved."""
+        try:
+            self.work.plan(text, self.settings.get("tile_offset_mm"), self.settings.get("reader"))
+        except (Refused, WordRefused) as reason:
+            return _sentence(f"{text.strip().upper()} cannot be set down: {reason}")
+        return f"{text.strip().upper()} can be set down from the tiles ready to pick up."
 
     def wait_idle(self, timeout_s: float) -> bool:
         """Until no command moves the arm, at most `timeout_s`; whether none does."""
@@ -174,6 +205,14 @@ class TilesApp:
             return f"Words are set down for a reader {READER_WORDS[reader]} from now on."
         reader = self.settings.get("reader")
         return f"Words are set down for a reader {READER_WORDS[reader]}: reader-location {', '.join(READER_WORDS)}."
+
+    def _agent(self, command: Command) -> str:
+        if self.agent is None:
+            raise CommandError("The language model is off: strands-agents is not installed (src/requirements.txt).")
+        sentence = command.argument.strip()
+        if not sentence:
+            raise CommandError("Ask what? Like: agent which words can the tiles make?")
+        return self.agent.ask(sentence)
 
     # --- inside -----------------------------------------------------------------------------------------------
 
