@@ -1,0 +1,5 @@
+# What files/words-en.tsv was made with (host only, not the IMX95), beside the PC's Hunspell en_US dictionary and
+# WordNet 3.0, which nltk fetches.
+wordfreq==3.1.1
+spylls==0.1.7
+nltk==3.10.4

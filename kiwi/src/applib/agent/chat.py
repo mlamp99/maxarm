@@ -1,5 +1,6 @@
 """The conversation with the language model, kept twice: in full for the Chat page and the console, and as one or two
-lines the model reads at the start of every request (`recap()`).
+lines the model reads at the start of every request (`recap()`). With each answer, what went to and from the model
+for it, for the page to show on request (`trace()`).
 
     chat = Chat()
     turn = chat.begin_turn("a 7-letter word")       # a request: after VISIT_QUIET_S of quiet, a new visitor's
@@ -43,9 +44,12 @@ class Message:
     text: str
     at: float                   # time.time()
     data: dict = field(default_factory=dict)
+    trace: List[dict] = field(default_factory=list)    # an answer's: what went to and from the model, `trace()`
 
     def to_json(self) -> dict:
-        return {"n": self.n, "role": self.role, "text": self.text, "at": self.at, **self.data}
+        """Without the trace, asked for apart: the pages poll the messages, and a trace is a few KB."""
+        return {"n": self.n, "role": self.role, "text": self.text, "at": self.at, "has_trace": bool(self.trace),
+                **self.data}
 
 
 @dataclass
@@ -65,10 +69,10 @@ class Chat:
 
     # --- the pages' messages ----------------------------------------------------------------------------------
 
-    def add(self, role: str, text: str, **data) -> Message:
+    def add(self, role: str, text: str, trace: Optional[List[dict]] = None, **data) -> Message:
         with self._lock:
             self._count += 1
-            message = Message(self._count, role, text, time.time(), dict(data))
+            message = Message(self._count, role, text, time.time(), dict(data), list(trace or []))
             self._messages.append(message)
             del self._messages[:-MAX_MESSAGES]
             return message
@@ -82,6 +86,12 @@ class Chat:
     def messages(self) -> List[dict]:
         with self._lock:
             return [message.to_json() for message in self._messages]
+
+    def trace(self, n: int) -> Optional[List[dict]]:
+        """What went to and from the model for message `n`, an answer; None if it has none or is no longer kept."""
+        with self._lock:
+            message = next((message for message in self._messages if message.n == n), None)
+            return list(message.trace) if message is not None and message.trace else None
 
     def forget(self) -> None:
         """A new visitor: nothing said before is shown or recalled."""
@@ -104,6 +114,11 @@ class Chat:
     def set_word(self, turn: Turn, word: str, status: str) -> None:
         with self._lock:
             turn.word, turn.status = word, status
+
+    def previous_request(self) -> str:
+        """The request before the one being answered, this visit; "" if there is none."""
+        with self._lock:
+            return self._turns[-2].request if len(self._turns) > 1 else ""
 
     def words_used(self) -> List[str]:
         """The words set down this visit, oldest first."""

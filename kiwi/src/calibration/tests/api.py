@@ -64,7 +64,7 @@ from applib.camera.store import RefinePoint
 from applib.motion import OVER_CUBES_MM, Motion
 from applib.overlay import draw_cube, picture_layer
 from applib.redcube import NOTCH_MM, OVER_MM, RedCube
-from camera import anchor, check
+from camera import check
 from camera.refine import off_by
 from common.server import BadRequest, Server, number
 from common.worker import Refused, Worker
@@ -82,6 +82,8 @@ UNDER_TOP_MM = 2.0
 CUP_RADIUS_MM = 10.5
 # RECORD POINT: further than half a cube from where the arm says the cup was, the cube was not under the cup.
 MAX_OFF_MM = CUBE_MM / 2
+# A point's cube as found, in config/debug/: at most this wide and tall, px.
+DEBUG_PICTURE_PX = (1200, 1200)
 
 
 class TestsSession:
@@ -98,7 +100,7 @@ class TestsSession:
         self.rng = random.Random()
         self._version = 0                           # counts the points' changes
         self._loaded: Tuple[Optional[int], Optional[CameraFit]] = (None, None)
-        self._base: Tuple[Optional[int], Optional[anchor.FoundBase]] = (None, None)   # CALIBRATE's base, per camera.json
+        self._frame: Tuple[Optional[int], Optional[np.ndarray]] = (None, None)   # CALIBRATE's frame, per camera.json
         self._described: Tuple[Optional[tuple], Optional[dict]] = (None, None)
         self._describing = threading.Lock()         # held by the one request working `_described` out
 
@@ -207,6 +209,7 @@ class TestsSession:
         detail = _described(fit, point)
         self.kept = record.Kept(point.id, tuple(here), list(sent), frame, found, fit, detail=detail,
                                  stamp=time.time_ns())
+        store.save_point_pictures(self.config_dir, point.id, point.taken, frame, self._found_picture())
         return detail
 
     def redo(self, body: dict) -> dict:
@@ -234,6 +237,7 @@ class TestsSession:
             self._keep([*self.points[:index], point, *self.points[index + 1:]])
         detail = f"{_described(fit, point)}; looked for with {tweak.describe()}"
         self.kept = kept.looked_again(found, fit, tweak, detail)
+        store.save_point_pictures(self.config_dir, point.id, point.taken, None, self._found_picture())
         return detail
 
     def undo(self, body: dict) -> dict:
@@ -254,6 +258,10 @@ class TestsSession:
             return None
         return record.zoomed(kept, max(64, min(width, 4096)), max(64, min(height, 4096)),
                              max(0.25, min(scale, 8.0))), "image/png"
+
+    def _found_picture(self) -> bytes:
+        """The last point's cube as found, for its pictures in config/debug/: as the page's record picture."""
+        return record.zoomed(self.kept, *DEBUG_PICTURE_PX, 1.0)
 
     def forget(self, body: dict) -> dict:
         point_id = int(number(body, "id"))
@@ -282,7 +290,7 @@ class TestsSession:
             raise Refused(problem)
         with self.lock:
             points = list(self.points)
-        refined, tie = refine.refined(fit, points, self._found(fit))
+        refined, tie = refine.refined(fit, points, self._calibration_frame())
         store.save_camera(self.config_dir, refined)
         store.save_correction(self.config_dir, tie.mesh(f"SAVE {time.strftime('%d %b %H:%M')}, "
                                                         f"{len(tie.rows)} points") if tie else None)
@@ -361,16 +369,15 @@ class TestsSession:
             with self.lock:
                 key, points = (self._loaded[0], self._version), list(self.points)
             if key != self._described[0]:
-                self._described = (key, refine.describe(fit, points, self._found(fit)))
+                self._described = (key, refine.describe(fit, points, self._calibration_frame()))
             return self._described[1]
 
-    def _found(self, fit: CameraFit) -> Optional[anchor.FoundBase]:
-        """The base CALIBRATE found, as camera.json keeps it, or found again in CALIBRATE's frame for a camera.json from
-        before it was kept: once per camera.json."""
+    def _calibration_frame(self) -> Optional[np.ndarray]:
+        """CALIBRATE's frame, where SAVE finds the base: read once per camera.json."""
         stamp = self._loaded[0]
-        if self._base[0] != stamp or stamp is None:
-            self._base = (stamp, anchor.base_of(fit, store.load_frame(self.config_dir)))
-        return self._base[1]
+        if self._frame[0] != stamp or stamp is None:
+            self._frame = (stamp, store.load_frame(self.config_dir))
+        return self._frame[1]
 
     def _usable(self) -> CameraFit:
         """The calibration, or Refused, saying why the tests cannot run."""

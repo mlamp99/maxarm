@@ -3,18 +3,19 @@ and what is left at each point the arm's own error -- the mesh its raw-to-true c
 
     found = base.find_base(frame, alone.desk_to_pixel)        # the base by its edges, in the cubes' desk space
     tie = fit_tie(found, tie_points(alone, points))           # CALIBRATE: the frame, and the mesh of its cubes
-    tie = kept_tie(fit.anchor, found, tie_points(alone, points))   # SAVE: CALIBRATE's frame, the mesh of all points
+    tie = kept_tie(fit.anchor, found, tie_points(alone, points))   # SAVE without its own camera: CALIBRATE's frame
     anchored(alone, tie)                                      # camera.json, the arm laid by the tie
     tie.mesh(made)                                            # config/arm-true.json: maxarm/mesh.py
 
 The camera is the cubes' edges alone (`fit.py`): reality, its 40 mm cubes its only
-length. Everything here is in the desk space the three cubes' calibration laid by
+length. Everything here is in the desk space the cubes' calibration laid by
 their readings (`cube_fit()`), which only has to be near the arm's: the tie says
 where the arm really stands in it.
 
-**The frame, once.** CALIBRATE lays the arm: its axis where the base is, its turn
-from the cubes' bearings. SAVE keeps it: points add to the correction and never move
-the camera.
+**The frame.** CALIBRATE lays the arm: its axis where the base is, its turn from the
+cubes' bearings. SAVE fits the camera again to every point's cube and lays the arm
+again the same way, on all the points (`camera/refine.py`); only when it cannot fit
+a camera does it keep CALIBRATE's frame and add the points to the correction.
 
 **What is trusted, and how much.** Each point is a cube seen by the camera (where
 its edges put it) and the firmware's position over it, made true by the formula

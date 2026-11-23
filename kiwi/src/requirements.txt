@@ -22,3 +22,8 @@ websockets==17.4
 # connector's, its own venv and process (connector/install.sh); here only what talks to it.
 strands-agents==1.50.2
 openai==2.52.0
+# The agent's dictionary finds words by meaning with a small embedding model, on the CPU (applib/agent/dictionary.py):
+# model2vec reads it, with tokenizers and safetensors; huggingface-hub at the version it was tried with, whose `hf`
+# fetches the model (scripts/install.sh) and finds it in the cache.
+model2vec==0.10.0
+huggingface-hub==1.33.0

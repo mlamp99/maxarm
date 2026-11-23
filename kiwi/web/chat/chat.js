@@ -1,14 +1,16 @@
 // The Chat page: a request to the language model on the board's Ara240 -- "go", "a 7-letter word", "an animal",
-// "elaborate" -- which guesses words, has them checked against the tiles in code, and has the arm set the best down.
+// "spell AVNET", "elaborate" -- which reads what it wants; code finds the word in the tiles -- the longest, or for a
+// clue those nearest it in meaning, the model choosing among them -- and the arm sets it down.
 //
 // On the left, the desk: the live view with the tiles drawn over it, as on the Tiles page; the letters on the tiles
 // ready to pick up, as tiles; and the word being set down, tile by tile as the arm carries each. LOCATE TILES is the
 // Tiles page's, and so are the tile offset and the reader the arm sets words down for.
-// On the right, the conversation: each request, the model's tool calls as they happen -- its guesses, green those
-// that fit, the one chosen filled -- and its answer, with what it took: seconds, model calls, tokens read and written.
-// A word set down, or not, is said when the arm is done. The model is told what happened before in a line, never the
-// conversation itself: NEW VISITOR starts both again. The model takes minutes to load after the board starts; its pill
-// says how far it has got, and the box waits for it. One request at a time: STOP cuts it short; RESET stops the arm.
+// On the right, the conversation: each request, the steps as they happen -- the words weighed, the one chosen filled
+// -- and the model's answer, with what it took: seconds, model calls, tokens read and written; under it, what went to
+// and from the model, as text to copy. A word set down, or not, is said when the arm is done. The model is told what
+// happened before in a line, never the conversation itself: NEW VISITOR starts both again. The model takes minutes to
+// load after the board starts; its pill says how far it has got, and the box waits for it. One request at a time:
+// STOP cuts it short; RESET stops the arm.
 
 import { $, api, fmt, mountHeader, report, setText, showHeader, startPolling } from '/common/page.js';
 import { PictureLayer } from '/common/layer.js';
@@ -26,6 +28,9 @@ const MODEL_WORDS = {
 const MODEL_PILLS = { ready: 'ready', loading: 'connecting', waiting: 'connecting', checking: 'connecting', failed: 'failed' };
 const TOOL_ICONS = { find_word: '⌕', detect_tiles: '◎' };
 const STEP_WORDS = { carrying: 'carrying', placed: 'set down', waiting: 'next' };
+const TRACE_HEADS = { system: 'the system prompt', request: 'the message', model: 'the model',
+  tool: 'what the tool gave back', pick: 'asked of the model alone: which word fits the clue',
+  look: 'looked at the tiles first' };
 
 mountHeader('chat');
 let state = null;
@@ -33,6 +38,8 @@ let inFlight = 0;
 let isLost = false;
 let messagesShown = '';
 let isPinned = true;            // the conversation scrolled to its end: kept there as it grows
+const tracesOpen = new Set();   // the answers whose trace is shown, by number
+const traces = new Map();       // the traces asked for: their entries, or why there is none
 
 const scene = new PictureLayer($('scene'), (width, scale) => `/api/tiles/scene.png?w=${width}&s=${scale}&areas=1`);
 const tiles = () => (state ? state.tiles : null);
@@ -162,15 +169,16 @@ function renderMessages() {
   const { messages, thinking } = chat();
   const elapsed = thinking ? thinking.seconds : 0;
   const shown = JSON.stringify([messages.map((message) => [message.n, message.is_done, message.text.length]),
-    thinking ? [thinking.doing, thinking.calls, elapsed] : null]);
+    thinking ? [thinking.doing, thinking.calls, elapsed] : null, [...tracesOpen].map((n) => [n, traces.has(n)])]);
   if (shown === messagesShown) return;
   messagesShown = shown;
   const box = $('messages');
-  let fitting = new Set();                     // the words the model found that fit, since the last request
+  let fitting = new Set();                     // the words found that the tiles spell, since the last request
   const parts = messages.map((message) => {
     if (message.role === 'user') fitting = new Set();
-    if (message.role === 'step' && message.fits) {
-      message.fits.filter((fit) => fit.is_fit).forEach((fit) => fitting.add(fit.word));
+    if (message.role === 'step' && message.words) {
+      (message.kind === 'given' ? [message.word] : [...message.words, message.word]).filter(Boolean)
+        .forEach((word) => fitting.add(word));
     }
     if (message.role === 'event' && message.word) fitting.add(message.word);
     return messageHtml(message, fitting);
@@ -181,9 +189,10 @@ function renderMessages() {
       + `${thinking.steps ? ` · tool call ${thinking.steps}` : ''}</span></div>`);
   }
   if (!parts.length) {
-    parts.push('<div class="empty">Ask for a word. The model guesses words of the tiles, the code checks each guess '
-      + 'against them -- the model cannot count letters -- and the arm sets the best one down. Try <b>go</b>, '
-      + '<b>a 7-letter word</b>, a clue like <b>a farm animal</b>, then <b>elaborate</b>.</div>');
+    parts.push('<div class="empty">Ask for a word. The model reads what you want, and code finds it among the words '
+      + 'the tiles spell -- the model cannot count letters: the longest, or for a clue those nearest it in meaning, '
+      + 'of which the model chooses one. The arm sets it down. Try <b>go</b>, <b>a 7-letter word</b>, a clue like '
+      + '<b>a farm animal</b>, <b>spell</b> a word of yours, then <b>elaborate</b>.</div>');
   }
   box.innerHTML = parts.join('');
   if (isPinned) box.scrollTop = box.scrollHeight;
@@ -199,12 +208,17 @@ function messageHtml(message, fitting) {
   const meta = message.is_failed ? `${fmt(message.seconds, 0)} s`
     : `${fmt(message.seconds, 0)} s · ${message.calls} model call${message.calls === 1 ? '' : 's'} · `
       + `${message.tokens_in} tokens read, ${message.tokens_out} written${message.is_cut ? ' · cut short' : ''}`;
+  const isOpen = tracesOpen.has(message.n);
+  const toggle = message.has_trace ? `<button type="button" class="trace-toggle" data-n="${message.n}">`
+    + `${isOpen ? '▾' : '▸'} what the model did</button>` : '';
   return `<div class="bubble assistant ${message.is_failed ? 'failed' : ''}">${withTiles(message.text, fitting)}`
-    + `<span class="meta">${meta}</span></div>`;
+    + `<span class="meta">${meta}</span></div>${toggle}`
+    + `${isOpen ? `<pre class="trace">${escaped(traceText(message.n))}</pre>` : ''}`;
 }
 
-// A tool call: its guesses as chips once checked -- green those that fit, the one set down filled, struck through
-// those whose letters are not on the tiles, and those the judge says are not words -- and what became of it.
+// A tool call: once done, the words weighed as chips -- for a clue those nearest it in meaning, for a length the
+// everyday words of it, else the longest the tiles spell -- the one chosen filled, a word of the user's struck through
+// when the tiles lack its letters; then what became of it.
 function stepHtml(message) {
   const classes = `step ${message.is_done ? '' : 'running'} ${message.is_failed ? 'failed' : ''}`;
   const head = `<span class="icon">${TOOL_ICONS[message.tool] || '•'}</span><span class="name">${message.tool}`
@@ -213,29 +227,80 @@ function stepHtml(message) {
   let result;
   if (!message.is_done) {
     result = escaped(message.argument || 'working…');
-  } else if (message.fits && message.fits.length) {
-    result = message.fits.map((fit) => guessChip(fit, message.word)).join('') + `<br>${verdict(message)}`;
+  } else if (message.words && message.words.length) {
+    result = `${wordsLead(message)}${message.words.map((word) => wordChip(word, message)).join(' ')}`
+      + `<br>${verdict(message)}`;
   } else {
-    result = escaped(message.text);
+    result = escaped(withoutAdvice(message.text));
   }
   return `<div class="${classes}" title="${escaped(message.text)}">${head}<span class="result">${result}</span></div>`;
 }
 
-function guessChip(fit, chosen) {
-  const blocked = !fit.is_fit && !fit.missing && fit.problem;
-  const madeUp = !fit.is_fit && !fit.missing && !fit.problem && fit.is_word === false;
-  const kind = fit.word === chosen ? 'fit chosen' : fit.is_fit ? 'fit' : blocked ? 'blocked' : madeUp ? 'made-up' : '';
-  const title = fit.is_fit ? `fits: ${fit.word.length} letters` : blocked ? fit.problem
-    : madeUp ? 'its letters are there, but it is not a word, the judge says'
-      : `the tiles lack ${[...fit.missing].join(' ')}`;
-  return `<span class="guess ${kind}" title="${escaped(title)}">${escaped(fit.word)}`
-    + `${fit.is_fit ? ` <small>${fit.word.length}</small>` : ''}</span>`;
+function wordsLead(message) {
+  if (message.kind === 'clue') return `<span class="lead">nearest “${escaped(message.clue)}” in meaning:</span> `;
+  if (message.kind === 'length') {
+    return `<span class="lead">${message.words[0].length}-letter words the tiles spell:</span> `;
+  }
+  if (message.kind === 'longest') return '<span class="lead">the longest the tiles spell:</span> ';
+  return '';
+}
+
+// A chip: its letter count is not copied, a space between chips is.
+function wordChip(word, message) {
+  const isLacking = message.kind === 'given' && Boolean(message.missing);
+  const kind = word === message.word ? 'fit chosen' : isLacking ? '' : 'fit';
+  const title = isLacking ? `the tiles lack ${[...message.missing].join(' ')}` : `${word.length} letters`;
+  return `<span class="guess ${kind}" title="${escaped(title)}">${escaped(word)}`
+    + `${isLacking ? '' : ` <small>${word.length}</small>`}</span>`;
 }
 
 function verdict(message) {
-  if (message.is_placed) return `→ the arm sets down ${tileWord(message.word)}`;
-  if (message.word) return `→ best: <b>${escaped(message.word)}</b>, not set down${message.place === false ? ', as asked' : ''}`;
-  return 'no word of them fits: the model is asked for others';
+  const { kind, word, said } = message;
+  if (kind === 'given' && message.missing) return `→ the tiles lack ${escaped([...message.missing].join(', '))}`;
+  if (kind === 'clue' && said === 'NONE') return `→ none of them is “${escaped(message.clue)}”, the model says`;
+  if (!word) {
+    const why = message.problem ? `the arm cannot set it down: ${message.problem}` : withoutAdvice(message.text);
+    return `→ ${escaped(why)}`;
+  }
+  const instead = kind === 'clue' ? 'nearest' : 'first';
+  const chose = kind !== 'clue' && kind !== 'length' ? '' : said === word ? 'the model chose it; '
+    : `the model named ${escaped(said || 'nothing')}, not one of them, so the ${instead}; `;
+  if (message.is_placed) return `→ ${chose}the arm sets down ${tileWord(word)}`;
+  const why = message.place === false ? ', as asked'
+    : message.busy ? `: the arm is setting down ${escaped(message.busy)}` : '';
+  return `→ ${chose}${tileWord(word)} not set down${why}`;
+}
+
+// A tool's answer as the page shows it: without what it tells the model to do next.
+function withoutAdvice(text) {
+  return String(text).replace(/\s*(Tell the user|Call find_word|If the user wants)\b.*$/s, '');
+}
+
+// What went to and from the model for an answer, as plain text: each entry under a heading.
+function traceText(n) {
+  const trace = traces.get(n);
+  if (trace === undefined) return 'asking the app for it…';
+  if (typeof trace === 'string') return trace;
+  return trace.map((entry) => `── ${TRACE_HEADS[entry.kind] || entry.kind}`
+    + `${entry.seconds !== undefined ? ` · ${fmt(entry.seconds, 1)} s` : ''} ──\n${entry.text}`).join('\n\n');
+}
+
+async function toggleTrace(n) {
+  if (tracesOpen.delete(n)) {
+    renderMessages();
+    return;
+  }
+  tracesOpen.add(n);
+  renderMessages();
+  if (traces.has(n)) return;
+  let reply;
+  try {
+    reply = await api('chat/trace', { n });
+  } catch {
+    reply = { status: 'error', detail: 'the calibration app is not answering' };
+  }
+  traces.set(n, reply.status === 'done' ? reply.trace : `Not there: ${reply.detail}`);
+  renderMessages();
 }
 
 function renderAsk() {
@@ -269,8 +334,10 @@ function escaped(text) {
   return String(text).replace(/[&<>"]/g, (character) => ESCAPES[character]);
 }
 
+// A word as tiles; copied, the word itself (chat.css).
 function tileWord(word) {
-  return `<span class="word-tiles">${[...word].map((letter) => `<span class="tile small">${letter}</span>`).join('')}`
+  return `<span class="word-tiles"><span class="as-text">${escaped(word)}</span>`
+    + `${[...word].map((letter) => `<span class="tile small" aria-hidden="true">${escaped(letter)}</span>`).join('')}`
     + '</span>';
 }
 
@@ -305,6 +372,10 @@ $('ask-form').addEventListener('submit', (event) => {
 $('stop').addEventListener('click', () => command('chat/stop', {}, 'STOP'));
 $('forget').addEventListener('click', () => command('chat/forget', {}, 'NEW VISITOR'));
 $('locate').addEventListener('click', () => command('tiles/locate', {}, 'LOCATE TILES'));
+$('messages').addEventListener('click', (event) => {
+  const toggle = event.target.closest('.trace-toggle');
+  if (toggle) toggleTrace(Number(toggle.dataset.n));
+});
 $('messages').addEventListener('scroll', () => {
   const box = $('messages');
   isPinned = box.scrollTop + box.clientHeight >= box.scrollHeight - 24;

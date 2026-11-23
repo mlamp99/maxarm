@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# The apps' Python packages, into the python3 on PATH -- an activated venv's, if there is one -- and the device's
-# certificate and key in config/ if it has none yet. On the board ../install.sh runs it in the app's venv; on a PC,
-# activate a venv first if you want one:
+# The apps' Python packages, into the python3 on PATH -- an activated venv's, if there is one -- the agent's
+# embedding model, and the device's certificate and key in config/ if it has none yet. On the board ../install.sh
+# runs it in the app's venv; on a PC, activate a venv first if you want one:
 #
 #   scripts/install.sh
 set -e
@@ -12,6 +12,11 @@ if [ "$(uname -m)" = aarch64 ]; then
 else
   python3 -m pip install -r src/requirements-pc.txt
 fi
+
+# The embedding model the agent's dictionary finds words by meaning with, 30 MB, into Hugging Face's cache, where
+# the apps read it without going online (src/applib/agent/dictionary.py: the same model and revision).
+hf download minishlab/potion-base-8M config.json model.safetensors tokenizer.json \
+  --revision bf8b056651a2c21b8d2565580b8569da283cab23
 
 mkdir -p config
 if [ ! -f config/device-pkey.pem ]; then

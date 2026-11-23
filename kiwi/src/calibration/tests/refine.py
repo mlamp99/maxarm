@@ -17,7 +17,6 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 
-from applib.camera.base import FoundBase
 from applib.camera.fit import CameraFit, stretch_of
 from applib.camera.model import project
 from applib.camera.sighting import in_frame
@@ -37,32 +36,32 @@ SUGGESTED_POINTS = 10
 OFF_MM = (1.5, 2.5)
 
 
-def refined(fit: CameraFit, points: List[RefinePoint], found: Optional[FoundBase]) -> Tuple[CameraFit, Optional[Tie]]:
+def refined(fit: CameraFit, points: List[RefinePoint], frame: Optional[np.ndarray]) -> Tuple[CameraFit, Optional[Tie]]:
     """The calibration SAVE CALIBRATION writes and the tie whose mesh is the arm's correction (None: no correction),
     or Refused, saying why the points do not make one."""
-    trial, tie, _ = _refined(fit, points, found)
+    trial, tie, _ = _refined(fit, points, frame)
     return trial, tie
 
 
-def _refined(fit: CameraFit, points: List[RefinePoint], found: Optional[FoundBase]
+def _refined(fit: CameraFit, points: List[RefinePoint], frame: Optional[np.ndarray]
              ) -> Tuple[CameraFit, Optional[Tie], List[Optional[np.ndarray]]]:
     """`refined()`, and each point's reading as the mesh of the other points puts it."""
     if not points and (fit.refined or fit.anchor):
-        return refine_and_leave_out(fit, [], found)
+        return refine_and_leave_out(fit, [], frame)
     if len(points) < MIN_POINTS:
         missing = MIN_POINTS - len(points)
         raise Refused(f"record {missing} more point{'s' if missing > 1 else ''} first: {MIN_POINTS} at the least, "
                       f"{SUGGESTED_POINTS} or more spread over the desk to be of use")
     try:
-        return refine_and_leave_out(fit, points, found)
+        return refine_and_leave_out(fit, points, frame)
     except PointsDoNotFit as reason:
         raise Refused(str(reason)) from None
 
 
-def describe(fit: CameraFit, points: List[RefinePoint], found: Optional[FoundBase]) -> dict:
+def describe(fit: CameraFit, points: List[RefinePoint], frame: Optional[np.ndarray]) -> dict:
     """The points, how far off each is, and what SAVE CALIBRATION would make."""
     try:
-        (trial, tie, put), problem = _refined(fit, points, found), None
+        (trial, tie, put), problem = _refined(fit, points, frame), None
     except Refused as reason:
         (trial, tie, put), problem = (None, None, []), str(reason)
     put = put if trial and trial.refined else [None] * len(points)
