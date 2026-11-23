@@ -1,0 +1,106 @@
+/* The Chat page: the desk -- the live view with the tiles drawn over it, the letters to use and the word being set
+   down, as tiles -- on the left; the conversation with the language model on the right. The camera's picture and the
+   card shown without a calibration are the Tiles page's (tiles.css). */
+
+main.chat {
+  display: grid; gap: 16px; padding: 16px 20px 28px; align-items: start;
+  grid-template-columns: minmax(520px, 1.25fr) minmax(400px, 1fr);
+  grid-template-areas: "desk talk";
+}
+main.chat .desk { grid-area: desk; }
+main.chat .talk { grid-area: talk; display: grid; grid-template-rows: auto 1fr auto auto auto;
+  height: calc(100vh - 96px); min-height: 520px; position: sticky; top: 72px; }
+
+@media (max-width: 1120px) {
+  main.chat { grid-template-columns: 1fr; grid-template-areas: "talk" "desk"; }
+  main.chat .talk { position: static; height: 640px; }
+}
+
+main.chat.is-blocked { grid-template-columns: 1fr; grid-template-areas: "blocked"; }
+main.chat.is-blocked .desk, main.chat.is-blocked .talk { display: none; }
+
+/* --- tiles, as the real ones look: a pale face, a dark letter ---------------- */
+
+.tiles-strip { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-height: 34px; }
+.tile { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 5px;
+  font: 700 17px var(--mono); color: #1d232b;
+  background: linear-gradient(160deg, #fbf8f1, #e5dfd2); border: 1px solid #c9c1b0;
+  box-shadow: 0 2px 0 #9c9380, 0 4px 10px rgba(0, 0, 0, 0.35); }
+.tile.small { width: 21px; height: 21px; font-size: 12.5px; border-radius: 4px; box-shadow: 0 1px 0 #9c9380; }
+.tile.slot { background: transparent; border: 1.5px dashed #6d7886; color: var(--faint); box-shadow: none; }
+.tile.carrying { border-color: var(--yellow); animation: lift 0.9s ease-in-out infinite alternate; }
+.tile.placed { background: linear-gradient(160deg, #eafbe9, #bfe9c6); border-color: var(--green);
+  box-shadow: 0 2px 0 #2f8f48, 0 0 12px var(--green-glow); }
+.tile.failed { border-color: var(--red); color: var(--red); }
+@keyframes lift { to { transform: translateY(-4px); box-shadow: 0 8px 14px rgba(0, 0, 0, 0.45); } }
+.word-tiles { display: inline-flex; gap: 2px; vertical-align: -5px; margin: 0 2px; }
+
+.letters-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.letters-row[hidden] { display: none; }
+.row-label { flex: none; width: 92px; color: var(--faint); font-size: 11px; letter-spacing: 1.3px;
+  text-transform: uppercase; }
+.desk-note { margin: 10px 2px 0; line-height: 1.5; }
+.desk-note:empty { display: none; }
+
+/* --- the conversation ---------------------------------------------------- */
+
+.messages { overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 4px 6px 12px 2px;
+  min-height: 0; }
+.messages .empty { margin: auto; max-width: 340px; text-align: center; color: var(--faint); line-height: 1.6; }
+
+.bubble { max-width: 88%; padding: 9px 13px; border-radius: 14px; line-height: 1.5; white-space: pre-wrap;
+  overflow-wrap: anywhere; }
+.bubble.user { align-self: flex-end; background: var(--green-wash); border: 1px solid rgba(65, 195, 99, 0.45);
+  border-bottom-right-radius: 4px; }
+.bubble.assistant { align-self: flex-start; background: var(--panel-raised); border: 1px solid var(--line-strong);
+  border-bottom-left-radius: 4px; }
+.bubble.assistant.failed { border-color: rgba(240, 82, 74, 0.5); color: #ffb2ab; }
+.bubble .meta { display: block; margin-top: 5px; color: var(--faint); font-size: 11px; white-space: normal; }
+.bubble.thinking { color: var(--muted); }
+.bubble.thinking .dots span { animation: blink 1.2s infinite; }
+.bubble.thinking .dots span:nth-child(2) { animation-delay: 0.2s; }
+.bubble.thinking .dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes blink { 50% { opacity: 0.2; } }
+
+/* A tool call: what the model asked for, and what came back. */
+.step { align-self: flex-start; max-width: 94%; display: grid; grid-template-columns: 22px 1fr; gap: 2px 6px;
+  padding: 6px 10px; border-left: 2px solid var(--line-strong); color: var(--muted); font-size: 12.5px; }
+.step .icon { color: var(--green-bright); font-size: 14px; line-height: 1.3; }
+.step .name { font: 600 12px var(--mono); color: var(--text); }
+.step .result { grid-column: 2; line-height: 1.5; overflow-wrap: anywhere; }
+.step.running .icon { animation: pulse 1s ease-in-out infinite; color: var(--yellow); }
+.step.failed { border-left-color: var(--red); }
+.guess { display: inline-block; margin: 2px 4px 2px 0; padding: 1px 7px; border-radius: 6px;
+  font: 600 11.5px var(--mono); letter-spacing: 0.8px; border: 1px solid var(--line-strong); color: var(--faint);
+  text-decoration: line-through; }
+.guess.fit { color: var(--green-bright); border-color: rgba(65, 195, 99, 0.5); background: var(--green-wash);
+  text-decoration: none; }
+.guess.blocked { color: var(--yellow); border-color: rgba(230, 184, 74, 0.45); text-decoration: none; }
+.guess.made-up { color: #b48ead; border-color: rgba(180, 142, 173, 0.45); text-decoration: line-through wavy; }
+.guess.chosen { color: #06210f; background: var(--green); border-color: var(--green); }
+.guess small { font-weight: 500; opacity: 0.8; }
+
+/* News from the app: a word set down, or not. */
+.event { align-self: center; padding: 4px 12px; border-radius: 999px; font-size: 12px; color: var(--green-bright);
+  background: var(--green-wash); border: 1px solid rgba(65, 195, 99, 0.4); }
+.event.failed { color: var(--red); background: var(--red-wash); border-color: rgba(240, 82, 74, 0.4); }
+
+.suggestions { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 0 8px; border-top: 1px solid var(--line); }
+.suggestions button { font: inherit; font-size: 12.5px; color: var(--muted); cursor: pointer; padding: 4px 11px;
+  border-radius: 999px; background: var(--panel); border: 1px solid var(--line-strong); }
+.suggestions button:hover:not(:disabled) { color: var(--green-bright); border-color: var(--green); }
+.suggestions button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.ask-row { display: flex; gap: 8px; margin: 0; }
+#text { flex: 1; min-width: 0; font: 15px var(--sans); color: var(--text); background: var(--bg);
+  border: 1px solid var(--line-strong); border-radius: 9px; padding: 9px 12px; }
+#text:focus { border-color: var(--green); outline: none; }
+#text:disabled { opacity: 0.45; }
+#ask { padding: 9px 20px; letter-spacing: 1.2px; }
+.btn.stop { color: #ffb2ab; background: var(--red-wash); border-color: rgba(240, 82, 74, 0.5); letter-spacing: 1px; }
+.btn.stop[hidden] { display: none; }
+.talk-note { margin: 8px 2px 0; }
+.talk-note:empty { display: none; }
+
+.talk .pill { max-width: 330px; }
+.talk .pill.off { opacity: 0.6; }

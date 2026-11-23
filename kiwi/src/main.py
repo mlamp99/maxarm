@@ -12,7 +12,7 @@ Commands, from the device's Commands tab in /IOTCONNECT or typed at the console:
     find-cube               find the red cube and bring the cup over it
     reader-location left    where the person reading the words stands: back, front, left or right
     agent SENTENCE          the sentence to the language model on the Ara240, which may run the commands above;
-                            the console's only, so far. Needs connector/ running (connector/install.sh, run.sh)
+                            its answer is the `answer` telemetry. Needs connector/ (connector/install.sh)
 
 Calibrate first: the calibration app (`src/calibration/calibration.py`) writes
 config/, and this app uses what it chose there -- the camera's mode and focus, the
@@ -35,7 +35,8 @@ The threads:
     webrtc     asyncio: the signalling channel, every viewer                      applib/webrtc.py
     iotc       the telemetry publisher, and paho's own MQTT thread          applib/iotc.py
     command    two: one moves the arm at a time (app/app.py)               applib/commands.py
-    agent      asks the language model a throwaway question until it answers   app/agent.py
+    connector  where the language model is: installed, loading, ready        applib/agent/connector.py
+    agent      a word the model chose, set down while it answers             applib/agent/service.py
     arm        connects the arm, and again after it fails or is lost        app/app.py
     main       the console, or a wait for Ctrl-C
 
@@ -53,9 +54,8 @@ from threading import Event, Thread
 from maxarm import MaxArm
 from maxarm.spaces import CONFIG_DIR
 
-from app import agent
 from app.app import TilesApp
-from applib import iotc, webrtc
+from applib import agent, iotc, webrtc
 from applib.camera.feed import Feed
 from applib.camera.store import CameraFile
 from applib.commands import CommandService
@@ -96,7 +96,7 @@ def main() -> int:
     telemetry = TelemetryState()
     motion = Motion(MaxArm(config_dir=None), CONFIG_DIR)
     app = TilesApp(motion, work, cube, settings, camera_file, overlay, telemetry)
-    app.set_agent(build_agent(app))
+    app.set_agent(build_agent(app, telemetry, overlay))
     service = CommandService(app.on_command, on_result=lambda result: overlay.show_answer(result.message,
                                                                                          result.is_ok))
     streamer = build_streamer(args, overlay, stream)
@@ -142,13 +142,24 @@ def build_streamer(args, overlay: StreamOverlay, stream: Stream):
     return streamer
 
 
-def build_agent(app: TilesApp):
-    """The language model on the Ara240, or None without strands-agents. Nothing is connected here: the connector is
-    optional and loads its model for minutes, so the agent's own thread finds out when it answers."""
+def build_agent(app: TilesApp, telemetry: TelemetryState, overlay: StreamOverlay):
+    """The language model on the Ara240, or None without strands-agents. Nothing is waited for here: the connector is
+    optional and loads its model for minutes; its own thread watches it, and says so as it changes."""
     if not agent.IS_STRANDS_AVAILABLE:
         print("agent      : off, strands-agents is not installed (src/requirements.txt)", flush=True)
+        telemetry.set(agent_status="off")
         return None
-    return agent.AgentService(app.on_command, app.describe_letters, app.check_word)
+
+    def on_change(status: dict) -> None:
+        print(f"agent      : {agent.describe_status(status)}", flush=True)
+        telemetry.set(agent_status=status["state"])
+        telemetry.wake()
+
+    def on_say(text: str, is_ok: bool) -> None:                 # a word set down, or not, after the answer
+        telemetry.set_once(answer=text)
+        overlay.show_answer(text, is_ok)
+
+    return agent.AgentService(agent.AraConnector(on_change=on_change), app.agent_desk(), on_say=on_say)
 
 
 def build_cloud(args, service: CommandService, telemetry: TelemetryState, overlay: StreamOverlay, streamer):

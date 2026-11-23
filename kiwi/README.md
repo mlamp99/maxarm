@@ -6,7 +6,8 @@ Started as a copy of `jackal/`, whose [`work/STATUS-jackal.md`](../work/STATUS-j
 references still point to.
 
 Two apps on one library. **The calibration app** (`src/calibration/`, its pages in `web/`) calibrates the desk and
-the camera and tries them: desk, camera, Fine Tune and Tiles pages, as impala left them. **The /IOTCONNECT app**
+the camera and tries them: desk, camera, Fine Tune and Tiles pages, as impala left them, and the Chat page, the
+language model on the Ara240 finding words of the tiles. **The /IOTCONNECT app**
 (`src/main.py`) takes commands from the dashboard or the console, sends what it found as telemetry, and streams the
 camera's picture with the tiles drawn over it over KVS WebRTC. Calibrate first; the two cannot run at once, as each
 holds the arm and the camera.
@@ -28,7 +29,7 @@ tar zxf tiles.tgz
 ./run.sh                # the app: /IOTCONNECT, the stream, the console
 ./run.sh --no-iotc      # the app without the cloud: commands at the console
 scripts/install-service.sh calibration   # or `app`: that one started at every boot; `none`: neither
-connector/install.sh    # optional, with an Ara240, once: the language model for `agent` (11 GB, many minutes)
+connector/install.sh    # optional, with an Ara240, once: the model for `agent` and Chat (11 GB, many minutes)
 connector/install-service.sh  # then at every boot (or connector/run.sh after each): the model ready minutes later
 ```
 
@@ -54,17 +55,21 @@ On a PC, in a venv of your own if you like: `scripts/install.sh`, then `python s
 | `find-cube` [*red*]         | park the arm, find the red cube in the live view, bring the cup over it             |
 | `reader-location` [*where*] | where the reader stands -- `back`, `front`, `left` or `right` -- or, alone, where   |
 |                             | they stand now                                                                      |
+| `agent` *SENTENCE*          | the sentence to the language model on the Ara240 -- `go`, `a 7-letter word`, `a     |
+|                             | farm animal`, `elaborate` -- which finds a word of the tiles and has it set down    |
 
-Each is answered by its acknowledgement, the answer the console prints. The console takes the same commands as text:
-`place TEAM`, `find cube`, `reader left`. The console alone, so far, takes `agent` *SENTENCE*: the sentence to
-Qwen2.5-7B-Instruct on the Ara240, whose tools are the letters as last seen, `detect`, a word checked against the
-tiles, and `place` (`src/app/agent.py`).
+Each is answered by its acknowledgement, the answer the console prints -- `agent`'s cut short, the whole of it the
+`answer` telemetry. The console takes the same commands as text: `place TEAM`, `find cube`, `reader left`,
+`agent go`.
 
 ## The Ara240
 
-Optional: without it the app runs as before and `agent` says the model is not answering. The image brings the
-Ara240's runtime and the wheels of NXP's eIQ AAF Connector, which holds the model on the Ara240 behind an
-OpenAI-style endpoint, port 3000, on the board only. `connector/install.sh` installs the connector into its own
+Optional: without it both apps run as before, and `agent` and the Chat page say where the model is -- not
+installed, not running, waiting for the Ara240, loading, about 6 minutes after the connector starts, or ready. The
+model, Qwen2.5-7B-Instruct, guesses words; code checks them against the tiles, the model judges which are words,
+and the arm sets the longest down while the model explains it (`src/applib/agent/`, shared by both apps). The image
+brings the Ara240's runtime and the wheels of NXP's eIQ AAF Connector, which holds the model on the Ara240 behind
+an OpenAI-style endpoint, port 3000, on the board only. `connector/install.sh` installs the connector into its own
 `connector/venv/`, patched (`apply-patch.sh`), and fetches the model into `/usr/share/llm/`, where the image's
 `ara2-fetch-models` puts it. `connector/install-service.sh` starts it at every boot, as the systemd service
 `iotc-aaf-connector` (`--remove` takes it out); without the service, `connector/run.sh` starts it in the
@@ -77,6 +82,10 @@ background, its log `connector/server.log`. With or without, `run.sh` restarts i
 |                 | read, `-` blank                                                                             |
 | `err_no_reach`  | the letters of those out of the arm's reach; empty when none is                             |
 | `err_too_close` | the letters of those too close to another to pick up; empty when none is                    |
+| `answer`        | the language model's answer to `agent`, and then what became of the word it set down; sent  |
+|                 | once each                                                                                   |
+| `agent_status`  | where the language model is: `off`, `not installed`, `stopped`, `waiting`, `loading`,       |
+|                 | `ready` or `failed`                                                                         |
 | `version`, `sdk_version` | the app's and the SDK's                                                            |
 
 The stream is the camera's live view at the calibration's frame size, made as large as H.264 level 3.1 holds (1104 x
@@ -100,7 +109,8 @@ pages' live view as a layer.
 | `src/main.py`       | the /IOTCONNECT app: the composition root                                                |
 | `src/app/`          | what the app does, command by command (`app.py`)                                         |
 | `src/applib/`       | how, for both apps: the tiles, the letters, the camera, the arm's moves, the overlay,    |
-|                     | the settings; and the app's commands, telemetry, /IOTCONNECT, the stream and WebRTC      |
+|                     | the settings, the language model and its tools (`agent/`); and the app's commands,       |
+|                     | telemetry, /IOTCONNECT, the stream and WebRTC                                            |
 | `src/maxarm/`       | the arm's library                                                                        |
 | `src/calibration/`  | the calibration app and its pages' requests; guide in its `README.md`                    |
 | `web/`              | the calibration app's pages: HTML, scripts, styles                                       |
@@ -110,7 +120,7 @@ pages' live view as a layer.
 | `training/`         | `letters/`: the reader's recipe                                                          |
 | `scripts/`          | `install.sh`, `install-ch341.sh`; `package.sh` makes `tiles.tgz`, `build-ch341.sh` the driver |
 |                     | `install-service.sh` starts an app at boot (`systemd/`)                                    |
-| `connector/`        | the Ara240's language model for `agent`: NXP's connector, installed and run by its scripts |
+| `connector/`        | the Ara240's language model: NXP's connector, installed and run by its scripts           |
 | `agenttools/`       | the fake board and camera, the overlay drawn on the owner's stills, checks; not shipped  |
 
 The arm's library, its calls and limits: [`src/maxarm/README.md`](src/maxarm/README.md).

@@ -1,55 +1,61 @@
 #!/usr/bin/env python3
-"""Sentences put to the language model on the Ara240 through the app's own `AgentService`, with nothing moved: the
-tools answer from a fixed set of letters, the arm and the camera are not touched. On the board, connector/run.sh
-running and the model loaded:
+"""Requests put to the language model on the Ara240 through the apps' own `AgentService`, with nothing moved: the
+desk is a fixed set of letters, the arm and the camera are not touched. On the board, the connector ready:
 
-    venv/bin/python agenttools/agent-check.py                        # the sentences below
-    venv/bin/python agenttools/agent-check.py "a 5-letter word"      # these
+    venv/bin/python agenttools/agent-check.py                               # the requests below, in turn
+    venv/bin/python agenttools/agent-check.py "a 5-letter word" "explain"   # these
+    venv/bin/python agenttools/agent-check.py --letters DVQEENMAOTSTZWN go
 
-Each tool call is printed as the app prints it. `detect_tiles` and `place_word` say what they would have done.
+One service for all of them, so each request is told what happened before it, as on the Chat page. A word "set
+down" takes PLACE_S and leaves the letters as they were: the tiles put back. Each tool call is printed as the apps
+print it.
 """
 
+import argparse
 import sys
 import time
-from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from app import agent                                   # noqa: E402
+from applib.agent import AgentService, AraConnector, Desk        # noqa: E402
+from applib.agent.words import missing_letters                   # noqa: E402
 
-LETTERS = "AEEHMORST"
-DROPOFF = "CAT"
-SENTENCES = ["Which letters are on the desk?", "Can you make the word HORSE?", "Give me a 5-letter word and place it."]
-
-
-def describe_letters() -> str:
-    return (f"The tiles as found at 12:00:00. Ready to pick up: {LETTERS}. Already in the dropoff area, left to "
-            f"right: {DROPOFF}. Not usable: none ('?' not read, '-' blank).")
-
-
-def check_word(text: str) -> str:
-    wanted = text.strip().upper()
-    short = Counter(wanted) - Counter(LETTERS)
-    if short:
-        return f"{wanted} cannot be set down: not on the tiles ready to pick up: {' '.join(sorted(short))}."
-    return f"{wanted} can be set down from the tiles ready to pick up."
-
-
-def run_command(command) -> str:
-    if command.verb == "detect":
-        return f"{len(LETTERS) + len(DROPOFF)} tiles (agent-check: nothing moved)."
-    return f"agent-check: {command.verb} {command.argument} not done, nothing moved."
+REQUESTS = ["go", "7-letter word", "A large herbivore domestic animal", "Elaborate",
+            "Locate tiles again and give me a 7-letter word", "Give me a word, but don't place tiles"]
+PLACE_S = 3.0
 
 
 def main() -> int:
-    service = agent.AgentService(run_command, describe_letters, check_word)
-    while not service.is_ready:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--letters", default="AEEHMORST", help="the letters on the tiles ready to pick up")
+    parser.add_argument("requests", nargs="*", default=REQUESTS)
+    args = parser.parse_args()
+    letters = "".join(sorted(args.letters.upper()))
+
+    def seen() -> dict:
+        return {"taken": "12:00:00", "on_offer": letters, "dropoff": "", "unusable": ""}
+
+    def check(word: str) -> str:
+        lacking = missing_letters(word, letters)
+        return f"not on the tiles ready to pick up: {' '.join(lacking)}" if lacking else ""
+
+    def place(word: str) -> str:
+        time.sleep(PLACE_S)
+        return f"{word} set down (agent-check: nothing moved)"
+
+    desk = Desk(seen=seen, detect=lambda: f"{len(letters)} tiles (agent-check: nothing moved)", check=check,
+                place=place)
+    source = AraConnector()
+    agent = AgentService(source, desk)
+    while source.status()["state"] != "ready":
         time.sleep(1)
-    for sentence in sys.argv[1:] or SENTENCES:
-        print(f"\n> {sentence}", flush=True)
+    for request in args.requests:
+        print(f"\n> {request}", flush=True)
         started = time.monotonic()
-        print(f"{service.ask(sentence)}   [{time.monotonic() - started:.1f} s]", flush=True)
+        print(f"{agent.ask(request)}   [{time.monotonic() - started:.1f} s]", flush=True)
+        while agent.state()["placing"]:
+            time.sleep(0.5)
     return 0
 
 

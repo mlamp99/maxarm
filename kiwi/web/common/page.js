@@ -5,6 +5,7 @@ const PAGES = [
   { id: 'camera', title: 'Camera', href: '/camera/' },
   { id: 'tests', title: 'Fine Tune', href: '/tests/' },
   { id: 'tiles', title: 'Tiles', href: '/tiles/' },
+  { id: 'chat', title: 'Chat', href: '/chat/' },
 ];
 const POLL_MS = 500;
 const TOAST_MS = 5000;

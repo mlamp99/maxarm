@@ -1,0 +1,98 @@
+"""The Chat page's requests: a request put to the language model on the Ara240, which finds a word of the tiles and
+has the arm set it down; stopping it; a new visitor.
+
+The model, its tools and the conversation are `applib/agent`, as the /IOTCONNECT app's `agent` command has them. The
+tiles are the Tiles page's -- the same detection, the same PLACE, with the tile offset and the reader chosen there
+(`tiles/api.py`) -- so LOCATE TILES on either page serves both, and a word the model sets down shows on both.
+
+| request                 | body | does                                                                            |
+| ----------------------- | ---- | ------------------------------------------------------------------------------- |
+| `POST /api/chat/ask`    | text | the request to the model, answered on a thread of its own: the page follows it  |
+|                         |      | in the state; refused at once while another is answered or the model is not     |
+|                         |      | ready                                                                           |
+| `POST /api/chat/stop`   |      | the request being answered cut short; the arm is RESET's                         |
+| `POST /api/chat/forget` |      | a new visitor: the conversation, and what the model is told of it, start again  |
+
+The state's `chat` is `AgentService.state()`: where the model is, the conversation, the request being answered and
+the word being set down. Without strands-agents, the model is `off`.
+"""
+
+from applib.agent import IS_STRANDS_AVAILABLE, AgentService, AraConnector, Desk, describe_status, word_check
+from applib.commands import CommandError
+from common.server import BadRequest, Server
+from tiles.api import TilesSession
+
+MAX_TEXT = 300              # a request's characters at most: a sentence or two
+OFF = {"model": {"state": "off", "detail": "strands-agents is not installed (src/requirements.txt)", "since": None,
+                 "elapsed_s": None, "typical_s": 0, "name": "the language model"},
+       "messages": [], "thinking": None, "placing": ""}
+
+
+class ChatSession:
+    def __init__(self, tiles: TilesSession) -> None:
+        self.tiles = tiles
+        self.agent = None
+        if IS_STRANDS_AVAILABLE:
+            desk = Desk(seen=tiles.work.letters_seen, detect=self._detect, check=word_check(tiles.work, tiles.settings),
+                        place=self._place)
+            self.agent = AgentService(AraConnector(on_change=_say_status), desk)
+        else:
+            print("agent      : off, strands-agents is not installed (src/requirements.txt)", flush=True)
+
+    def register(self, server: Server) -> None:
+        server.add_state(self.state)
+        server.post("/api/chat/ask", self.ask)
+        server.post("/api/chat/stop", self.stop)
+        server.post("/api/chat/forget", self.forget)
+
+    # --- the requests -----------------------------------------------------
+
+    def ask(self, body: dict) -> dict:
+        text = " ".join(str(body.get("text", "")).split())
+        if not text:
+            raise BadRequest("no text given")
+        if len(text) > MAX_TEXT:
+            raise BadRequest(f"a request is {MAX_TEXT} characters at most, not {len(text)}")
+        if self.agent is None:
+            return {"status": "refused", "detail": f"the language model is off: {OFF['model']['detail']}"}
+        try:
+            self.agent.submit(text, source="page")
+        except CommandError as reason:
+            return {"status": "refused", "detail": str(reason)}
+        return {"status": "done", "detail": ""}
+
+    def stop(self, body: dict) -> dict:
+        if self.agent is None or not self.agent.stop():
+            return {"status": "refused", "detail": "nothing is being answered"}
+        return {"status": "done", "detail": ""}
+
+    def forget(self, body: dict) -> dict:
+        if self.agent is not None:
+            self.agent.forget()
+        return {"status": "done", "detail": ""}
+
+    # --- what the tools do ------------------------------------------------
+
+    def _detect(self) -> str:
+        return _done(self.tiles.locate({}))
+
+    def _place(self, word: str) -> str:
+        return _done(self.tiles.place_word(word))
+
+    # --- for the page -----------------------------------------------------
+
+    def state(self) -> dict:
+        problem = self.tiles.camera_file.get()[1]
+        return {"chat": self.agent.state() if self.agent is not None else OFF,
+                "unavailable": {"chat": problem} if problem else {}}
+
+
+def _done(outcome: dict) -> str:
+    """A worker's outcome as the tools take it: its detail, or CommandError saying why it was not done."""
+    if outcome["status"] != "done":
+        raise CommandError(outcome["detail"] or outcome["status"])
+    return outcome["detail"]
+
+
+def _say_status(status: dict) -> None:
+    print(f"agent      : {describe_status(status)}", flush=True)

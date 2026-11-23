@@ -14,9 +14,13 @@ does not import it:
 What flows each way:
 
     D2C   every 10 s, and at once when a command asks: sdk_version, version, and
-          the tiles' letters and those in trouble (`tilework.TileWork.summary()`)
+          the tiles' letters and those in trouble (`tilework.TileWork.summary()`);
+          `agent_status`, where the language model is (`applib/agent/connector.py`);
+          and once, when there is one, `answer`: the model's answer to `agent`, or
+          what became of the word it set down
     C2D   the device template's commands (`files/device-template.json`), each
-          acknowledged with its answer
+          acknowledged with its answer -- `agent`'s cut to MAX_AGENT_ACK_CHARS, a
+          tooltip's worth, the whole of it the `answer` telemetry
     KVS   the signalling channel and the AWS credentials `webrtc.py` signs with
 
 The cloud is required: `connect()` raises, and `main.py` lets it stop the app,
@@ -57,6 +61,7 @@ C2D_VERBS = {
     "place": commands.PLACE,
     "find-cube": commands.FIND_CUBE,
     "reader-location": commands.READER_LOCATION,
+    "agent": commands.AGENT,
 }
 
 TELEMETRY_INTERVAL_S = 10.0
@@ -64,6 +69,7 @@ MIN_SEND_GAP_S = 1.0        # a burst of wakes must not turn into an MQTT flood
 RECONNECT_WAIT_S = 30.0     # after a failure that took the client down entirely
 CREDENTIALS_MARGIN_S = 120  # AWS credentials are renewed this long before they expire
 MAX_ACK_CHARS = 200         # an acknowledgement is shown as a tooltip: a sentence, not a page
+MAX_AGENT_ACK_CHARS = 60    # the model's answer is a paragraph: enough to know which; the rest is `answer`
 
 
 class IotcClient:
@@ -216,6 +222,8 @@ class IotcClient:
         try:
             result = future.result()
             is_ok, text = result.is_ok, result.message
+            if is_ok and C2D_VERBS.get(message.command_name) == commands.AGENT:
+                text = shorten(text, MAX_AGENT_ACK_CHARS)
         except Exception as error:
             logger.exception("c2d %s failed", message.command_name)
             is_ok, text = False, f"Failed: {type(error).__name__}"

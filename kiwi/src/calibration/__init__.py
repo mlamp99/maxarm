@@ -11,6 +11,7 @@
 | `tests/`  | Fine Tune: the red cube found and the arm brought over it, the arm sent   |
 |           | to a point of the desk clicked in the live view, the points that refine   |
 | `tiles/`  | the 25 mm tiles found in the snapshot, read, and a word of them set down  |
+| `chat/`   | a request to the language model on the Ara240, which sets a word down     |
 
 Each page's HTML, scripts and styles are in the pilot's `web/`, a directory per
 page. What the /IOTCONNECT app shares with these pages is in `applib/`.

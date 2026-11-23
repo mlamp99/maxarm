@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """The calibration web app. One page per calibration, each a tab: the desk first, then the camera; then the tests,
-and the tiles.
+the tiles, and the chat with the language model on the Ara240 about them.
 
     ../.venv/bin/python src/calibration/calibration.py                  # then open http://localhost:8080
     ../.venv/bin/python src/calibration/calibration.py --host ::        # every address, for another machine's browser
@@ -33,6 +33,7 @@ from maxarm.spaces import CONFIG_DIR                         # noqa: E402
 from applib.camera.feed import Feed                          # noqa: E402
 from applib.motion import Motion                             # noqa: E402
 from camera.api import CameraSession                         # noqa: E402
+from chat.api import ChatSession                             # noqa: E402
 from common import arm_api                                   # noqa: E402
 from common.server import Server                             # noqa: E402
 from common.worker import Worker                             # noqa: E402
@@ -44,12 +45,14 @@ from tiles.api import TilesSession                           # noqa: E402
 def run(host: str, port: int, config_dir: Path = CONFIG_DIR) -> None:
     worker = Worker(Motion(MaxArm(config_dir=None), config_dir))
     feed = Feed(config_dir)
-    server = Server(WEB, home="desk", pages=["camera", "tests", "tiles"])
+    server = Server(WEB, home="desk", pages=["camera", "tests", "tiles", "chat"])
     arm_api.register(server, worker)
     DeskSession(worker, config_dir).register(server)
     CameraSession(worker, feed, config_dir).register(server)
     TestsSession(worker, feed, config_dir).register(server)
-    TilesSession(worker, feed, config_dir).register(server)
+    tiles = TilesSession(worker, feed, config_dir)
+    tiles.register(server)
+    ChatSession(tiles).register(server)
     worker.start()
     feed.start()
     print(f"calibration: http://localhost:{port}/  -- Ctrl-C to stop", flush=True)

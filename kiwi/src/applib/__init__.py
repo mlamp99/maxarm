@@ -21,4 +21,5 @@ of, and what they share. Nothing here knows of either app's pages, nor of the cl
 | `telemetry` | what the device tells the cloud, kept until it is sent                               |
 | `iotc`      | /IOTCONNECT: telemetry out, commands in, the stream's channel                        |
 | `webrtc`    | KVS WebRTC: the stream to every viewer                                               |
+| `agent`     | the language model on the Ara240 and its tools: the app's `agent`, the Chat page     |
 """

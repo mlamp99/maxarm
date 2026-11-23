@@ -4,10 +4,12 @@ Specs: [`work/PILOT-falcon.md`](../../../work/PILOT-falcon.md), the desk page;
 [`work/PILOT-gecko.md`](../../../work/PILOT-gecko.md), the camera and Fine Tune pages;
 [`work/PILOT-hyena.md`](../../../work/PILOT-hyena.md), the Tiles page;
 [`work/PILOT-impala.md`](../../../work/PILOT-impala.md), the tweaks to all of them since;
-[`work/PILOT-jackal.md`](../../../work/PILOT-jackal.md), what it shares with the /IOTCONNECT app.
+[`work/PILOT-jackal.md`](../../../work/PILOT-jackal.md), what it shares with the /IOTCONNECT app;
+[`work/PILOT-kiwi.md`](../../../work/PILOT-kiwi.md), the Chat page.
 One web app with a page per calibration: the desk first, then the camera; then Fine Tune, which tries the camera's
 calibration and refines it; then Tiles, which finds the 25 mm letter tiles, reads their letters, says which the
-arm can pick up, and sets a word of them down.
+arm can pick up, and sets a word of them down; then Chat, where the language model on the board's Ara240 finds a
+word of the tiles for the arm to set down.
 
 ```
 ../.venv/bin/python src/calibration/calibration.py                  # then open http://localhost:8080
@@ -389,6 +391,51 @@ one whose letter needs the least turning goes; an N, an S or an O is turned to w
 The library's `carry()` picks the tile up and sets it down, and knowing both ends, shares out a turn the cup cannot
 make from centre.
 
+## The Chat page
+
+`chat/`. A request to the language model on the board's Ara240 -- Qwen2.5-7B-Instruct behind NXP's connector,
+`connector/` (the pilot's README, "The Ara240") -- which finds a word of the tiles and has the arm set it down: what
+the /IOTCONNECT app's `agent` command does, by the same code (`applib/agent/`). The tiles are the Tiles page's: the
+same LOCATE TILES and PLACE, with its tile offset and reader. Like it, the page is there once `config/camera.json`
+is. Without the connector the page says why the model is not there; everything else runs as before.
+
+Left the desk: the live view with the tiles drawn over it, the letters on the tiles ready to pick up, as tiles, and
+the word being set down, each tile filled once the arm has set it down. Right the conversation.
+
+1. **Wait for the model.** Its pill, in the conversation's heading, says where it is: not installed, not running,
+   waiting for the Ara240, loading -- how long so far, of about 6 minutes -- or ready. Until it is ready, the box
+   waits.
+2. **Ask**, in the box or by a suggestion under the conversation:
+   - **go** (run, start, ...): the longest word the model finds of the tiles, set down;
+   - **a 7-letter word**: one of exactly that many letters, the number read from the request;
+   - **a clue** -- a farm animal, something you sit on: a word that matches it;
+   - **elaborate** (explain): the last word explained, nothing moved;
+   - **look at the tiles again, then ...**: LOCATE TILES first;
+   - **a word, but don't place it**: the word, nothing moved.
+3. **Watch it work.** Each tool call shows as it happens: the model's guesses, checked against the tiles -- green
+   those that fit, with their letter count, the one set down filled; struck through those whose letters are not
+   there; wavy those the model, asked of each alone, says are not words. Then its answer, with what it took:
+   seconds, model calls, tokens read and written. The word is set down while the model explains it; when the arm is
+   done, the conversation says so.
+
+One request at a time: another meanwhile is refused, and so is one before the model is ready. **STOP** cuts the
+model short; RESET stops the arm. The model is told what happened before in one line -- the last word and what
+became of it -- never the conversation itself: **NEW VISITOR** starts both again, and so do ten minutes of quiet.
+
+| control      | does                                                                               |
+| ------------ | ---------------------------------------------------------------------------------- |
+| ASK, Enter   | the request to the model                                                           |
+| a suggestion | that request                                                                       |
+| STOP         | the model's answer cut short                                                       |
+| NEW VISITOR  | the conversation, and what the model is told of it, started again                  |
+| LOCATE TILES | as on the Tiles page                                                               |
+
+**How a word is found** (`applib/agent/`). The model guesses six words at once (`find_word`); code checks each
+against the tiles' letters, each tile once, and against where it would go (PLACE's plan); then the model is asked
+of each that fits, alone, whether it is a word (`judge.py`): it is a poor maker of words from letters and a better
+judge of one. Of those that pass, the longest -- of the length asked for, if one is -- and not set down before this
+visit, is set down. A tool call the model writes out as text is made all the same (`repair.py`).
+
 From the pilot's root:
 
 | directory              | holds                                                                                   |
@@ -396,14 +443,16 @@ From the pilot's root:
 | `src/calibration/`     | the app (`calibration.py`) and each page's requests: `common/` the web server, the     |
 |                        | arm's one thread (`worker.py`) and its controls (`arm_api.py`); `desk/` the plane and  |
 |                        | its files; `camera/` CALIBRATE, the check image (`check.py`), the                       |
-|                        | refinement (`refine.py`); `tests/` Fine Tune; `tiles/` the Tiles page                   |
+|                        | refinement (`refine.py`); `tests/` Fine Tune; `tiles/` the Tiles page; `chat/` the      |
+|                        | Chat page                                                                               |
 | `web/`                 | the pages: `common/` the look, the view from above with the height beside it (`grid.js`,|
 |                        | `view.css`, `height.js`), desk space to the picture and back (`shares.js`), the marks  |
 |                        | drawn over it (`marks.js`), a layer drawn in Python laid over it (`layer.js`), the      |
 |                        | picture full size (`fullview.js`); `desk/`, `camera/` (its GUIDE, `guide.md`),          |
-|                        | `tests/`, `tiles/`, each page's `index.html`, script, styles and grid                   |
+|                        | `tests/`, `tiles/`, `chat/`, each page's `index.html`, script, styles and grid          |
 | `src/applib/`          | what the /IOTCONNECT app shares with the pages: the camera (`camera/`: which camera,    |
 |                        | the live view, the fit and its files, the cubes, the red cube), the arm's moves         |
 |                        | (`motion.py`), the tiles' flow (`tilework.py`), the red cube's (`redcube.py`), what is  |
 |                        | drawn over the picture (`overlay/`), the settings (`settings.py`); and the tiles found, |
-|                        | read, placed and a word of them planned (`tiles/`, `letters/`, `areas.py`, `word.py`)   |
+|                        | read, placed and a word of them planned (`tiles/`, `letters/`, `areas.py`, `word.py`);  |
+|                        | the language model and its tools (`agent/`)                                             |

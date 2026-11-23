@@ -47,6 +47,24 @@
             "unit": "",
             "attributeColor": "",
             "aggregateTypes": []
+        },
+        {
+            "name": "answer",
+            "displayName": "",
+            "type": "STRING",
+            "description": "The language model's answer to the agent command, or what became of the word it set down; sent once each",
+            "unit": "",
+            "attributeColor": "",
+            "aggregateTypes": []
+        },
+        {
+            "name": "agent_status",
+            "displayName": "",
+            "type": "STRING",
+            "description": "Where the language model on the Ara240 is: off, not installed, stopped, waiting, loading, ready or failed",
+            "unit": "",
+            "attributeColor": "",
+            "aggregateTypes": []
         }
     ],
     "commands": [
@@ -75,6 +93,13 @@
             "name": "reader-location",
             "command": "reader-location",
             "requiredParam": false,
+            "requiredAck": true,
+            "isOTACommand": false
+        },
+        {
+            "name": "agent",
+            "command": "agent",
+            "requiredParam": true,
             "requiredAck": true,
             "isOTACommand": false
         }

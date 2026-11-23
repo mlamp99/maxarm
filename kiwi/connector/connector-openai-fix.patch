@@ -46,7 +46,19 @@
  class Usage(BaseModel):
 --- a/Llm.py
 +++ b/Llm.py
-@@ -323,9 +323,17 @@
+@@ -144,6 +144,11 @@
+         if "top_p" in llm_params.model_fields_set:
+             ara_generation_config.top_p = llm_params.top_p
+ 
++        # The repetition penalty of the config and of a request, passed on to the Ara240, which
++        # takes it (dv_model_set_llm_cfg_params): left out, it is 1.0, none, whatever is asked.
++        if "repeat_penalty" in llm_params.model_fields_set:
++            ara_generation_config.repetition_penalty = llm_params.repeat_penalty
++
+         return ara_generation_config
+ 
+     def _create_tool_logits_processor(self, tools_schema: Optional[str] = None):
+@@ -325,9 +330,17 @@
  
          num_output_tokens = int(self.model._generated_tokens_count)
  
@@ -65,7 +77,7 @@
              created=int(time.time()),
              model=self.name,
              usage=Usage(
-@@ -354,12 +362,16 @@
+@@ -356,12 +369,16 @@
                  delta = ChunkDelta(content=current_response)
              else:
                  try:
@@ -84,7 +96,7 @@
                      )
                      delta = ChunkDelta(tool_calls=[tool_call])
                  except:
-@@ -371,7 +383,10 @@
+@@ -373,7 +390,10 @@
                  object="chat.completion.chunk",
                  created=time.time(),
                  model=self.name,
@@ -96,7 +108,7 @@
              )
              return serialize_chunk(response_chunk)
  
-@@ -493,7 +508,7 @@
+@@ -495,7 +515,7 @@
              object="chat.completion.chunk",
              created=time.time(),
              model=self.name,

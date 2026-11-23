@@ -8,14 +8,15 @@
 # skipping". That much is property-alarm's patch (work/refs/iotc-eiq-imx95-property-alarm), models.py and Llm.py.
 # HfLlm.py is ours: the model's prompt shows an earlier call's arguments quoted and escaped, the model writes its next
 # call the same way, and the connector cannot read it back -- a second call with arguments, after a first with
-# arguments, comes back as text.
+# arguments, comes back as text. So is Llm.py's repetition penalty: the config's and a request's repeat_penalty passed
+# on to the Ara240, which takes it, where 2.2 reads it and drops it.
 set -e
 cd "$(dirname "$(readlink -f "$0")")"
 
 PACKAGE=$(echo venv/lib/python3.*/site-packages/eiq_aaf_connector)
 [ -d "$PACKAGE" ] || { echo "The connector is not installed here: connector/install.sh first."; exit 1; }
 
-if grep -q "_for_template" "$PACKAGE/llm_engines/HfLlm.py"; then
+if grep -q "repetition_penalty = llm_params.repeat_penalty" "$PACKAGE/llm_engines/Llm.py"; then
   echo "Already patched: $PACKAGE"
   exit 0
 fi

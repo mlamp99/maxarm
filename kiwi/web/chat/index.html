@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chat · MaxArm</title>
+  <link rel="stylesheet" href="/common/page.css">
+  <link rel="stylesheet" href="/common/view.css">
+  <link rel="stylesheet" href="/tiles/tiles.css">
+  <link rel="stylesheet" href="chat.css">
+  <script type="module" src="chat.js"></script>
+</head>
+<body>
+<header class="top"></header>
+
+<main class="chat">
+
+  <section class="card blocked" id="blocked" hidden>
+    <svg class="blocked-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="12" width="36" height="26" rx="5"/>
+      <circle cx="24" cy="25" r="7.5"/><path d="M17 12l3-5h8l3 5"/><path d="M8 42 40 8"/></svg>
+    <h2>The camera is not calibrated yet</h2>
+    <p id="blocked-why"></p>
+    <a class="btn primary" href="/camera/">Go to the camera page</a>
+  </section>
+
+  <section class="card desk">
+    <div class="card-head">
+      <h2>The desk</h2>
+      <span class="hint" id="feed-device"></span>
+      <div class="tools">
+        <button class="btn primary" id="locate"
+          title="Park the arm, take the snapshot at full size, find the tiles in it and read their letters"
+          >◎ LOCATE TILES</button>
+      </div>
+    </div>
+    <div class="feed-box" id="feed-box">
+      <img id="feed" alt="">
+      <img id="scene" class="layer" alt="">
+      <span class="feed-badge" id="feed-badge"></span>
+      <span class="feed-note" id="feed-note"></span>
+    </div>
+    <div class="letters-row">
+      <span class="row-label">tiles to use</span>
+      <div class="tiles-strip" id="on-offer"></div>
+    </div>
+    <div class="letters-row" id="word-row" hidden>
+      <span class="row-label" id="word-label">setting down</span>
+      <div class="tiles-strip word" id="word-tiles"></div>
+      <span class="hint" id="word-note"></span>
+    </div>
+    <p class="hint desk-note" id="desk-note"></p>
+  </section>
+
+  <section class="card talk">
+    <div class="card-head">
+      <h2>Chat</h2>
+      <div class="tools">
+        <span class="pill" id="model"><span class="dot"></span><span></span></span>
+        <button class="btn small" id="forget" title="A new visitor: the conversation, and what the model is told of
+          it, start again">NEW VISITOR</button>
+      </div>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="suggestions" id="suggestions"></div>
+    <form class="ask-row" id="ask-form">
+      <input id="text" type="text" autocomplete="off" maxlength="300" placeholder="go, a 7-letter word, an animal…"
+        title="What to ask the model; Enter asks it">
+      <button class="btn primary" id="ask" type="submit" title="Ask the language model on the Ara240">ASK</button>
+      <button class="btn stop" id="stop" type="button" hidden
+        title="Cut the model's answer short; RESET stops the arm">■ STOP</button>
+    </form>
+    <p class="hint talk-note" id="talk-note"></p>
+  </section>
+
+</main>
+<div id="toasts"></div>
+</body>
+</html>

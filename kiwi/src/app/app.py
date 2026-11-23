@@ -18,10 +18,11 @@ so the handlers below, read top to bottom, are the whole behaviour of the app:
 - `reader-location [back|front|left|right]`: where the person reading the word
   stands, kept in `config/appcfg.json`; without one, where they stand now.
 - `agent SENTENCE`: the sentence to the language model on the Ara240
-  (`agent.py`), whose tools are these handlers -- `detect`, `place` -- and two
-  that move nothing: the letters as last seen, and whether a word can be set
-  down from them. Held outside the lock, as its tools come back in through
-  `on_command()`; the model takes one sentence at a time.
+  (`applib/agent`), whose tools are these handlers -- `detect`, and `place`,
+  which it starts on a thread of its own and does not wait for -- and the
+  letters as last seen (`agent_desk()`). Held outside the lock, as its tools
+  come back in through `on_command()`; the model takes one sentence at a time,
+  and refuses another meanwhile. Its answer goes to the dashboard as `answer`.
 
 The arm is connected on a thread of its own (`keep_arm_connected()`): at the
 start, and again RECONNECT_S after it fails or is lost, so the app runs on
@@ -42,6 +43,7 @@ from typing import TYPE_CHECKING, Optional, Union
 from maxarm import MoveResult, TransportError
 
 from applib import commands
+from applib.agent.desk import Desk, word_check
 from applib.camera.fit import CameraFit
 from applib.camera.store import CameraFile
 from applib.commands import Command, CommandError
@@ -53,8 +55,8 @@ from applib.telemetry import TelemetryState
 from applib.tilework import TileWork
 from applib.word import WordRefused
 
-if TYPE_CHECKING:                       # for the type only: agent.py needs strands-agents, which may not be there
-    from app.agent import AgentService
+if TYPE_CHECKING:                       # for the type only: the agent needs strands-agents, which may not be there
+    from applib.agent import AgentService
 
 READER_WORDS = {"back": "behind the arm", "front": "in front of the arm", "left": "at the arm's left",
                 "right": "at the arm's right"}
@@ -132,22 +134,12 @@ class TilesApp:
         """The language model, once built: its tools are this app's handlers, so it is built after the app."""
         self.agent = agent
 
-    def describe_letters(self) -> str:
-        """The letters as last seen, for the language model: what a word can take, what is set down already."""
-        seen = self.work.letters_seen()
-        if seen is None:
-            return "No tiles found yet: detect them first."
-        return (f"The tiles as found at {seen['taken']}. Ready to pick up: {seen['on_offer'] or 'none'}. Already in "
-                f"the dropoff area, left to right: {seen['dropoff'] or 'none'}. Not usable: "
-                f"{seen['unusable'] or 'none'} ('?' not read, '-' blank).")
-
-    def check_word(self, text: str) -> str:
-        """Whether `text` can be set down from the tiles as last found, and if not, why; planned, nothing moved."""
-        try:
-            self.work.plan(text, self.settings.get("tile_offset_mm"), self.settings.get("reader"))
-        except (Refused, WordRefused) as reason:
-            return _sentence(f"{text.strip().upper()} cannot be set down: {reason}")
-        return f"{text.strip().upper()} can be set down from the tiles ready to pick up."
+    def agent_desk(self) -> Desk:
+        """What the language model's tools do with the tiles: this app's own commands, under its lock."""
+        def run(verb: str, argument: str = "") -> str:
+            return self.on_command(Command(verb, argument, f"agent: {verb} {argument}".strip()))
+        return Desk(seen=self.work.letters_seen, detect=lambda: run(commands.DETECT),
+                    check=word_check(self.work, self.settings), place=lambda word: run(commands.PLACE, word))
 
     def wait_idle(self, timeout_s: float) -> bool:
         """Until no command moves the arm, at most `timeout_s`; whether none does."""
@@ -211,8 +203,10 @@ class TilesApp:
             raise CommandError("The language model is off: strands-agents is not installed (src/requirements.txt).")
         sentence = command.argument.strip()
         if not sentence:
-            raise CommandError("Ask what? Like: agent which words can the tiles make?")
-        return self.agent.ask(sentence)
+            raise CommandError("Ask what? Like: agent a 7-letter word.")
+        answer = self.agent.ask(sentence, source="app")
+        self.telemetry.set_once(answer=answer)
+        return answer
 
     # --- inside -----------------------------------------------------------------------------------------------
 

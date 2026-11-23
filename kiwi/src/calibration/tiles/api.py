@@ -105,10 +105,15 @@ class TilesSession:
             self.settings.set(tile_offset_mm=number(body, "offset"))
         except ValueError as reason:
             raise BadRequest(str(reason)) from None
+        return self.place_word(str(body.get("letters", "")))
+
+    def place_word(self, letters: str) -> dict:
+        """The tiles that spell `letters` carried to the dropoff arc, gripped and turned as the settings say: PLACE's,
+        and the Chat page's."""
         offset, reader = self.settings.get("tile_offset_mm"), self.settings.get("reader")
         try:
             fit = self._usable()
-            steps, stamp = self.work.plan(str(body.get("letters", "")), offset, reader)
+            steps, stamp = self.work.plan(letters, offset, reader)
         except (Refused, word.WordRefused) as reason:
             return {"status": "refused", "detail": str(reason)}
         spelled = "".join(step.letter for step in steps)
