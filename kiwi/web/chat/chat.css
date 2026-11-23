@@ -33,7 +33,11 @@ main.chat.is-blocked .desk, main.chat.is-blocked .talk { display: none; }
   box-shadow: 0 2px 0 #2f8f48, 0 0 12px var(--green-glow); }
 .tile.failed { border-color: var(--red); color: var(--red); }
 @keyframes lift { to { transform: translateY(-4px); box-shadow: 0 8px 14px rgba(0, 0, 0, 0.45); } }
-.word-tiles { display: inline-flex; gap: 2px; vertical-align: -5px; margin: 0 2px; }
+/* A word drawn as tiles, copied as the word: the tiles cannot be selected, the word's own text, unseen, can. */
+.word-tiles { display: inline-flex; gap: 2px; vertical-align: -5px; margin: 0 2px; position: relative; }
+.word-tiles .tile { user-select: none; }
+.word-tiles .as-text { position: absolute; inset: 0; overflow: hidden; color: transparent; font-size: 1px;
+  white-space: nowrap; }
 
 .letters-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
 .letters-row[hidden] { display: none; }
@@ -62,7 +66,7 @@ main.chat.is-blocked .desk, main.chat.is-blocked .talk { display: none; }
 .bubble.thinking .dots span:nth-child(3) { animation-delay: 0.4s; }
 @keyframes blink { 50% { opacity: 0.2; } }
 
-/* A tool call: what the model asked for, and what came back. */
+/* A tool call: what the model asked for, and what came back: the words weighed, as chips. */
 .step { align-self: flex-start; max-width: 94%; display: grid; grid-template-columns: 22px 1fr; gap: 2px 6px;
   padding: 6px 10px; border-left: 2px solid var(--line-strong); color: var(--muted); font-size: 12.5px; }
 .step .icon { color: var(--green-bright); font-size: 14px; line-height: 1.3; }
@@ -75,10 +79,17 @@ main.chat.is-blocked .desk, main.chat.is-blocked .talk { display: none; }
   text-decoration: line-through; }
 .guess.fit { color: var(--green-bright); border-color: rgba(65, 195, 99, 0.5); background: var(--green-wash);
   text-decoration: none; }
-.guess.blocked { color: var(--yellow); border-color: rgba(230, 184, 74, 0.45); text-decoration: none; }
-.guess.made-up { color: #b48ead; border-color: rgba(180, 142, 173, 0.45); text-decoration: line-through wavy; }
 .guess.chosen { color: #06210f; background: var(--green); border-color: var(--green); }
-.guess small { font-weight: 500; opacity: 0.8; }
+.guess small { font-weight: 500; opacity: 0.8; user-select: none; }
+.step .lead { color: var(--faint); }
+
+/* Under an answer: what went to and from the model, as plain text to copy. */
+.trace-toggle { align-self: flex-start; margin: -4px 0 0 4px; padding: 0; font: 11px var(--sans); color: var(--faint);
+  background: none; border: none; cursor: pointer; }
+.trace-toggle:hover { color: var(--green-bright); }
+.trace { align-self: stretch; margin: 0; padding: 8px 10px; max-height: 320px; overflow: auto; white-space: pre-wrap;
+  overflow-wrap: anywhere; font: 11.5px/1.45 var(--mono); color: var(--muted); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; }
 
 /* News from the app: a word set down, or not. */
 .event { align-self: center; padding: 4px 12px; border-radius: 999px; font-size: 12px; color: var(--green-bright);

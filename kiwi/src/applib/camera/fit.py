@@ -22,6 +22,9 @@ them is the arm's error there, not hidden in a bent camera.
 3. **Edges.** Each visible edge of each cube moved onto the strongest colour edge
    beside it (`edges.py`). An outline counts only where the cube's colour is on
    its inner side: a shadow's edge, or the desk's grain, has the desk on both sides.
+   The camera is fitted to the bottom and vertical edges only: the top's are found
+   inside the cube, and a top looking small puts the camera further off than it is,
+   reading the desk long (STATUS-kiwi §8). Where a cube stands, all its edges.
 4. **The arm, roughly.** The camera stays as the cubes' edges made it -- reality, the
    40 mm cubes its only length (the owner, 13 Nov: bending it onto the arm's
    readings tilted the cubes and moved the base) -- and the arm is laid on it by
@@ -459,15 +462,24 @@ def _fit_edges(frame: np.ndarray, naming: Dict[str, Blob], points: Points,
             raise CameraNotFound("the cubes' edges could not be followed in the frame: is the light even, and "
                                  "each cube clear of other things?")
 
+        fitted = [without_top(found_on) for found_on in found]
+
         def residuals(trial: np.ndarray) -> np.ndarray:
             parts = [edges.signed_distances(corners, *found_on) for corners, found_on in
-                     zip(_corners(trial, points), found)]
+                     zip(_corners(trial, points), fitted)]
             parts.append((trial[CENTRE] - centre) / (CENTRE_SPREAD * frame.shape[1]))
             return np.concatenate(parts)
 
         params, distances, _ = least_squares(residuals, params, STEPS, huber=EDGE_HUBER_PX, iterations=30)
         distances = distances[:-2]
     return params, distances, found
+
+
+def without_top(found_on: tuple) -> tuple:
+    """The edges found on a cube but those of its top face (corners 4 to 7, `cube_corners()`)."""
+    starts, ends, targets = found_on
+    keep = (starts < 4) | (ends < 4)
+    return starts[keep], ends[keep], targets[keep]
 
 
 def _edges_seen(params: np.ndarray, points: Points) -> List[List[Edge]]:

@@ -104,7 +104,7 @@ button tells the same story as this section, for whoever is at the arm; the firs
    view, at the camera's full size, are averaged -- under 2 s -- and the camera is fitted to the cubes in them,
    about 2 s more, to the cubes' readings by the formula alone, so no earlier correction gets in. The arm's base is
    found in the frame by its nuts, and the arm laid on the camera: its axis where the nuts put it, its turn from the
-   cubes' bearings (`camera/anchor.py`) -- the frame SAVE keeps. `config/camera.json` is written, with the frame
+   cubes' bearings (`camera/anchor.py`). `config/camera.json` is written, with the frame
    beside it as `config/camera-frame.png`, and `config/arm-true.json`, the arm's correction the three cubes make,
    which the library converts with at once. A cube whose reach is more than 5 mm off what the other two say does
    not fit: CALIBRATE names it and leaves it out -- record it again and CALIBRATE. The check image shows the fit:
@@ -231,8 +231,10 @@ once FIND RED CUBE or ARM TO DESK has brought the cup down (below). Every rim is
    as on the desk page. A point whose reach is more than 5 mm off what the others say does not fit (`anchor.py`): its
    badge is red, and SAVE names it and leaves it out -- its cube moved after RECORD, or the cup was off it; forget
    it and record it again. In Z one far off says the snapshot's edges were not all the cube's. **SAVE
-   CALIBRATION**, from four points on, keeps the camera and the arm's frame on it as CALIBRATE laid them -- the
-   axis where it found the base, the turn from the cubes' bearings -- writes `arm-true.json`, the points that fit --
+   CALIBRATION**, from four points on, fits the camera again to every point's cube, on their bottom and vertical
+   edges (the tops' are found inside the cube), finds the base through it in CALIBRATE's frame and lays the arm as
+   CALIBRATE does -- the axis where the base is, the turn from all the points' bearings -- writes `arm-true.json`,
+   the points that fit --
    their pattern over the whole desk and a mesh of what it leaves at each (`maxarm/mesh.py`) -- and `camera.json` with its report, and redraws the camera page's check image with it, on the
    calibration's own frame. With no points left, it puts back the three cubes' own calibration, no correction.
    Points not saved -- changed since the last SAVE or CALIBRATE -- are not used by the arm: SAVE then stands out,
@@ -408,15 +410,17 @@ the word being set down, each tile filled once the arm has set it down. Right th
 2. **Ask**, in the box or by a suggestion under the conversation:
    - **go** (run, start, ...): the longest word the model finds of the tiles, set down;
    - **a 7-letter word**: one of exactly that many letters, the number read from the request;
-   - **a clue** -- a farm animal, something you sit on: a word that matches it;
+   - **a clue** -- a farm animal, something you sit on: a word that matches it, or none if the tiles spell none;
+   - **spell AVNET** (place, write): that word as it is, or what letters the tiles lack for it;
    - **elaborate** (explain): the last word explained, nothing moved;
    - **look at the tiles again, then ...**: LOCATE TILES first;
    - **a word, but don't place it**: the word, nothing moved.
-3. **Watch it work.** Each tool call shows as it happens: the model's guesses, checked against the tiles -- green
-   those that fit, with their letter count, the one set down filled; struck through those whose letters are not
-   there; wavy those the model, asked of each alone, says are not words. Then its answer, with what it took:
-   seconds, model calls, tokens read and written. The word is set down while the model explains it; when the arm is
-   done, the conversation says so.
+3. **Watch it work.** Each tool call shows as it happens: the words weighed -- for a clue those nearest it in
+   meaning, else the longest the tiles spell -- with their letter count, the one chosen filled; a word of the
+   visitor's struck through when the tiles lack its letters. Then the model's answer, with what it took: seconds,
+   model calls, tokens read and written; under it, **what the model did**, everything that went to and from the
+   model for it, as text to copy. The word is set down while the model explains it; when the arm is done, the
+   conversation says so. The first request after a word is set down looks at the tiles again first.
 
 One request at a time: another meanwhile is refused, and so is one before the model is ready. **STOP** cuts the
 model short; RESET stops the arm. The model is told what happened before in one line -- the last word and what
@@ -430,11 +434,13 @@ became of it -- never the conversation itself: **NEW VISITOR** starts both again
 | NEW VISITOR  | the conversation, and what the model is told of it, started again                  |
 | LOCATE TILES | as on the Tiles page                                                               |
 
-**How a word is found** (`applib/agent/`). The model guesses six words at once (`find_word`); code checks each
-against the tiles' letters, each tile once, and against where it would go (PLACE's plan); then the model is asked
-of each that fits, alone, whether it is a word (`judge.py`): it is a poor maker of words from letters and a better
-judge of one. Of those that pass, the longest -- of the length asked for, if one is -- and not set down before this
-visit, is set down. A tool call the model writes out as text is made all the same (`repair.py`).
+**How a word is found** (`applib/agent/`). The model says what the request wants (`find_word`): the longest, a clue,
+or a word of the visitor's. Code finds the words the tiles spell, each tile once, in the word list
+(`files/words-en.tsv`, `dictionary.py`) -- the model cannot count letters -- and plans the word as PLACE would. For a
+clue the twelve nearest it in meaning, by a small embedding model on the CPU, are put to the model, which names the
+one the clue fits, or none; for a length, the everyday words of it, and it names the most vivid (`finder.py`). A word
+set down before this visit is not chosen again while another fits. A tool call the model writes out as text is made
+all the same (`repair.py`).
 
 From the pilot's root:
 

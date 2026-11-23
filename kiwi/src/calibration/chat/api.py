@@ -1,5 +1,5 @@
 """The Chat page's requests: a request put to the language model on the Ara240, which finds a word of the tiles and
-has the arm set it down; stopping it; a new visitor.
+has the arm set it down; stopping it; a new visitor; what went to and from the model for an answer.
 
 The model, its tools and the conversation are `applib/agent`, as the /IOTCONNECT app's `agent` command has them. The
 tiles are the Tiles page's -- the same detection, the same PLACE, with the tile offset and the reader chosen there
@@ -12,6 +12,7 @@ tiles are the Tiles page's -- the same detection, the same PLACE, with the tile 
 |                         |      | ready                                                                           |
 | `POST /api/chat/stop`   |      | the request being answered cut short; the arm is RESET's                         |
 | `POST /api/chat/forget` |      | a new visitor: the conversation, and what the model is told of it, start again  |
+| `POST /api/chat/trace`  | n    | what went to and from the model for answer `n`: asked for apart, not polled     |
 
 The state's `chat` is `AgentService.state()`: where the model is, the conversation, the request being answered and
 the word being set down. Without strands-agents, the model is `off`.
@@ -19,7 +20,7 @@ the word being set down. Without strands-agents, the model is `off`.
 
 from applib.agent import IS_STRANDS_AVAILABLE, AgentService, AraConnector, Desk, describe_status, word_check
 from applib.commands import CommandError
-from common.server import BadRequest, Server
+from common.server import BadRequest, Server, number
 from tiles.api import TilesSession
 
 MAX_TEXT = 300              # a request's characters at most: a sentence or two
@@ -44,6 +45,7 @@ class ChatSession:
         server.post("/api/chat/ask", self.ask)
         server.post("/api/chat/stop", self.stop)
         server.post("/api/chat/forget", self.forget)
+        server.post("/api/chat/trace", self.trace)
 
     # --- the requests -----------------------------------------------------
 
@@ -70,6 +72,12 @@ class ChatSession:
         if self.agent is not None:
             self.agent.forget()
         return {"status": "done", "detail": ""}
+
+    def trace(self, body: dict) -> dict:
+        trace = self.agent.trace(int(number(body, "n", 1))) if self.agent is not None else None
+        if trace is None:
+            return {"status": "refused", "detail": "that answer is no longer kept"}
+        return {"status": "done", "detail": "", "trace": trace}
 
     # --- what the tools do ------------------------------------------------
 

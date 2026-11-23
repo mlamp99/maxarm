@@ -15,6 +15,7 @@ but this one belongs to one rig, so none of them is in git (`../.gitignore`).
 | `camera-frame.png`          | the frame CALIBRATE took: cubes in view, arm parked     | `calibration/`, camera page |
 | `camera-check.jpg`          | the latest check image, as the camera page shows it     | `calibration/`, camera page |
 | `camera-refine-points.json` | the points which refine `camera.json`                   | `calibration/`, both pages  |
+| `debug/`                    | each point's snapshot and its cube as found, while kept | `calibration/`, Fine Tune   |
 | `camera-view.json`          | QUALITY or FPS: the camera's mode for the live view     | `calibration/`, camera page |
 | `arm-true.json`             | the arm's raw-to-true correction the points make        | `calibration/`, both pages  |
 | `appcfg.json`               | the app's settings that differ from their defaults      | the Tiles page; the app     |

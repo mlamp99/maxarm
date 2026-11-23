@@ -153,13 +153,13 @@ class TileWork:
     def letters_seen(self) -> Optional[dict]:
         """The last detection's letters by where their tiles lie, upper case, as `summary()` shows them: those a word
         can take, sorted; those in the dropoff area, left to right from behind the arm -- a word set down, likely;
-        the rest; and when. None before the first detection."""
+        the rest; and when, as a time and as the detection's stamp. None before the first detection."""
         with self.lock:
             found = self.found
         if not found:
             return None
         dropoff = [tile for tile in found["tiles"] if tile["area"] == areas.DROPOFF.name]
-        return {"taken": found["taken"], "on_offer": found["on_offer"],
+        return {"taken": found["taken"], "stamp": found["stamp"], "on_offer": found["on_offer"],
                 "dropoff": "".join(_shown(tile) for tile in dropoff),
                 "unusable": "".join(_shown(tile) for tile in found["tiles"] if tile not in dropoff
                                     and not (tile["status"] == areas.Status.READY.value and tile["is_read"]))}

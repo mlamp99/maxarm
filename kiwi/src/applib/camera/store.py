@@ -18,6 +18,7 @@ Every file is written beside and renamed into place, so a crash never leaves hal
 import dataclasses
 import json
 import re
+import shutil
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -44,6 +45,10 @@ REFINE_FILE = "camera-refine-points.json"
 REFINE_PREVIOUS_FILE = "camera-refine-points-previous.json"
 CORRECTION_FILE = converter.CORRECTION_FILE.name
 VIEW_FILE = "camera-view.json"
+# Per point recorded on Fine Tune: its snapshot, lossless, and the cube as found, drawn -- for an agent or a person to
+# review a calibration with. Only the points on file have them: a point forgotten takes its pictures along, and a new
+# calibration all of them.
+DEBUG_DIR = "debug"
 CHECK_QUALITY = 90
 
 
@@ -188,14 +193,43 @@ def save_refine_points(config_dir: Path, points: List[RefinePoint]) -> None:
         "points": [asdict(point) for point in points],
     }
     _replace(config_dir / REFINE_FILE, lambda partial: partial.write_text(_json_text(content)))
+    _keep_pictures_of(config_dir, points)
 
 
 def set_aside_refine_points(config_dir: Path) -> int:
-    """The points, moved aside for a new calibration: how many there were."""
+    """The points moved aside for a new calibration, their pictures deleted: how many there were."""
     count = len(load_refine_points(config_dir))
     if count:
         (config_dir / REFINE_FILE).replace(config_dir / REFINE_PREVIOUS_FILE)
+    shutil.rmtree(config_dir / DEBUG_DIR, ignore_errors=True)
     return count
+
+
+def save_point_pictures(config_dir: Path, point_id: int, taken: str, snapshot: Optional[np.ndarray],
+                        found: bytes) -> None:
+    """A recorded point's snapshot (None: unchanged, as after REDO) and the cube as found in it (PNG), in DEBUG_DIR,
+    named by the point and when it was taken."""
+    folder = config_dir / DEBUG_DIR
+    folder.mkdir(exist_ok=True)
+    name = _picture_name(point_id, taken)
+    if snapshot is not None:
+        _replace(folder / f"{name}.png", lambda partial: _write_image(partial, snapshot))
+    _replace(folder / f"{name}-found.png", lambda partial: partial.write_bytes(found))
+
+
+def _picture_name(point_id: int, taken: str) -> str:
+    return f"point-{point_id}-{re.sub(r'[^0-9A-Za-z]+', '', taken)}"
+
+
+def _keep_pictures_of(config_dir: Path, points: List[RefinePoint]) -> None:
+    """DEBUG_DIR's pictures of points no longer on file deleted."""
+    folder = config_dir / DEBUG_DIR
+    if not folder.exists():
+        return
+    names = {_picture_name(point.id, point.taken) for point in points}
+    for path in folder.iterdir():
+        if path.name.split(".")[0].removesuffix("-found") not in names:
+            path.unlink(missing_ok=True)
 
 
 def load_view_choice(config_dir: Path) -> str:
@@ -223,6 +257,7 @@ def set_aside_calibration(config_dir: Path) -> List[str]:
         if path.exists():
             path.replace(path.with_name(f"{path.stem}-previous{path.suffix}"))
             moved.append(name)
+    shutil.rmtree(config_dir / DEBUG_DIR, ignore_errors=True)
     _reload(config_dir / CORRECTION_FILE)
     return moved
 

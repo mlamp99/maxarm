@@ -128,8 +128,8 @@ class AraConnector:
                                       "extra_body": {"top_k": TOP_K, "repeat_penalty": REPEAT_PENALTY}})
 
     def ask_plain(self, system: str, question: str) -> str:
-        """One question with no tools, the model's answer to it: the word judge's (`judge.py`). Asked as a request's
-        tool runs, `lock` held by it; the model answers one at a time anyway."""
+        """One question with no tools, the model's answer to it: its choice among words (`finder.py`). Asked as a
+        request's tool runs, `lock` held by it; the model answers one at a time anyway."""
         return self._post([{"role": "system", "content": system}, {"role": "user", "content": question}])
 
     def failed(self, error: Exception) -> None:
@@ -258,3 +258,21 @@ def describe_status(status: dict) -> str:
         detail = f"{detail}, since {time.strftime('%H:%M:%S', time.localtime(since))}, about {LOAD_S // 60}:" \
                  f"{LOAD_S % 60:02d} in all"
     return f"{state}: {detail}" if detail else state
+
+
+def describe_unready(status: dict) -> str:
+    """Why a request cannot be put to the model now, in a sentence."""
+    state, detail = status["state"], status["detail"]
+    if state == NOT_INSTALLED:
+        return "The language model is not installed on this board: connector/install.sh, with an Ara240."
+    if state == STOPPED:
+        return "The language model is installed but not running: connector/run.sh, or connector/install-service.sh."
+    if state == WAITING:
+        return f"The language model's service is {detail}: it loads the model after that, minutes."
+    if state == LOADING:
+        left = max(0, int(status["typical_s"] - (time.time() - status["since"]))) if status["since"] else 0
+        return ("The language model is loading onto the Ara240" +
+                (f": about {left // 60 + 1} min left." if left else ", nearly done."))
+    if state == FAILED:
+        return f"The language model is not answering: {detail}."
+    return "The language model is being looked for: ask again in a moment."
