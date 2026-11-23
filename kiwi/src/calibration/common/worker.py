@@ -57,6 +57,8 @@ class Worker:
         self.count = 0
         self.connection = {"status": "connecting", "detail": ""}
         self._failed_at = 0.0                       # time.monotonic() when the arm last failed to connect, or was lost
+        # The retry waits on this, not on `condition`: a command's notify() wakes one waiter, and must wake the arm's.
+        self._stopped = threading.Event()
         self.is_running = True
         self.thread = threading.Thread(target=self._run, name="arm", daemon=True)
 
@@ -107,6 +109,7 @@ class Worker:
         """Hold the arm where it is, finish, and close the port."""
         with self.condition:
             self.is_running = False
+            self._stopped.set()
             for waiting in self.queue:
                 waiting.finish("superseded", "shutting down")
             self.queue.clear()
@@ -180,9 +183,8 @@ class Worker:
         while True:
             is_failed = self.connection["status"] == "failed"
             wait = RECONNECT_S - (time.monotonic() - self._failed_at) if is_failed else RECONNECT_S
-            with self.condition:
-                if self.condition.wait_for(lambda: not self.is_running, timeout=max(wait, 0.0)):
-                    return
+            if self._stopped.wait(max(wait, 0.0)):
+                return
             if self.connection["status"] == "failed" and time.monotonic() - self._failed_at >= RECONNECT_S:
                 self.connect()
 
